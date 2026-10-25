@@ -1,0 +1,84 @@
+
+Questo file definisce la struttura ad albero delle cartelle, le logiche applicate, le dipendenze attive e la roadmap di sviluppo.
+
+🗺️ Specifica Tecnica & Stato del Progetto: DevSkillMap
+
+L'applicazione è configurata come una Skill Map interattiva e dinamica basata su un tema Dark Sci-Fi / Cyberpunk, sviluppata interamente tramite classi native di Tailwind CSS per eliminare fogli di stile esterni ridondanti.
+
+🛠️ Dipendenze Utilizzate (pnpm)
+
+Il progetto si basa esclusivamente su pacchetti moderni e performanti:
+• vite e @tailwindcss/vite – Ambiente di build ultrarapido con compilatore nativo.
+• react & react-dom – Libreria core dell'interfaccia.
+• @xyflow/react – Versione ufficiale aggiornata di React Flow per la gestione e il rendering dei grafi.
+• react-router-dom – Cabina di regia per la navigazione e il routing delle pagine dedicate.
+• @supabase/supabase-js – Client ufficiale per l'integrazione con il backend e l'autenticazione.
+• lucide-react – Set di icone vettoriali per la pulsantiera dei nodi e della Navbar.
+• @radix-ui/react-dialog & @radix-ui/react-tooltip – Componenti primitivi, accessibili e non stilizzati per la creazione di modali e tooltip.
+
+📂 Albero delle Cartelle e Responsabilità dei File
+
+text
+src/
+├── assets/                 # Asset statici globali
+│   └── index.css           # Punto d'ingresso CSS contenente solo @import "tailwindcss"
+├── components/             # Componenti dell'interfaccia utente (UI) generici e riutilizzabili
+│   ├── GlossaryText.jsx    # [DA IMPLEMENTARE] Analizzatore Regex di testi per iniettare i Tooltip
+│   ├── Modal.jsx           # [DA IMPLEMENTARE] Modale Radix UI scura per i dettagli delle tecnologie
+│   └── Navbar.jsx          # Header fluttuante stile "Cyber Glass" con NavLink di navigazione
+├── context/                # Stato globale condiviso dell'applicazione
+│   ├── AuthContext.jsx     # [DA IMPLEMENTARE] Cabina di regia per sessioni utenti Supabase Auth
+│   └── GlossaryContext.jsx # [DA IMPLEMENTARE] Store per memorizzare e distribuire i termini del glossario
+├── flow/                   # Compartimento esclusivo per la logica di React Flow (@xyflow/react)
+│   ├── nodes/              # Definizione visiva dei singoli nodi del grafo
+│   │   ├── MacroGroupNode.jsx # Gestore dei 3 grandi cerchi di sfondo (Venn Diagram)
+│   │   ├── TechNode.jsx    # Il componente del nodo tecnologico (titolo, accenti neon, pulsanti interni)
+│   │   └── index.jsx       # Registro centralizzato (nodeTypes) privo di logiche per il Fast Refresh
+│   └── utils/              # Funzioni di supporto geometrico e matematico
+│       └── geometry.js     # Algoritmo trigonometrico puro (Seno/Coseno) per il raggio dei nodi figli
+├── hooks/                  # Custom hooks per isolare le chiamate dati dai componenti grafici
+│   └── useFetchMap.js      # [DA IMPLEMENTARE] Gestore delle chiamate asincrone verso Supabase
+├── pages/                  # Viste principali agganciate al Router
+│   ├── Guidelines.jsx      # Pagina informativa sulle linee guida della piattaforma
+│   ├── GuidedPath.jsx      # Pagina dedicata al percorso di studi strutturato predefinito
+│   ├── Login.jsx           # Pagina di autenticazione utente
+│   ├── Security.jsx        # Pagina tematica su Ethical Hacking e OWASP top 10
+│   └── SkillMap.jsx        # Schermata principale: canvas infinito di React Flow con logica di espansione raggio
+├── services/               # Inizializzazione dei servizi esterni
+│   └── supabase.js         # Singleton del client Supabase alimentato da variabili d'ambiente (.env)
+├── App.jsx                 # Configurazione delle rotte e punto di montaggio dei Context Providers
+└── main.jsx                # Entry point globale dell'applicazione React
+Usa il codice con cautela.
+
+🧠 Logica e Architettura Applicata
+
+
+1. Disposizione Circolare dei Nodi Figli
+
+La logica risiede in geometry.js. Quando l'utente preme il pulsante + in un TechNode, la funzione toggleChildren in SkillMap.jsx intercetta le coordinate (x, y) del nodo genitore e suddivide un cerchio perfetto di \(360^{\circ }\) (\(2\pi\) radianti) per il numero dei figli presenti nel database mockup:
+\(\Delta \theta =\frac{2\pi }{N}\)
+Ogni sotto-nodo viene generato e posizionato a una distanza fissa (raggio di 150px) sommando lo spostamento vettoriale al punto di origine del padre.
+
+2. Gestione dello Stato e Sicurezza delle Chiavi
+
+I collegamenti (edges) vengono generati unendo gli ID con la struttura edge-${parentId}-${child.id}. Per impedire l'errore di duplicazione chiavi causato dal StrictMode di React, lo stato esegue un filtraggio protettivo preventivo (cleanEdges) prima di iniettare i nuovi collegamenti nel grafo.
+
+3. Ereditarietà Cromatica dei Nodi (Neon Accent)
+
+Il file TechNode.jsx legge la proprietà category trasmessa da SkillMap.jsx. In base al valore (frontend, backend, database), assegna una stringa esadecimale (#7ab8ff, #64d9bd, #c49aff) e la applica in tempo reale ai bordi del nodo e ai punti di ancoraggio (Handles) di React Flow, ricreando l'effetto bagliore cyberpunk desiderato.
+
+📈 Tabella di Marcia (Cosa abbiamo fatto vs Cosa manca)
+
+
+Funzionalità / File	Stato Attuale	Logica Applicata / Mancante
+Ambiente e Struttura	✅ Completata	Configurato pnpm, Vite, Tailwind CSS nativo senza stili inline.
+Navbar & App Router	✅ Completata	Navigazione scura stile "Cyber Glass" funzionante su tutte le pagine.
+Macro Gruppi (Venn)	✅ Completata	Sfondi cerchiati bloccati in posizione per Frontend, Backend e Database.
+TechNode Interattivo	✅ Completata	Ereditarietà colori neon, toggle icone (+ / -) e gestione dei sotto-nodi.
+Espansione a Cerchio	✅ Completata	Calcolo trigonometrico isolato in geometry.js con protezione anti-duplicati.
+Modale Info (Modal.jsx)	⏳ Da fare	Integrazione con @radix-ui/react-dialog per sostituire l'attuale alert.
+Glossario (GlossaryText)	⏳ Da fare	Creazione del Context e del parser Regex per i tooltip ad attivazione hover.
+Schema DB (Supabase SQL)	⏳ Da fare	Definizione delle tabelle relazionali e inserimento delle funzioni di fetch.
+Pagine Contenuto	⏳ Da fare	Sostituzione dei testi mockup nelle pagine Linee Guida, Sicurezza e Percorso.
+
+Ho salvato l'intera mappa concettuale in questo schema.
