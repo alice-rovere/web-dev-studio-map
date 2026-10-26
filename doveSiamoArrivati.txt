@@ -21,7 +21,6 @@ Il progetto si basa esclusivamente su pacchetti moderni e performanti:
 text
 src/
 ├── assets/                 # Asset statici globali
-│   └── index.css           # Punto d'ingresso CSS contenente solo @import "tailwindcss"
 ├── components/             # Componenti dell'interfaccia utente (UI) generici e riutilizzabili
 │   ├── GlossaryText.jsx    # [DA IMPLEMENTARE] Analizzatore Regex di testi per iniettare i Tooltip
 │   ├── NodeDetailsModal.jsx# Modale Radix UI scura per i dettagli delle tecnologie
@@ -48,8 +47,7 @@ src/
 │   └── supabase.js         # Singleton del client Supabase alimentato da variabili d'ambiente (.env)
 ├── App.jsx                 # Configurazione delle rotte e punto di montaggio dei Context Providers
 └── main.jsx                # Entry point globale dell'applicazione React
-Usa il codice con cautela.
-
+└── index.css               # Punto d'ingresso CSS contenente solo @import "tailwindcss"
 🧠 Logica e Architettura Applicata
 
 
@@ -79,4 +77,4 @@ Espansione a Cerchio	✅ Completata	Calcolo trigonometrico isolato in geometry.j
 Modale Info (Modal.jsx)	✅ Completata	Integrazione con @radix-ui/react-dialog per sostituire l'attuale alert.
 Glossario (GlossaryText)	⏳ Da fare	Creazione del Context e del parser Regex per i tooltip ad attivazione hover.
 Schema DB (Supabase SQL)	⏳ Da fare	Definizione delle tabelle relazionali e inserimento delle funzioni di fetch.
-Pagine Contenuto	⏳ Da fare	Sostituzione dei testi mockup nelle pagine Linee Guida, Sicurezza e Percorso.
+Pagine Contenuto	✅ Completata	Sostituzione dei testi mockup nelle pagine Linee Guida, Sicurezza e Percorso.

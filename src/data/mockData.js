@@ -112,8 +112,8 @@ export const initialNodes = [
       bgColor: "bg-blue-50/30",
       textColor: "text-blue-500",
     },
-    position: { x: 100, y: 100 },
-    style: { width: 500, height: 500 },
+    position: { x: 50, y: 50 }, // Spostato a sinistra e in alto per fare spazio
+    style: { width: 700, height: 700 }, // Ingrandito da 500 a 700
     focusable: false,
     draggable: false,
   },
@@ -126,8 +126,8 @@ export const initialNodes = [
       bgColor: "bg-emerald-50/30",
       textColor: "text-emerald-500",
     },
-    position: { x: 450, y: 100 },
-    style: { width: 500, height: 500 },
+    position: { x: 540, y: 50 }, // Bilanciato per mantenere la stessa percentuale di intersezione orizzontale
+    style: { width: 700, height: 700 }, // Ingrandito da 500 a 700
     focusable: false,
     draggable: false,
   },
@@ -140,8 +140,8 @@ export const initialNodes = [
       bgColor: "bg-purple-50/30",
       textColor: "text-purple-500",
     },
-    position: { x: 275, y: 400 },
-    style: { width: 500, height: 500 },
+    position: { x: 295, y: 470 }, // Ricalcolato sull'asse Y per centrarlo geometricamente sotto i primi due
+    style: { width: 700, height: 700 }, // Ingrandito da 500 a 700
     focusable: false,
     draggable: false,
   },
@@ -150,18 +150,19 @@ export const initialNodes = [
     type: "tech",
     data: { label: "HTML", hasChildren: true, isOpen: false },
     position: { x: 220, y: 200 },
+    
   },
   {
     id: "css",
     type: "tech",
     data: { label: "CSS", hasChildren: true, isOpen: false },
-    position: { x: 220, y: 300 },
+    position: { x: 180, y: 300 },
   },
   {
     id: "javascript",
     type: "tech",
     data: { label: "JavaScript", hasChildren: true, isOpen: false },
-    position: { x: 500, y: 250 },
+    position: { x: 550, y: 250 },
   },
 ];
 
