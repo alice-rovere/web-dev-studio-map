@@ -6,7 +6,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim();
 const looksLikePlaceholder = (value) =>
   !value || value.includes("la_tua") || value.includes("your-");
 
-export const isSupabaseConfigured =
+const isSupabaseConfigured =
   !looksLikePlaceholder(supabaseUrl) && !looksLikePlaceholder(supabaseAnonKey);
 
 export const supabaseConfigError = isSupabaseConfigured

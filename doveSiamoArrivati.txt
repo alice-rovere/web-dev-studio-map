@@ -1,125 +1,215 @@
+DEVSKILLMAP - SPECIFICA TECNICA E STATO DEL PROGETTO
+Ultimo aggiornamento: 26 ottobre 2026
 
-Questo file definisce la struttura ad albero delle cartelle, le logiche applicate, le dipendenze attive e la roadmap di sviluppo.
+-------------------------------------------------------------------------------
+1. PANORAMICA
+-------------------------------------------------------------------------------
 
-🗺️ Specifica Tecnica & Stato del Progetto: DevSkillMap
+DevSkillMap è una Skill Map interattiva per lo sviluppo web full-stack. L'app
+mostra un grafo di tecnologie espandibili, organizza i nodi nelle categorie
+frontend, backend e database e permette a utenti autenticati con ruolo editor o
+admin di gestire nodi, relazioni, contenuti e glossario.
 
-L'applicazione è configurata come una Skill Map interattiva e dinamica basata su un tema Dark Sci-Fi / Cyberpunk, sviluppata interamente tramite classi native di Tailwind CSS per eliminare fogli di stile esterni ridondanti.
+Il progetto è una SPA React con tema Dark Sci-Fi / Cyberpunk, stile gestito
+tramite Tailwind CSS nativo e persistenza dati su Supabase.
 
-🛠️ Dipendenze Utilizzate (pnpm)
+Stato sintetico: applicazione funzionante end-to-end. Restano da fare test
+automatici, pipeline CI/CD e alcune funzionalità di supporto (gestione utenti da
+UI, ricerca e filtri).
 
-Il progetto si basa esclusivamente su pacchetti moderni e performanti:
-• vite e @tailwindcss/vite – Ambiente di build ultrarapido con compilatore nativo.
-• react & react-dom – Libreria core dell'interfaccia.
-• @xyflow/react – Versione ufficiale aggiornata di React Flow per la gestione e il rendering dei grafi.
-• react-router-dom – Cabina di regia per la navigazione e il routing delle pagine dedicate.
-• @supabase/supabase-js – Client ufficiale per l'integrazione con il backend e l'autenticazione.
-• lucide-react – Set di icone vettoriali per la pulsantiera dei nodi e della Navbar.
-• @radix-ui/react-dialog & @radix-ui/react-tooltip – Componenti primitivi, accessibili e non stilizzati per la creazione di modali e tooltip.
+-------------------------------------------------------------------------------
+2. STACK TECNOLOGICO
+-------------------------------------------------------------------------------
 
-📂 Albero delle Cartelle e Responsabilità dei File
+- vite e @tailwindcss/vite: build e HMR.
+- react e react-dom: interfaccia utente.
+- @xyflow/react: rendering e interazione con i grafi.
+- react-router-dom: routing delle pagine.
+- @supabase/supabase-js: autenticazione, database e RLS.
+- lucide-react: icone.
+- @radix-ui/react-dialog e @radix-ui/react-tooltip: modali e tooltip accessibili.
+- eslint e plugin React: qualità del codice.
 
-text
+Requisiti runtime: Node.js ^20.19.0 oppure >=22.12.0; gestione pacchetti con pnpm.
+
+-------------------------------------------------------------------------------
+3. STRUTTURA DELLE CARTELLE
+-------------------------------------------------------------------------------
+
 src/
-├── assets/                 # Asset statici globali
-├── components/             # Componenti dell'interfaccia utente (UI) generici e riutilizzabili
-│   ├── GlossaryText.jsx    # [DA IMPLEMENTARE] Analizzatore Regex di testi per iniettare i Tooltip
-│   ├── NodeDetailsModal.jsx# Modale Radix UI scura per i dettagli delle tecnologie
-│   └── Navbar.jsx          # Header fluttuante stile "Cyber Glass" con NavLink di navigazione
-├── context/                # Stato globale condiviso dell'applicazione
-│   ├── AuthContext.jsx     # [DA IMPLEMENTARE] Cabina di regia per sessioni utenti Supabase Auth
-│   └── GlossaryContext.jsx # [DA IMPLEMENTARE] Store per memorizzare e distribuire i termini del glossario
-├── flow/                   # Compartimento esclusivo per la logica di React Flow (@xyflow/react)
-│   ├── nodes/              # Definizione visiva dei singoli nodi del grafo
-│   │   ├── MacroGroupNode.jsx # Gestore dei 3 grandi cerchi di sfondo (Venn Diagram)
-│   │   ├── TechNode.jsx    # Il componente del nodo tecnologico (titolo, accenti neon, pulsanti interni)
-│   │   └── index.jsx       # Registro centralizzato (nodeTypes) privo di logiche per il Fast Refresh
-│   └── utils/              # Funzioni di supporto geometrico e matematico
-│       └── geometry.js     # Algoritmo trigonometrico puro (Seno/Coseno) per il raggio dei nodi figli
-├── hooks/                  # Custom hooks per isolare le chiamate dati dai componenti grafici
-│   └── useFetchMap.js      # [DA IMPLEMENTARE] Gestore delle chiamate asincrone verso Supabase
-├── pages/                  # Viste principali agganciate al Router
-│   ├── Guidelines.jsx      # Pagina informativa sulle linee guida della piattaforma
-│   ├── GuidedPath.jsx      # Pagina dedicata al percorso di studi strutturato predefinito
-│   ├── Login.jsx           # Pagina di autenticazione utente
-│   ├── Security.jsx        # Pagina tematica su Ethical Hacking e OWASP top 10
-│   └── SkillMap.jsx        # Schermata principale: canvas infinito di React Flow con logica di espansione raggio
-├── services/               # Inizializzazione dei servizi esterni
-│   └── supabase.js         # Singleton del client Supabase alimentato da variabili d'ambiente (.env)
-├── App.jsx                 # Configurazione delle rotte e punto di montaggio dei Context Providers
-└── main.jsx                # Entry point globale dell'applicazione React
-└── index.css               # Punto d'ingresso CSS contenente solo @import "tailwindcss"
-🧠 Logica e Architettura Applicata
+├── components/
+│   ├── admin/
+│   │   ├── GlossaryManager.jsx   # CRUD glossario dal pannello admin
+│   │   ├── NodeForm.jsx          # Creazione/modifica nodi, categorie e padri
+│   │   └── NodeTree.jsx          # Albero gerarchico dei nodi
+│   ├── ContentSectionEditor.jsx  # Editor delle sezioni strutturate
+│   ├── ContentSectionView.jsx    # Rendering di testo, liste, tabelle, timeline e codice
+│   ├── GlossaryForm.jsx          # Form rapido per aggiungere un termine
+│   ├── GlossaryText.jsx          # Parser Regex e tooltip Radix sui termini
+│   ├── Navbar.jsx                # Header, navigazione e stato autenticazione
+│   ├── NodeDetailsModal.jsx      # Modale dettagli del nodo
+│   └── RequireEditor.jsx         # Guardia di rotta per editor/admin
+├── context/
+│   ├── AuthContext.jsx           # Provider sessione e profilo Supabase
+│   ├── authContextStore.js       # Store del context Auth
+│   ├── GlossaryContext.jsx       # Store del context Glossario
+│   └── GlossaryProvider.jsx      # Caricamento e mutazioni del glossario
+├── data/
+│   ├── baseNodes.js              # Macro gruppi, ancore, colori ed etichette categoria
+│   └── fullStackData.js          # Nodi, archi e lezioni del percorso guidato
+├── flow/
+│   ├── nodes/
+│   │   ├── index.jsx             # Registro nodeTypes
+│   │   ├── MacroGroupNode.jsx    # Sfondo dei macro gruppi Frontend/Backend/Database
+│   │   └── TechNode.jsx          # Nodo tecnologico con accenti neon e toggle figli
+│   └── utils/
+│       ├── geometry.js           # Calcolo delle posizioni circolari dei figli
+│       └── nodeGraph.js          # Normalizzazione dati, alberi, visibilità e layout
+├── hooks/
+│   ├── useAuth.js                # Accesso al context Auth
+│   ├── useGlossary.js            # Accesso al context Glossario
+│   └── useMapGraph.js            # Caricamento mappa, espansione nodi e layout
+├── pages/
+│   ├── Admin.jsx                 # Pannello editor (nodi, contenuti, glossario)
+│   ├── Guidelines.jsx            # Linee guida
+│   ├── GuidedPath.jsx            # Percorso guidato sulla richiesta web
+│   ├── Login.jsx                 # Accesso con Supabase Auth
+│   ├── NodeKnowledge.jsx         # Approfondimento di un nodo
+│   ├── Security.jsx              # Sicurezza ed ethical hacking
+│   └── SkillMap.jsx              # Canvas principale React Flow
+├── services/
+│   ├── glossaryService.js        # CRUD glossario
+│   ├── mapService.js             # Fetch e CRUD di nodi, relazioni e sezioni
+│   └── supabase.js               # Singleton client Supabase da variabili ambiente
+├── App.jsx                       # Router e provider globali
+├── index.css                     # Tailwind e override per i controlli React Flow
+└── main.jsx                      # Entry point React
 
+supabase/
+├── migrations/
+│   ├── 0001_init.sql             # Tabelle, trigger, funzioni e profili
+│   └── 0002_rls.sql              # Grant e policy Row Level Security
+└── seed.sql                      # Dati iniziali di nodi, relazioni, contenuti e glossario
 
-1. Disposizione Circolare dei Nodi Figli
+File di progetto:
+- index.html: titolo e lingua italiana della SPA.
+- README.md: istruzioni di installazione, configurazione Supabase, script e deploy.
+- .env.example: modello delle variabili VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.
 
-La logica risiede in geometry.js. Quando l'utente preme il pulsante + in un TechNode, la funzione toggleChildren in SkillMap.jsx intercetta le coordinate (x, y) del nodo genitore e suddivide un cerchio perfetto di \(360^{\circ }\) (\(2\pi\) radianti) per il numero dei figli presenti nel database mockup:
-\(\Delta \theta =\frac{2\pi }{N}\)
-Ogni sotto-nodo viene generato e posizionato a una distanza fissa (raggio di 150px) sommando lo spostamento vettoriale al punto di origine del padre.
+-------------------------------------------------------------------------------
+4. ARCHITETTURA E LOGICHE APPLICATE
+-------------------------------------------------------------------------------
 
-2. Gestione dello Stato e Sicurezza delle Chiavi
+4.1 Caricamento della mappa
+useMapGraph richiama fetchMapGraph, che legge in parallelo nodes, node_parents e
+node_categories da Supabase. buildNodeGraph normalizza i dati in mappe indicizzate
+per id, calcola la categoria primaria e costruisce le relazioni padre-figlio. I
+nodi senza padre sono le radici mostrate inizialmente.
 
-I collegamenti (edges) vengono generati unendo gli ID con la struttura edge-${parentId}-${child.id}. Per impedire l'errore di duplicazione chiavi causato dal StrictMode di React, lo stato esegue un filtraggio protettivo preventivo (cleanEdges) prima di iniettare i nuovi collegamenti nel grafo.
+4.2 Espansione e layout
+Ogni TechNode espone il toggle dei figli. useMapGraph mantiene un Set di nodi
+espansi e getVisibleGraph attraversa l'albero per determinare nodi e archi
+visibili. Le posizioni vengono calcolate ricorsivamente:
+- i nodi radice usano position_x/position_y del database, altrimenti un'ancora
+  per categoria;
+- i figli sono distribuiti su un cerchio tramite calculateCircularPositions;
+- il raggio cresce con la profondità: 150px + 40px per ogni livello oltre il primo.
 
-3. Ereditarietà Cromatica dei Nodi (Neon Accent)
+4.3 Sicurezza dei dati e ruoli
+Supabase Auth gestisce la sessione. AuthProvider carica il profilo dalla tabella
+profiles e espone role, isEditor e isAdmin. RequireEditor protegge /admin:
+- senza sessione reindirizza a /login;
+- con sessione ma senza ruolo editor/admin mostra accesso negato.
 
-Il file TechNode.jsx legge la proprietà category trasmessa da SkillMap.jsx. In base al valore (frontend, backend, database), assegna una stringa esadecimale (#7ab8ff, #64d9bd, #c49aff) e la applica in tempo reale ai bordi del nodo e ai punti di ancoraggio (Handles) di React Flow, ricreando l'effetto bagliore cyberpunk desiderato.
+Il database applica le stesse regole con RLS: lettura pubblica su nodi, relazioni,
+categorie, sezioni e glossario; scrittura consentita solo a editor/admin attraverso
+le funzioni is_editor() e is_admin().
 
-📈 Tabella di Marcia (Cosa abbiamo fatto vs Cosa manca)
+4.4 Gestione dei nodi
+Il pannello Admin permette di creare nodi radice e figli, modificare descrizione,
+best practice, naming conventions e link di studio, assegnare categorie e padri.
+Le operazioni sono separate tra updateNode, setNodeCategories e setNodeParents.
+Il database impedisce cicli padre-figlio con un trigger ricorsivo e impone un solo
+padre primario e una sola categoria primaria per nodo tramite indici univoci parziali.
 
+4.5 Sezioni di contenuto
+node_content_sections memorizza approfondimenti con type text, list, table,
+timeline o code e payload JSON. ContentSectionEditor gestisce creazione, modifica,
+eliminazione e riordino; ContentSectionView renderizza i diversi formati. La stessa
+vista è usata in NodeKnowledge con permessi di modifica solo per editor/admin.
 
-Funzionalità / File	Stato Attuale	Logica Applicata / Mancante
-Ambiente e Struttura	✅ Completata	Configurato pnpm, Vite, Tailwind CSS nativo senza stili inline.
-Navbar & App Router	✅ Completata	Navigazione scura stile "Cyber Glass" funzionante su tutte le pagine.
-Macro Gruppi (Venn)	✅ Completata	Sfondi cerchiati bloccati in posizione per Frontend, Backend e Database.
-TechNode Interattivo	✅ Completata	Ereditarietà colori neon, toggle icone (+ / -) e gestione dei sotto-nodi.
-Espansione a Cerchio	✅ Completata	Calcolo trigonometrico isolato in geometry.js con protezione anti-duplicati.
-Modale Info (Modal.jsx)	✅ Completata	Integrazione con @radix-ui/react-dialog per sostituire l'attuale alert.
-Glossario (GlossaryText)	✅ Completata	Creazione del Context e del parser Regex per i tooltip ad attivazione hover.
-Schema DB (Supabase SQL)	⏳ Da fare	Definizione delle tabelle relazionali e inserimento delle funzioni di fetch.
-Pagine Contenuto	✅ Completata	Sostituzione dei testi mockup nelle pagine Linee Guida, Sicurezza e Percorso.
+4.6 Glossario e tooltip
+GlossaryProvider carica i termini e li distribuisce tramite context. GlossaryText
+costruisce un'unica Regex con i termini ordinati per lunghezza decrescente, applica
+l'escape dei caratteri speciali e usa confini Unicode per evitare match dentro altre
+parole. Il testo viene scomposto in nodi React e i termini trovati diventano trigger
+Radix Tooltip con la definizione recuperata dal glossario.
 
+4.7 Percorso guidato
+fullStackData definisce 11 lezioni e un grafo statico del ciclo di vita di una
+richiesta web. GuidedPath usa React Flow con nodi dedicati e un edge personalizzato
+per le curve di ritorno, evidenziando nodo e arco correnti a ogni passo.
 
+4.8 Schema Supabase
+Tabelle principali:
+- profiles: utente, email e ruolo viewer/editor/admin.
+- nodes: contenuto del nodo e posizione opzionale.
+- node_parents: relazioni DAG con ordinamento e flag primary.
+- node_categories: categorie multiple con una sola primary.
+- node_content_sections: sezioni ordinate con payload JSON.
+- glossary_terms: termini univoci case-insensitive e definizioni.
 
+Trigger e funzioni:
+- handle_new_user crea automaticamente il profilo alla registrazione Auth.
+- set_updated_at aggiorna updated_at su nodes, sezioni e glossario.
+- prevent_node_parent_cycle impedisce relazioni cicliche.
+- is_editor e is_admin centralizzano i controlli di ruolo per le policy RLS.
 
-La logica che permette la visualizzazione automatica dei termini e dei relativi tooltip si basa su un flusso in tre fasi: Centralizzazione, Scansione Regex (Parser) e Sostituzione Dinamica con Radix UI.
-Ecco come funziona nel dettaglio, passo dopo passo:
+Il file seed.sql inserisce un albero iniziale su HTML, CSS e JavaScript, relative
+categorie, relazioni, sezioni di esempio e tre termini di glossario.
 
-1. La Base Dati Centralizzata
+-------------------------------------------------------------------------------
+5. STATO DELLE FUNZIONALITÀ
+-------------------------------------------------------------------------------
 
-Tutto parte dallo stato globale contenuto in GlossaryProvider. Questo store mette a disposizione un array di oggetti (la lista dei termini) a tutta l'applicazione:
-javascript
-// La sorgente della verità
-[
-  { term: "Deployment", definition: "Rilascio e attivazione dell'applicazione..." },
-  { term: "Frontend", definition: "La parte di un'applicazione visibile..." }
-]
-Usa il codice con cautela.
-Quando usi il componente <GlossaryText>, quest'ultimo intercetta la lista aggiornata tramite l'hook useGlossary().
+Area                          | Stato       | Note
+------------------------------|-------------|-----------------------------------
+Ambiente e struttura          | Completato  | pnpm, Vite, Tailwind nativo.
+Router e Navbar               | Completato  | Rotte pubbliche, login e area admin.
+Mappa React Flow              | Completato  | Nodi espandibili, archi e macro gruppi.
+Layout circolare              | Completato  | Geometria isolata e layout ricorsivo.
+Dettaglio nodo                | Completato  | Modale con relazioni e risorse.
+Pannello Admin                | Completato  | CRUD nodi, categorie e relazioni.
+Sezioni di contenuto          | Completato  | Editor, rendering e riordino.
+Glossario                     | Completato  | CRUD e tooltip automatici.
+Autenticazione e ruoli        | Completato  | Supabase Auth, profili e RLS.
+Percorso guidato              | Completato  | 11 lezioni con focus su nodo e arco.
+Schema database e seed        | Completato  | Migrazioni, trigger, policy e dati iniziali.
+Pulizia export                | Completato  | Rimossi export non usati fuori dai moduli.
+Documentazione README         | Completato  | Setup, Supabase, script, rotte e deploy.
+Metadati index.html           | Completato  | Lingua italiana e titolo DevSkillMap.
+Test automatici               | Da fare     | Nessuna suite configurata.
+CI/CD e deploy                | Da fare     | Build pronta, pipeline non configurata.
+Gestione utenti da UI         | Da fare     | Ruoli assegnati tramite database.
+Ricerca e filtri nodi         | Da fare     | Miglioramento UX opzionale.
 
-2. La Creazione Dinamica della Regex (L'analizzatore)
+-------------------------------------------------------------------------------
+6. ULTIME MODIFICHE
+-------------------------------------------------------------------------------
 
-Per evitare di cercare i termini uno a uno (operazione lenta che rallenterebbe la pagina), il componente GlossaryText compila tutti i termini del glossario in un'unica grande espressione regolare (Regex).
-1. Previene i bug dei caratteri speciali: Prende i termini e applica un escape (es. se un termine contenesse un punto o un più, inserisce il backslash \\).
-2. Ordina per lunghezza decrescente: Ordina i termini dal più lungo al più corto (tramite .sort((a, b) => b.length - a.length)). Questo serve a evitare che se hai nel glossario sia "Web" che "Web Developer", la macchina si fermi a "Web" spezzando la parola più lunga.
-3. Crea l'unione (|): Unisce i termini con il simbolo della "O" logica (|). Il pattern finale risulterà simile a questo: (Deployment|Web Developer|Frontend).
+- Rimossi gli export superflui, mantenendo interni i simboli usati solo nel modulo:
+  isSupabaseConfigured, getPrimaryCategory, FLOW_NODES, FLOW_EDGES, ContentBlock
+  e CustomRouteEdge.
+- Sostituito il README generico di Vite con la documentazione reale del progetto.
+- Aggiornato index.html con lang="it" e titolo descrittivo dell'applicazione.
+- Allineato questo documento allo stato effettivo di codice e database.
 
-3. La Scansione del Testo (Confini delle Parole)
+-------------------------------------------------------------------------------
+7. PROSSIMI PASSI
+-------------------------------------------------------------------------------
 
-Il testo inserito dentro <GlossaryText>testo</GlossaryText> viene analizzato usando la Regex creata, con un'accortezza fondamentale per l'italiano e la grammatica: i Confini di Parola Universitari (\p{L}).
-La Regex usa dei controlli chiamati Lookbehind e Lookahead negativi:
-javascript
-`(?<![\\p{L}\\p{N}_])(${glossaryPattern})(?![\\p{L}\\p{N}_])`
-Usa il codice con cautela.
-• Cosa fa? Dice alla macchina: "Trova il termine solo se NON è preceduto o seguito da altre lettere o numeri".
-• Perché è fondamentale? Se nel glossario hai la parola "API", la Regex la troverà nella frase "Le nostre API funzionano", ma la ignorerà intelligentemente dentro la parola "Capire" o "Tapiro", evitando di rompere parole comuni.
-
-4. La Sostituzione Atomica nel DOM
-
-Il componente non usa dangerouslySetInnerHTML (che sarebbe rischioso per la sicurezza), ma esegue una scomposizione del testo puro in un array di elementi React:
-1. Un cursore (cursor) tiene traccia di dove siamo arrivati a leggere.
-2. Quando viene trovato un match, il testo precedente al match viene salvato come testo normale.
-3. Il termine esatto trovato viene rimosso dal flusso del testo semplice e viene trasformato in un componente interattivo (<Tooltip.Root>).
-4. Al termine trovato viene agganciata la sua definizione recuperata istantaneamente dalla Mappa.
-5. Il cursore si sposta in avanti e il ciclo ricomincia fino alla fine del testo.
-Alla fine di questo processo, la stringa di testo originale si è trasformata in una collezione mista di nodi di testo e nodi interattivi pronti per mostrare il badge neon colorato al passaggio del mouse.
+1. Aggiungere test automatici per i servizi, useMapGraph e i componenti critici.
+2. Configurare una pipeline CI con lint, test e build.
+3. Documentare e automatizzare il deploy SPA con fallback su index.html.
+4. Valutare una UI admin per la gestione dei profili e dei ruoli.
+5. Valutare ricerca, filtri e legenda per migliorare la navigazione della mappa.

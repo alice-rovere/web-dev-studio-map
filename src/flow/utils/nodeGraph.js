@@ -7,7 +7,7 @@ const asNumber = (value) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
-export function getPrimaryCategory(categories = []) {
+function getPrimaryCategory(categories = []) {
   if (!categories.length) return "frontend";
   const primary = categories.find((entry) => entry.is_primary);
   return primary?.category ?? categories[0].category;

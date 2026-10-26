@@ -1,7 +1,7 @@
 import { MarkerType } from "@xyflow/react";
 
 // Solo i nodi sequenziali del flusso di chiamata
-export const FLOW_NODES = [
+const FLOW_NODES = [
   {
     id: "demo-client",
     label: "User / Client",
@@ -67,7 +67,7 @@ export const FLOW_NODES = [
   },
 ];
 
-export const FLOW_EDGES = [
+const FLOW_EDGES = [
   { id: "flow-client-frontend", source: "demo-client", target: "demo-frontend", label: "usa" },
   { id: "flow-frontend-request", source: "demo-frontend", target: "demo-http-request", label: "invia" },
   { id: "flow-request-backend", source: "demo-http-request", target: "demo-api-server", label: "HTTP" },

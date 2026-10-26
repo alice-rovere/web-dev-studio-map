@@ -1,4 +1,4 @@
-export function ContentBlock({ section }) {
+function ContentBlock({ section }) {
   const payload = section?.payload ?? {};
 
   if (section?.type === "text" && typeof payload.text === "string") {

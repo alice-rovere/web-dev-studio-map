@@ -92,7 +92,7 @@ function FlowPathNode({ data }) {
 }
 
 // Edge personalizzato per le curve di ritorno complesse senza sovrapposizioni
-export function CustomRouteEdge({
+function CustomRouteEdge({
   id,
   label,
   sourceX,
