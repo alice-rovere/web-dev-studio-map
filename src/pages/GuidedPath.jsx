@@ -130,7 +130,7 @@ function PathCanvas({ graph }) {
 
   useEffect(() => {
     // Inquadra automaticamente i nodi attivi al cambio dello step
-    fitView({ padding: 0.4, duration: 400 });
+    fitView({ duration: 400 });
   }, [graph, fitView]);
 
   return (

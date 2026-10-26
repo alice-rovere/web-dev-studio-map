@@ -7,7 +7,7 @@ export const FLOW_NODES = [
     label: "User / Client",
     category: "Client",
     description: "Il browser usato dalla persona.",
-    position: { x: 0, y: 250 },
+    position: { x: 0, y: 150 },
   },
   {
     id: "demo-frontend",
@@ -21,7 +21,7 @@ export const FLOW_NODES = [
     label: "HTTP Request",
     category: "Richiesta",
     description: "Trasporta la richiesta dal client al backend.",
-    position: { x: 500, y: 250 },
+    position: { x: 500, y: 150 },
   },
   {
     id: "demo-api-server",
@@ -35,7 +35,7 @@ export const FLOW_NODES = [
     label: "Backend",
     category: "Applicazione",
     description: "Elabora la richiesta e coordina l'accesso ai dati.",
-    position: { x: 1000, y: 250 },
+    position: { x: 1000, y: 150 },
   },
   {
     id: "demo-database-query",
@@ -49,14 +49,14 @@ export const FLOW_NODES = [
     label: "Database",
     category: "Persistenza",
     description: "Conserva i dati dell'applicazione.",
-    position: { x: 1500, y: 250 },
+    position: { x: 1500, y: 150 },
   },
   {
     id: "demo-query-result",
     label: "Query Result",
     category: "Risultato",
     description: "I dati recuperati tornano al backend.",
-    position: { x: 1250, y: 450 },
+    position: { x: 1500, y: 450 },
   },
   {
     id: "demo-json-response",
@@ -72,48 +72,50 @@ export const FLOW_EDGES = [
   { id: "flow-frontend-request", source: "demo-frontend", target: "demo-http-request", label: "invia" },
   { id: "flow-request-backend", source: "demo-http-request", target: "demo-api-server", label: "HTTP" },
   { id: "flow-server-backend", source: "demo-api-server", target: "demo-backend", label: "inoltra" },
-{ id: "flow-backend-query", source: "demo-backend", target: "demo-database-query", label: "interroga" },
+  { id: "flow-backend-query", source: "demo-backend", target: "demo-database-query", label: "interroga" },
   { id: "flow-query-database", source: "demo-database-query", target: "demo-database", label: "query" },
   
-    {
+   // 1. Dal Database scende verso il Query Result
+  {
     id: "flow-database-result",
     source: "demo-database",
     target: "demo-query-result",
     label: "restituisce",
-    sourceHandle: "source-bottom", // Corretto
-    targetHandle: "target-top",    // Corretto
+    sourceHandle: "source-bottom",
+    targetHandle: "target-top",
     data: { direction: "response" }
   },
   
-  // CORREZIONE 2: Dal query-result (source-left) torna al backend (target-bottom)
+  // 2. Dal Query Result il dato torna indietro ed entra nel Backend
   {
     id: "flow-result-backend",
     source: "demo-query-result",
     target: "demo-backend",
-    label: "risultato",
-    sourceHandle: "source-left",   // Corretto
-    targetHandle: "target-bottom", // Corretto
+    label: "elabora",
+    sourceHandle: "source-left",       // Esce da sinistra del blocco Query Result (x: 1500)
+    targetHandle: "target-bottom",     // Entra dal basso nel Backend (x: 1000, y: 150)
     data: { direction: "response", customRoute: true }
   },
   
-  // CORREZIONE 3: Dal backend (source-bottom) va alla json-response (target-right)
+  // 3. Ora che il Backend ha il dato, lo trasforma e lo invia alla JSON Response
   {
     id: "flow-backend-json",
     source: "demo-backend",
     target: "demo-json-response",
     label: "serializza",
-    sourceHandle: "source-bottom", // Corretto
-    targetHandle: "target-left",   // Corretto (cambiato in left per fluidità verso sinistra)
+    sourceHandle: "source-left",       // Esce da sinistra del Backend
+    targetHandle: "target-top",        // Entra dall'alto della JSON Response (x: 625, y: 450)
     data: { direction: "response", customRoute: true }
   },
   
+  // 4. Dalla JSON Response torna infine al Client per aggiornare l'interfaccia
   {
     id: "flow-json-client",
     source: "demo-json-response",
     target: "demo-client",
     label: "JSON",
     sourceHandle: "source-left",
-    targetHandle: "target-bottom",
+    targetHandle: "target-bottom",     // Chiude il ciclo sotto al browser dell'utente
     data: { direction: "response" }
   },
 ];
@@ -162,17 +164,30 @@ export const GUIDED_LESSONS = [
   },
   {
     title: "8. Ritorno dei Dati Grezzi",
-    description: "Il Database produce un Query Result che viene riaffidato all'applicazione di Backend.",
+    description: "Il Database produce un Query Result con i record estratti.",
     focusedNodeId: "demo-query-result",
     focusedEdgeId: "flow-database-result",
   },
   {
-    title: "9. Impacchettamento JSON",
-    description: "Il backend trasforma i dati in una stringa JSON standardizzata pronta per viaggiare in rete e la invia al client.",
+    title: "9. Elaborazione nel Backend",
+    description: "I dati grezzi tornano al Backend, che si occupa di validarli e modellarli.",
+    focusedNodeId: "demo-backend", // Il focus torna qui!
+    focusedEdgeId: "flow-result-backend",
+  },
+  {
+    title: "10. Impacchettamento JSON",
+    description: "Il backend trasforma i dati in formato JSON standard pronto per essere inviato.",
     focusedNodeId: "demo-json-response",
     focusedEdgeId: "flow-backend-json",
   },
+  {
+    title: "11. Risposta al Client",
+    description: "La JSON Response torna infine al browser per aggiornare dinamicamente l'interfaccia dell'utente.",
+    focusedNodeId: "demo-client",
+    focusedEdgeId: "flow-json-client",
+  },
 ];
+
 
 export function getFlowGraph(activeLessonIndex) {
   const lesson = GUIDED_LESSONS[activeLessonIndex] || GUIDED_LESSONS[0];
