@@ -1,4 +1,5 @@
 import { ArrowLeft } from "lucide-react";
+import { StickyNotesCanvas } from "../components/StickyNotesCanvas";
 
 const namingConventions = [
   {
@@ -74,10 +75,13 @@ function GuidelineList({ items }) {
 
 export default function Guidelines({ onClose }) {
   return (
+    // AGGIUNTO: "relative" permette ai post-it di fluttuare su TUTTA la pagina
     <section
       aria-labelledby="guidelines-page-title"
-      className="h-full w-full bg-slate-950 text-slate-100 p-6 md:p-12 font-sans overflow-y-auto"
+      className="relative h-full w-full bg-slate-950 text-slate-100 p-6 md:p-12 font-sans overflow-y-auto"
     >
+      <StickyNotesCanvas boardId="page-linee-guida" />
+
       <header className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-800 pb-6 mb-8 gap-4">
         <button
           className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-md px-2 py-1 -ml-2"

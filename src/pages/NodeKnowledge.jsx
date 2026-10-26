@@ -1,9 +1,7 @@
 import { ArrowLeft, Lock, X } from "lucide-react";
 import ContentSectionEditor from "../components/ContentSectionEditor";
-import {
-  CATEGORY_COLORS,
-  CATEGORY_LABELS,
-} from "../data/baseNodes";
+import { CATEGORY_COLORS, CATEGORY_LABELS } from "../data/baseNodes";
+import { StickyNotesCanvas } from "../components/StickyNotesCanvas";
 
 export default function NodeKnowledgePage({
   node,
@@ -18,6 +16,7 @@ export default function NodeKnowledgePage({
 
   return (
     <section className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-10 font-sans border border-zinc-900 rounded-xl relative shadow-2xl overflow-hidden before:absolute before:top-0 before:left-0 before:w-full before:h-px before:bg-linear-to-r before:from-transparent before:via-zinc-700 before:to-transparent">
+      <StickyNotesCanvas boardId="page-node-knowledge" />
       <header className="flex justify-between items-center border-b border-zinc-900 pb-4 mb-6">
         <button
           className="flex items-center gap-2 text-xs font-mono tracking-widest text-zinc-400 hover:text-white transition-colors uppercase border border-zinc-800 bg-zinc-900/40 px-3 py-1.5 rounded-md backdrop-blur-sm"
@@ -85,7 +84,10 @@ export default function NodeKnowledgePage({
           </p>
         )}
 
-        <div style={{ borderTopColor: `${accent}22` }} className="border-t pt-6">
+        <div
+          style={{ borderTopColor: `${accent}22` }}
+          className="border-t pt-6"
+        >
           <ContentSectionEditor canEdit={canEdit} nodeId={node?.id} />
         </div>
       </div>

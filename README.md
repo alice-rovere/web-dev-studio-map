@@ -88,23 +88,23 @@ Mappa interattiva delle competenze per lo sviluppo web full-stack. I nodi tecnol
 
 ## Script
 
-| Comando | Descrizione |
-| --- | --- |
-| `pnpm dev` | Avvia Vite in modalità sviluppo con HMR. |
-| `pnpm build` | Genera la build di produzione in `dist/`. |
+| Comando        | Descrizione                                 |
+| -------------- | ------------------------------------------- |
+| `pnpm dev`     | Avvia Vite in modalità sviluppo con HMR.    |
+| `pnpm build`   | Genera la build di produzione in `dist/`.   |
 | `pnpm preview` | Anteprima locale della build di produzione. |
-| `pnpm lint` | Esegue ESLint su tutto il progetto. |
+| `pnpm lint`    | Esegue ESLint su tutto il progetto.         |
 
 ## Rotte
 
-| Percorso | Pagina | Accesso |
-| --- | --- | --- |
-| `/` | Mappa delle competenze | Pubblico |
-| `/linee-guida` | Linee guida | Pubblico |
-| `/sicurezza` | Sicurezza | Pubblico |
-| `/percorso-guidato` | Percorso guidato | Pubblico |
-| `/login` | Accesso | Pubblico |
-| `/admin` | Pannello editor | Editor/admin autenticati |
+| Percorso            | Pagina                 | Accesso                  |
+| ------------------- | ---------------------- | ------------------------ |
+| `/`                 | Mappa delle competenze | Pubblico                 |
+| `/linee-guida`      | Linee guida            | Pubblico                 |
+| `/sicurezza`        | Sicurezza              | Pubblico                 |
+| `/percorso-guidato` | Percorso guidato       | Pubblico                 |
+| `/login`            | Accesso                | Pubblico                 |
+| `/admin`            | Pannello editor        | Editor/admin autenticati |
 
 ## Struttura del progetto
 
@@ -140,3 +140,53 @@ La build statica viene generata in `dist/`. Per un deploy SPA configura il fallb
 
 - Il file `.env` è escluso dal repository: non committare chiavi o segreti.
 - Attualmente non è presente una suite di test automatici.
+
+## Sistema Sticky Notes (Memo Fluttuanti)
+
+Il progetto include un sistema centralizzato di post-it fluttuanti, trascinabili e ridimensionabili in puro JavaScript/JSX, integrato nativamente con il tema scuro del progetto e persistito su Supabase.
+
+### Architettura e Componenti
+
+- **`src/hooks/useStickyNotes.js`**: Gestisce lo stato ottimistico locale e sincronizza le operazioni CRUD su Supabase (`select`, `insert`, `update`, `delete`).
+- **`src/components/StickyNotesCanvas.jsx`**: Canvas invisibile che intercetta i movimenti del mouse, gestisce il riposizionamento in primo piano al click (`z-index`) e renderizza il pulsante fluttuante unificato in basso a destra.
+
+### Sicurezza (Row Level Security)
+
+La tabella `public.sticky_notes` è protetta da politiche RLS su Supabase. Ogni utente autenticato può interagire ed editare **esclusivamente i propri post-it**, garantendo la totale privacy degli appunti di studio.
+
+### Come utilizzarlo in una nuova pagina
+
+Per abilitare i post-it fluttuanti in una rotta o in un componente, segui questi due passaggi:
+
+1. Assicurati che il contenitore principale della pagina abbia la classe Tailwind `relative` (necessaria per calcolare correttamente le coordinate assolute dei post-it).
+2. Importa `StickyNotesCanvas` e istanzialo passandogli un `boardId` testuale **univoco** a tua scelta.
+
+#### Esempio pratico:
+
+```jsx
+import React from "react";
+import { StickyNotesCanvas } from "../components/StickyNotesCanvas";
+
+export default function NuovaPaginaStudio() {
+  return (
+    // 1. Il tag radice DEVE essere "relative"
+    <section className="relative h-full w-full bg-slate-950 text-slate-100 p-6 overflow-y-auto">
+      {/* 2. Inietta il canvas inventando un boardId univoco per questa vista */}
+      <StickyNotesCanvas boardId="page-nuovo-argomento" />
+
+      {/* Contenuto standard della pagina */}
+      <div className="max-w-4xl mx-auto">
+        <h2 className="text-2xl font-bold">Nuovo Argomento di Studio</h2>
+        <p className="text-slate-400">Contenuto didattico...</p>
+      </div>
+    </section>
+  );
+}
+```
+
+### Convenzioni Naming per `boardId`
+
+| Ambito di Utilizzo              | Formato Consigliato   | Esempio                                  |
+| ------------------------------- | --------------------- | ---------------------------------------- |
+| Pagine statiche / Rotte globali | `page-<nome-pagina>`  | `"page-sicurezza"`, `"page-linee-guida"` |
+| Schede di dettaglio nodi mappa  | `node-<id-nodo-flow>` | `"node-react-19"`, `"node-supabase-db"`  |
