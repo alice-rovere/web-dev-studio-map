@@ -24,7 +24,7 @@ src/
 │   └── index.css           # Punto d'ingresso CSS contenente solo @import "tailwindcss"
 ├── components/             # Componenti dell'interfaccia utente (UI) generici e riutilizzabili
 │   ├── GlossaryText.jsx    # [DA IMPLEMENTARE] Analizzatore Regex di testi per iniettare i Tooltip
-│   ├── Modal.jsx           # [DA IMPLEMENTARE] Modale Radix UI scura per i dettagli delle tecnologie
+│   ├── NodeDetailsModal.jsx# Modale Radix UI scura per i dettagli delle tecnologie
 │   └── Navbar.jsx          # Header fluttuante stile "Cyber Glass" con NavLink di navigazione
 ├── context/                # Stato globale condiviso dell'applicazione
 │   ├── AuthContext.jsx     # [DA IMPLEMENTARE] Cabina di regia per sessioni utenti Supabase Auth
@@ -76,7 +76,7 @@ Navbar & App Router	✅ Completata	Navigazione scura stile "Cyber Glass" funzion
 Macro Gruppi (Venn)	✅ Completata	Sfondi cerchiati bloccati in posizione per Frontend, Backend e Database.
 TechNode Interattivo	✅ Completata	Ereditarietà colori neon, toggle icone (+ / -) e gestione dei sotto-nodi.
 Espansione a Cerchio	✅ Completata	Calcolo trigonometrico isolato in geometry.js con protezione anti-duplicati.
-Modale Info (Modal.jsx)	⏳ Da fare	Integrazione con @radix-ui/react-dialog per sostituire l'attuale alert.
+Modale Info (Modal.jsx)	✅ Completata	Integrazione con @radix-ui/react-dialog per sostituire l'attuale alert.
 Glossario (GlossaryText)	⏳ Da fare	Creazione del Context e del parser Regex per i tooltip ad attivazione hover.
 Schema DB (Supabase SQL)	⏳ Da fare	Definizione delle tabelle relazionali e inserimento delle funzioni di fetch.
 Pagine Contenuto	⏳ Da fare	Sostituzione dei testi mockup nelle pagine Linee Guida, Sicurezza e Percorso.
