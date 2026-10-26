@@ -11,11 +11,6 @@ const learningResources = [
     description: "Percorsi e laboratori interattivi in un ambiente didattico.",
     href: "https://portswigger.net",
   },
-  {
-    label: "OWASP Web Security Testing Guide",
-    description: "Guida ai test di sicurezza da svolgere con autorizzazione.",
-    href: "https://owasp.org",
-  },
 ];
 
 export default function Security({ onClose }) {
@@ -38,7 +33,7 @@ export default function Security({ onClose }) {
         </span>
       </header>
 
-      <div className="max-w-4xl mx-auto space-y-12">
+      <div className="max-w-4xl mx-auto space-y-12 pb-5">
         <header className="space-y-3">
           <span className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
             PERCORSO INTRODUTTIVO
@@ -144,7 +139,7 @@ export default function Security({ onClose }) {
 
         <section
           aria-labelledby="security-resources-title"
-          className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4"
+          className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4 pb"
         >
           <h3
             id="security-resources-title"
@@ -169,7 +164,7 @@ export default function Security({ onClose }) {
                       className="shrink-0 text-slate-500 group-hover:text-indigo-400 transition-colors"
                     />
                   </span>
-                  <span className="text-xs text-slate-400 mt-2 leading-relaxed flex-grow">
+                  <span className="text-xs text-slate-400 mt-2 leading-relaxed grow">
                     {description}
                   </span>
                 </a>

@@ -168,7 +168,7 @@ export default function Guidelines({ onClose }) {
           </div>
         </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-5">
           <section
             aria-labelledby="guidelines-files-title"
             className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4"
