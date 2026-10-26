@@ -128,13 +128,32 @@ supabase/
 └── seed.sql             # Dati iniziali
 ```
 
-## Build e deploy
+## Deploy su Vercel
+
+1. Pubblica il repository su GitHub e accedi a [Vercel](https://vercel.com/).
+2. Seleziona **Add New... > Project**, importa `alice-rovere/web-dev-studio-map` e lascia che Vercel rilevi Vite.
+3. Imposta queste variabili in **Settings > Environment Variables**, almeno per l'ambiente **Production** (e anche **Preview** se vuoi provare i deploy di anteprima):
+
+   | Nome | Valore |
+   | ---- | ----- |
+   | `VITE_SUPABASE_URL` | Lo stesso URL già usato nel file `.env` locale |
+   | `VITE_SUPABASE_ANON_KEY` | La stessa chiave anon/publishable già usata nel file `.env` locale |
+
+   Sono valori pubblici usati dal browser. Non inserire mai una chiave `service_role` o altri segreti nelle variabili `VITE_*`.
+
+4. Fai clic su **Deploy**. Vercel esegue `pnpm build` e pubblica la cartella `dist/`; `vercel.json` inoltra le rotte dell'app a `index.html`, così anche URL come `/login` e `/admin` funzionano se aperti direttamente.
+5. Dopo il primo deploy, copia il dominio assegnato (ad esempio `https://<nome-progetto>.vercel.app`) nelle impostazioni Supabase:
+   - In **Authentication > URL Configuration**, imposta **Site URL** sul dominio di produzione e aggiungi il dominio tra i **Redirect URLs**. Se usi anteprime Vercel, aggiungi anche i relativi URL di anteprima necessari.
+   - In **Authentication > Providers > Email**, lascia disabilitata la registrazione pubblica se vuoi consentire l'accesso solo agli utenti creati da te.
+6. Verifica il sito pubblico, l'accesso con l'utente esistente e le operazioni previste per i suoi permessi. Il progetto Supabase, i dati e le policy RLS restano gli stessi; non eseguire di nuovo il seed sul database esistente.
+
+Ogni push sul branch collegato a Production avvia un nuovo deploy. Le modifiche alle variabili d'ambiente richiedono un nuovo deploy per essere incluse nella build client.
+
+Per verificare la build in locale prima della pubblicazione:
 
 ```bash
 pnpm build
 ```
-
-La build statica viene generata in `dist/`. Per un deploy SPA configura il fallback di tutte le rotte su `index.html`. Le variabili `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` devono essere presenti nell'ambiente di build.
 
 ## Note
 
