@@ -168,6 +168,22 @@ export function buildNodeGraph({
     return (parentsByChild.get(nodeId) ?? []).map((entry) => entry.parent_id);
   }
 
+  function getAncestorPath(nodeId) {
+    const ancestors = new Set();
+    let current = nodeId;
+    const seen = new Set([nodeId]);
+
+    while (true) {
+      const primaryParent = parentsByChild.get(current)?.[0];
+      if (!primaryParent || seen.has(primaryParent.parent_id)) break;
+      current = primaryParent.parent_id;
+      seen.add(current);
+      ancestors.add(current);
+    }
+
+    return ancestors;
+  }
+
   function getChildIds(nodeId) {
     return (childrenByParent.get(nodeId) ?? []).map((entry) => entry.child_id);
   }
@@ -183,6 +199,7 @@ export function buildNodeGraph({
     getDepth,
     getParentIds,
     getChildIds,
+    getAncestorPath,
   };
 }
 

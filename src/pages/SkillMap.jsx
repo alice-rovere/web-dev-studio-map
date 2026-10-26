@@ -4,6 +4,7 @@ import {
   Controls,
   ReactFlow,
   ReactFlowProvider,
+  useReactFlow,
 } from "@xyflow/react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 
@@ -24,10 +25,13 @@ const SkillMapContent = () => {
     edges,
     expandedIds,
     toggleNode,
+    expandFocused,
     loading,
     error,
     reload,
   } = useMapGraph();
+
+  const { getNode, setCenter } = useReactFlow();
 
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [activeKnowledgeId, setActiveKnowledgeId] = useState(null);
@@ -77,6 +81,37 @@ const SkillMapContent = () => {
     }));
   }, [graph, selectedNodeId]);
 
+  const handleToggleChildren = useCallback(
+    (nodeId) => {
+      if (expandedIds.has(nodeId)) {
+        toggleNode(nodeId);
+        return;
+      }
+
+      expandFocused(nodeId);
+
+      const flowNode = getNode(nodeId);
+      const fallbackNode = nodes.find((node) => node.id === nodeId);
+      const position = flowNode?.position ?? fallbackNode?.position;
+      if (!position) return;
+
+      const isSubNode =
+        (flowNode?.data?.parentCount ??
+          fallbackNode?.data?.parentCount ??
+          0) > 0;
+      const width =
+        flowNode?.measured?.width ?? (isSubNode ? 110 : 190);
+      const height =
+        flowNode?.measured?.height ?? (isSubNode ? 30 : 44);
+
+      setCenter(position.x + width / 2, position.y + height / 2, {
+        zoom: 1,
+        duration: 500,
+      });
+    },
+    [expandedIds, toggleNode, expandFocused, getNode, setCenter, nodes],
+  );
+
   const finalNodes = useMemo(
     () => [
       ...MACRO_GROUPS,
@@ -85,12 +120,12 @@ const SkillMapContent = () => {
         data: {
           ...node.data,
           isSubNode: node.data.parentCount > 0,
-          onToggleChildren: () => toggleNode(node.id),
+          onToggleChildren: () => handleToggleChildren(node.id),
           onOpenModal: () => setSelectedNodeId(node.id),
         },
       })),
     ],
-    [nodes, toggleNode],
+    [nodes, handleToggleChildren],
   );
 
   if (activeKnowledgeId) {

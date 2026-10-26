@@ -51,6 +51,15 @@ export function useMapGraph() {
     });
   }, []);
 
+  const expandFocused = useCallback(
+    (nodeId) => {
+      const next = graph.getAncestorPath(nodeId);
+      next.add(nodeId);
+      setExpandedIds(next);
+    },
+    [graph],
+  );
+
   const collapseAll = useCallback(() => {
     setExpandedIds(new Set());
   }, []);
@@ -161,6 +170,7 @@ export function useMapGraph() {
     edges: layout.visibleEdges,
     expandedIds,
     toggleNode,
+    expandFocused,
     collapseAll,
     loading,
     error,
