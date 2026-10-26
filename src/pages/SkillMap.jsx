@@ -11,6 +11,7 @@ import {
 
 import { nodeTypes } from "../flow/nodes/index.jsx";
 import { calculateCircularPositions } from "../flow/utils/geometry.js";
+import NodeDetailsModal from "../components/NodeDetailsModal.jsx"; // Importazione del componente Radix UI
 import "@xyflow/react/dist/style.css";
 
 const MOCK_CHILDREN_DB = {
@@ -29,6 +30,42 @@ const MOCK_CHILDREN_DB = {
     { id: "bootstrap", label: "bootstrap" },
     { id: "tailwind", label: "tailwind" },
   ],
+};
+
+// Database mockup per alimentare l'Inspector delle tecnologie
+const MOCK_DETAILS_DB = {
+  html: {
+    description:
+      "HyperText Markup Language. Struttura portante del web per l'organizzazione semantica del contenuto applicativo.",
+    best_practices:
+      "Usa marcatori semantici nativi.\nValida costantemente i tag secondo specifiche W3C.",
+    naming_conventions: [
+      "Tag e attributi rigorosamente minuscoli",
+      "Classi in kebab-case",
+    ],
+    study_urls: [{ label: "MDN HTML Basics", url: "https://mozilla.org" }],
+  },
+  css: {
+    description:
+      "Cascading Style Sheets. Gestione dello stile visivo, layout responsivi e implementazioni grafiche neon dell'HUD.",
+    best_practices:
+      "Mantieni l'architettura atomica.\nSfrutta le variabili native o utility classes.",
+    naming_conventions: ["Metodologia BEM o utility pure"],
+    study_urls: [
+      { label: "Tailwind CSS Documentation", url: "https://tailwindcss.com" },
+    ],
+  },
+  javascript: {
+    description:
+      "Linguaggio runtime asincrono ad eventi. Logica computazionale ed interazioni dinamiche dei grafi di rete.",
+    best_practices:
+      "Evita mutazioni dirette degli stati condivisi.\nPrediligi astrazioni funzionali.",
+    naming_conventions: [
+      "camelCase per metodi e variabili",
+      "PascalCase per costruttori",
+    ],
+    study_urls: [{ label: "MDN JavaScript Guide", url: "https://mozilla.org" }],
+  },
 };
 
 const initialNodes = [
@@ -101,6 +138,29 @@ const SkillMapContent = () => {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
   const { setCenter } = useReactFlow();
+
+  // Stati locali per governare il ciclo vitale del pannello laterale
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedNode, setSelectedNode] = useState(null);
+
+  // Azione per aprire la modale registrando l'istanza del nodo cliccato
+  const handleOpenModal = useCallback((node) => {
+    setSelectedNode(node);
+    setIsModalOpen(true);
+  }, []);
+
+  // Azione per chiudere la modale ripulendo la memoria di tracciamento
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false);
+    setSelectedNode(null);
+  }, []);
+  const handleOpenKnowledge = useCallback(() => {
+    if (selectedNode) {
+      console.log(`Richiesta documentazione estesa per: ${selectedNode.id}`);
+      // In futuro qui inserirai la navigazione (es: navigate('/guided-path'))
+      // o l'apertura di un pannello di secondo livello
+    }
+  }, [selectedNode]);
 
   const toggleChildren = useCallback(
     (parentId, parentX, parentY) => {
@@ -204,9 +264,17 @@ const SkillMapContent = () => {
             };
           }
           if (n.type === "macroGroup") {
-            return { ...n, style: { ...n.style, opacity: 0.3 } };
+            return {
+              ...n,
+              data: { ...n.data },
+              style: { ...n.style, opacity: 0.3 },
+            };
           }
-          return { ...n, style: { ...n.style, opacity: 0.15 } };
+          return {
+            ...n,
+            data: { ...n.data },
+            style: { ...n.style, opacity: 0.15 },
+          };
         });
 
         return [...mappedNodes, ...newNodes];
@@ -218,18 +286,36 @@ const SkillMapContent = () => {
   // Mantiene intatto il passaggio delle funzioni di callback ai nodi
   const finalNodes = nodes.map((node) => {
     if (node.type === "tech") {
+      // Determiniamo la categoria ereditata in base all'ID o al gruppo di appartenenza visiva
+      const nodeCategory =
+        node.id.includes("html") || node.id.includes("css")
+          ? "frontend"
+          : "backend";
+
       return {
         ...node,
         data: {
           ...node.data,
+          category: nodeCategory, // Passiamo la categoria per gli accenti cromatici della modale
           onToggleChildren: () =>
             toggleChildren(node.id, node.position.x, node.position.y),
-          onOpenModal: (label) => alert(`Modale per: ${label}`),
+          // Passiamo l'intera struttura del nodo all'handler dell'Inspector
+          onOpenModal: () =>
+            handleOpenModal({
+              ...node,
+              data: { ...node.data, category: nodeCategory },
+            }),
         },
       };
     }
     return node;
   });
+
+  // Estraiamo la chiave corretta per il DB dettagli (gestisce sia nodi principali che sotto-nodi child)
+  const currentDetailsKey = selectedNode
+    ? selectedNode.id.replace(/.*-child-/, "")
+    : null;
+  const currentDetails = MOCK_DETAILS_DB[currentDetailsKey] || null;
 
   return (
     <div className="absolute inset-0 w-full h-full bg-[#0b1120] bg-linear-to-b from-[#182741]/30 to-transparent">
@@ -239,18 +325,24 @@ const SkillMapContent = () => {
           className="bg-slate-950/70! backdrop-blur-md! border! border-slate-800! rounded-lg! p-1! shadow-[0_0_15px_rgba(0,0,0,0.5)]!"
           position="bottom-left"
         />
-        {/* <MiniMap
-          position="bottom-right"
-          className="bg-slate-50"
-          zoomable
-          pannable
-        /> */}
       </ReactFlow>
+
+      {/* COMPONENTE INTERFACCIA: Montato esternamente al canvas di React Flow */}
+      <NodeDetailsModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        node={selectedNode}
+        details={currentDetails}
+        glossary={[]} // Verrà cablato con il GlossaryContext nel prossimo step
+        onOpenKnowledge={handleOpenKnowledge}
+        onSelectRelated={(relatedId) =>
+          console.log(`Naviga a relazione: ${relatedId}`)
+        }
+      />
     </div>
   );
 };
 
-// ESPORTAZIONE FINALE: Il wrapper che inietta il Provider di React Flow
 const SkillMap = () => {
   return (
     <ReactFlowProvider>
