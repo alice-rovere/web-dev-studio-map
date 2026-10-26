@@ -1,227 +1,156 @@
-import { useState, useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
-  ReactFlow,
   Background,
   Controls,
-  useReactFlow,
+  ReactFlow,
   ReactFlowProvider,
 } from "@xyflow/react";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 
 import { nodeTypes } from "../flow/nodes/index.jsx";
-import { calculateCircularPositions } from "../flow/utils/geometry.js";
 import NodeDetailsModal from "../components/NodeDetailsModal.jsx";
 import NodeKnowledgePage from "./NodeKnowledge.jsx";
-
-// Importazione delle configurazioni e dei database di mockup esterni
-import {
-  MOCK_CHILDREN_DB,
-  MOCK_DETAILS_DB,
-  initialNodes,
-  initialEdges,
-} from "../data/mockData.js";
+import { useMapGraph } from "../hooks/useMapGraph";
+import { useAuth } from "../hooks/useAuth";
+import { MACRO_GROUPS } from "../data/baseNodes";
 
 import "@xyflow/react/dist/style.css";
 
 const SkillMapContent = () => {
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
-  const { setCenter } = useReactFlow();
+  const { isEditor } = useAuth();
+  const {
+    graph,
+    nodes,
+    edges,
+    expandedIds,
+    toggleNode,
+    loading,
+    error,
+    reload,
+  } = useMapGraph();
 
-  // Stati per il controllo dei moduli di interfaccia sovrapposti
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedNode, setSelectedNode] = useState(null);
+  const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [activeKnowledgeId, setActiveKnowledgeId] = useState(null);
 
-  // Stati per la gestione della pagina di conoscenza estesa e del DB reattivo locale
-  const [activeKnowledgeNode, setActiveKnowledgeNode] = useState(null);
-  const [detailsDb, setDetailsDb] = useState(MOCK_DETAILS_DB);
-
-  const handleOpenModal = useCallback((node) => {
-    setSelectedNode(node);
-    setIsModalOpen(true);
-  }, []);
-
-  const handleCloseModal = useCallback(() => {
-    setIsModalOpen(false);
-    setSelectedNode(null);
-  }, []);
-
-  const handleOpenKnowledge = useCallback(() => {
-    if (selectedNode) {
-      setActiveKnowledgeNode(selectedNode);
-      setIsModalOpen(false);
-    }
-  }, [selectedNode]);
-
-  const handleSaveKnowledgeContent = useCallback(
-    async (parsedContent) => {
-      if (!activeKnowledgeNode) return;
-      const knowledgeKey = activeKnowledgeNode.id.replace(/.*-child-/, "");
-
-      setDetailsDb((prevDb) => ({
-        ...prevDb,
-        [knowledgeKey]: {
-          ...prevDb[knowledgeKey],
-          extended_content: parsedContent,
-        },
-      }));
-
-      console.log(
-        `Salvataggio mockup completato per il modulo: ${knowledgeKey}`,
-      );
-      return null;
-    },
-    [activeKnowledgeNode],
-  );
-
-  const toggleChildren = useCallback(
-    (parentId, parentX, parentY) => {
-      setNodes((currentNodes) => {
-        const areChildrenOpen = currentNodes.some((n) =>
-          n.id.startsWith(`${parentId}-child-`),
-        );
-
-        // --- CASO CHIUSURA ---
-        if (areChildrenOpen) {
-          setEdges((currentEdges) =>
-            currentEdges
-              .filter((e) => !e.id.startsWith(`edge-${parentId}-`))
-              .map((e) => ({ ...e, style: { ...e.style, opacity: 1 } })),
-          );
-
-          setCenter(350, 300, { zoom: 0.9, duration: 800 });
-
-          return currentNodes
-            .map((n) =>
-              n.id === parentId
-                ? {
-                    ...n,
-                    data: { ...n.data, isOpen: false },
-                    style: { ...n.style, opacity: 1 },
-                  }
-                : { ...n, style: { ...n.style, opacity: 1 } },
-            )
-            .filter((n) => !n.id.startsWith(`${parentId}-child-`));
-        }
-
-        // --- CASO APERTURA ---
-        const childrenData = MOCK_CHILDREN_DB[parentId] || [];
-        if (childrenData.length === 0) return currentNodes;
-
-        const edgeColor =
-          parentId === "html"
-            ? "#7ab8ff"
-            : parentId === "javascript"
-              ? "#64d9bd"
-              : "#94a3b8";
-
-        const positions = calculateCircularPositions(
-          parentX,
-          parentY,
-          childrenData.length,
-          150,
-        );
-
-        const centerX = parentX + 160 / 2;
-        const centerY = parentY + 44 / 2;
-
-        setCenter(centerX, centerY, { zoom: 1.3, duration: 800 });
-
-        const newNodes = childrenData.map((child, index) => ({
-          id: `${parentId}-child-${child.id}`,
-          type: "tech",
-          data: { label: child.label, isSubNode: true },
-          position: positions[index],
-          style: { opacity: 1 },
-        }));
-
-        const newEdges = childrenData.map((child) => ({
-          id: `edge-${parentId}-${child.id}`,
-          source: parentId,
-          target: `${parentId}-child-${child.id}`,
-          animated: true,
-          style: { stroke: edgeColor, strokeWidth: 2, opacity: 1 },
-        }));
-
-        setEdges((currentEdges) => {
-          const cleanEdges = currentEdges.filter(
-            (e) => !e.id.includes("-child-"),
-          );
-          const opacifiedEdges = cleanEdges.map((e) => ({
-            ...e,
-            style: { ...e.style, opacity: 0.15 },
-          }));
-          return [...opacifiedEdges, ...newEdges];
-        });
-
-        return currentNodes
-          .map((n) =>
-            n.id === parentId ? { ...n, data: { ...n.data, isOpen: true } } : n,
-          )
-          .concat(newNodes);
-      });
-    },
-    [setNodes, setEdges, setCenter],
-  );
-
-  // Iniezione dinamica delle funzioni di callback e categorie ereditate nei nodi grafici
-  const finalNodes = nodes.map((node) => {
-    if (node.type === "tech") {
-      const nodeCategory =
-        node.id.includes("html") || node.id.includes("css")
-          ? "frontend"
-          : node.id.includes("javascript")
-            ? "backend"
-            : "database";
+  const toDisplayNode = useCallback(
+    (nodeId) => {
+      const node = graph.nodesById.get(nodeId);
+      if (!node) return null;
 
       return {
+        id: node.id,
+        type: "tech",
+        data: {
+          label: node.label,
+          categories: node.categories,
+          primaryCategory: node.primaryCategory,
+          description: node.description,
+          best_practices: node.best_practices,
+          naming_conventions: node.naming_conventions,
+          study_urls: node.study_urls,
+          hasChildren: graph.getChildIds(nodeId).length > 0,
+          isOpen: expandedIds.has(nodeId),
+          parentCount: graph.getParentIds(nodeId).length,
+        },
+      };
+    },
+    [graph, expandedIds],
+  );
+
+  const selectedNode = selectedNodeId
+    ? toDisplayNode(selectedNodeId)
+    : null;
+
+  const selectedParents = useMemo(() => {
+    if (!selectedNodeId) return [];
+    return graph.getParentIds(selectedNodeId).map((parentId) => ({
+      id: parentId,
+      label: graph.nodesById.get(parentId)?.label ?? parentId,
+    }));
+  }, [graph, selectedNodeId]);
+
+  const selectedChildren = useMemo(() => {
+    if (!selectedNodeId) return [];
+    return graph.getChildIds(selectedNodeId).map((childId) => ({
+      id: childId,
+      label: graph.nodesById.get(childId)?.label ?? childId,
+    }));
+  }, [graph, selectedNodeId]);
+
+  const finalNodes = useMemo(
+    () => [
+      ...MACRO_GROUPS,
+      ...nodes.map((node) => ({
         ...node,
         data: {
           ...node.data,
-          category: nodeCategory,
-          onToggleChildren: () =>
-            toggleChildren(node.id, node.position.x, node.position.y),
-          onOpenModal: () =>
-            handleOpenModal({
-              ...node,
-              data: { ...node.data, category: nodeCategory },
-            }),
+          isSubNode: node.data.parentCount > 0,
+          onToggleChildren: () => toggleNode(node.id),
+          onOpenModal: () => setSelectedNodeId(node.id),
         },
-      };
+      })),
+    ],
+    [nodes, toggleNode],
+  );
+
+  if (activeKnowledgeId) {
+    const knowledgeNode = toDisplayNode(activeKnowledgeId);
+
+    if (knowledgeNode) {
+      return (
+        <NodeKnowledgePage
+          canEdit={isEditor}
+          key={activeKnowledgeId}
+          node={knowledgeNode}
+          onBack={() => {
+            setActiveKnowledgeId(null);
+            setSelectedNodeId(activeKnowledgeId);
+          }}
+          onClose={() => {
+            setActiveKnowledgeId(null);
+            setSelectedNodeId(null);
+          }}
+        />
+      );
     }
-    return node;
-  });
-
-  const currentDetailsKey = selectedNode
-    ? selectedNode.id.replace(/.*-child-/, "")
-    : null;
-  const currentDetails = selectedNode ? detailsDb[currentDetailsKey] : null;
-
-  // RITORNO CONDIZIONALE: Se attiva la vista estesa, monta NodeKnowledgePage
-  if (activeKnowledgeNode) {
-    const knowledgeKey = activeKnowledgeNode.id.replace(/.*-child-/, "");
-    const knowledgeDetails = detailsDb[knowledgeKey] || {};
-
-    return (
-      <NodeKnowledgePage
-        node={activeKnowledgeNode}
-        content={knowledgeDetails.extended_content || []}
-        canEdit={true}
-        onBack={() => {
-          setActiveKnowledgeNode(null);
-          setIsModalOpen(true);
-        }}
-        onClose={() => {
-          setActiveKnowledgeNode(null);
-          handleCloseModal();
-        }}
-        onSaveContent={handleSaveKnowledgeContent}
-      />
-    );
   }
 
   return (
     <div className="absolute inset-0 w-full h-full bg-[#0b1120] bg-linear-to-b from-[#182741]/30 to-transparent">
-      <ReactFlow nodes={finalNodes} edges={edges} nodeTypes={nodeTypes} fitView>
+      {loading && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#0b1120]/60 backdrop-blur-sm">
+          <p className="font-mono text-xs text-slate-400">
+            Caricamento mappa neurale…
+          </p>
+        </div>
+      )}
+
+      {error && !loading && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center p-6">
+          <div className="w-full max-w-md rounded-xl border border-rose-500/30 bg-rose-950/10 p-6 text-center">
+            <AlertTriangle className="mx-auto mb-3 text-rose-400" size={26} />
+            <h1 className="mb-1 text-sm font-bold text-white">
+              Mappa non disponibile
+            </h1>
+            <p className="mb-4 text-xs text-slate-400">{error}</p>
+            <button
+              className="inline-flex items-center gap-2 rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-semibold text-rose-200 hover:bg-rose-500/10"
+              onClick={() => reload({ clearPositions: true })}
+              type="button"
+            >
+              <RefreshCw size={13} />
+              Riprova
+            </button>
+          </div>
+        </div>
+      )}
+
+      <ReactFlow
+        edges={edges}
+        fitView
+        nodeTypes={nodeTypes}
+        nodes={finalNodes}
+      >
         <Background variant="dots" gap={20} size={1} color="#1e293b" />
         <Controls
           className="bg-slate-950/70! backdrop-blur-md! border! border-slate-800! rounded-lg! p-1! shadow-[0_0_15px_rgba(0,0,0,0.5)]!"
@@ -230,15 +159,18 @@ const SkillMapContent = () => {
       </ReactFlow>
 
       <NodeDetailsModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        childNodes={selectedChildren}
+        isOpen={Boolean(selectedNode)}
         node={selectedNode}
-        details={currentDetails}
-        glossary={[]}
-        onOpenKnowledge={handleOpenKnowledge}
-        onSelectRelated={(relatedId) =>
-          console.log(`Naviga a relazione: ${relatedId}`)
-        }
+        onClose={() => setSelectedNodeId(null)}
+        onOpenKnowledge={() => {
+          if (selectedNodeId) {
+            setActiveKnowledgeId(selectedNodeId);
+            setSelectedNodeId(null);
+          }
+        }}
+        onSelectRelated={(relatedId) => setSelectedNodeId(relatedId)}
+        parents={selectedParents}
       />
     </div>
   );

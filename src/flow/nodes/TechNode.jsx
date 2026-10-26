@@ -1,53 +1,101 @@
 import { Handle, Position } from "@xyflow/react";
-import { Info, Plus, Minus } from "lucide-react";
+import { GitFork, Info, Minus, Plus } from "lucide-react";
+import {
+  CATEGORY_COLORS,
+  CATEGORY_LABELS,
+} from "../../data/baseNodes";
 
 const TechNode = ({ data }) => {
   const {
     label,
     isSubNode,
+    categories = [],
+    primaryCategory = "frontend",
     hasChildren,
     isOpen,
+    parentCount = 0,
     onToggleChildren,
     onOpenModal,
   } = data;
 
+  const accent = CATEGORY_COLORS[primaryCategory] ?? "#94a3b8";
+  const secondaryCategories = categories.filter(
+    (entry) => entry.category !== primaryCategory,
+  );
+
   const containerClasses = isSubNode
-    ? "px-3 py-1.5 bg-[#141d2d]/90 border border-slate-700 rounded-[6px] text-xs text-[#aebbd0] min-w-[110px]"
+    ? "px-3 py-1.5 bg-[#141d2d]/90 border rounded-[6px] text-xs text-[#aebbd0] min-w-[110px]"
     : "px-4 py-3 border rounded-[12px] bg-gradient-to-br from-[#192336]/98 to-[#111928]/98 shadow-[0_8px_24px_rgba(0,0,0,0.2)] text-[13px] font-medium min-w-[190px] transition-all duration-150 ease-in-out";
 
   return (
     <div
       className={`flex flex-col gap-1.25 group select-none ${containerClasses} hover:-translate-y-0.5`}
+      style={{
+        borderColor: `${accent}66`,
+        boxShadow: isSubNode
+          ? `0 0 8px ${accent}18`
+          : `0 0 0 1px ${accent}12, 0 8px 24px rgba(0,0,0,0.25)`,
+      }}
     >
       <Handle
         type="target"
         position={Position.Top}
-        className="bg-slate-400 w-1.5 h-1.5"
+        style={{ background: accent }}
+        className="w-1.5 h-1.5"
       />
 
       <div className="flex items-center justify-between w-full gap-3">
-        <span>{label}</span>
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <span className="truncate">{label}</span>
+          {(secondaryCategories.length > 0 || parentCount > 1) && (
+            <span className="flex items-center gap-1.5">
+              {secondaryCategories.map((entry) => (
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  key={entry.category}
+                  style={{
+                    backgroundColor:
+                      CATEGORY_COLORS[entry.category] ?? "#94a3b8",
+                  }}
+                  title={CATEGORY_LABELS[entry.category] ?? entry.category}
+                />
+              ))}
+              {parentCount > 1 && (
+                <span
+                  className="flex items-center gap-0.5 text-[9px] font-mono text-slate-500"
+                  title={`Visibile da ${parentCount} padri`}
+                >
+                  <GitFork size={9} />
+                  {parentCount}
+                </span>
+              )}
+            </span>
+          )}
+        </div>
 
         <div className="flex items-center gap-1.5">
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpenModal?.(label);
+            onClick={(event) => {
+              event.stopPropagation();
+              onOpenModal?.();
             }}
-            className="p-1 text-slate-400 hover:text-blue-500 rounded hover:bg-slate-100 transition-colors cursor-pointer"
+            className="p-1 text-slate-400 hover:text-cyan-300 rounded hover:bg-slate-800/60 transition-colors cursor-pointer"
             title="Mostra dettagli"
+            type="button"
           >
             <Info size={isSubNode ? 12 : 14} />
           </button>
 
-          {hasChildren && !isSubNode && (
+          {hasChildren && (
             <button
-              onClick={(e) => {
-                e.stopPropagation();
+              onClick={(event) => {
+                event.stopPropagation();
                 onToggleChildren?.();
               }}
-              className="p-1 text-slate-400 hover:text-emerald-600 rounded hover:bg-slate-100 transition-colors cursor-pointer flex items-center justify-center"
+              className="p-1 rounded hover:bg-slate-800/60 transition-colors cursor-pointer flex items-center justify-center"
+              style={{ color: isOpen ? accent : "#94a3b8" }}
               title={isOpen ? "Riduci" : "Espandi"}
+              type="button"
             >
               {isOpen ? <Minus size={14} /> : <Plus size={14} />}
             </button>
@@ -58,7 +106,8 @@ const TechNode = ({ data }) => {
       <Handle
         type="source"
         position={Position.Bottom}
-        className="bg-slate-400 w-1.5 h-1.5"
+        style={{ background: accent }}
+        className="w-1.5 h-1.5"
       />
     </div>
   );
