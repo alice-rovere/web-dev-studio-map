@@ -72,7 +72,7 @@ export function GlossaryForm({ error, onAddTerm, onClose }) {
             disabled={isSubmitting}
             onChange={(event) => setTerm(event.target.value)}
             placeholder="Es. deployment"
-            className="w-full px-3 py-2 text-[13px] text-[#e8edf5] bg-[#0e1624] border border-[#33445d] rounded-[8px] focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30 transition-all placeholder:text-[#53657d]"
+            className="w-full px-3 py-2 text-[13px] text-[#e8edf5] bg-[#0e1624] border border-[#33445d] rounded-lg focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30 transition-all placeholder:text-[#53657d]"
             value={term}
           />
         </div>
@@ -90,7 +90,7 @@ export function GlossaryForm({ error, onAddTerm, onClose }) {
             onChange={(event) => setDefinition(event.target.value)}
             placeholder="Descrivi brevemente il termine"
             rows={3}
-            className="w-full px-3 py-2 text-[13px] text-[#e8edf5] bg-[#0e1624] border border-[#33445d] rounded-[8px] focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30 transition-all resize-none placeholder:text-[#53657d]"
+            className="w-full px-3 py-2 text-[13px] text-[#e8edf5] bg-[#0e1624] border border-[#33445d] rounded-lg focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30 transition-all resize-none placeholder:text-[#53657d]"
             value={definition}
           />
         </div>
@@ -99,7 +99,7 @@ export function GlossaryForm({ error, onAddTerm, onClose }) {
         {(validationError || error) && (
           <p
             aria-live="polite"
-            className="text-[12px] font-medium text-rose-400 bg-rose-950/20 border border-rose-500/30 px-3 py-1.5 rounded-[6px]"
+            className="text-[12px] font-medium text-rose-400 bg-rose-950/20 border border-rose-500/30 px-3 py-1.5 rounded-md"
           >
             {validationError || error}
           </p>
@@ -108,7 +108,7 @@ export function GlossaryForm({ error, onAddTerm, onClose }) {
         {/* Azioni del Form */}
         <div className="flex justify-end gap-3 pt-2 border-t border-[#33445d] mt-2">
           <button
-            className="h-[34px] px-[12px] text-[12px] font-medium text-[#b9c5d6] hover:text-[#e8edf5] bg-[#192536]/50 hover:bg-[#192536] border border-[#33445d]/60 rounded-[8px] transition-colors cursor-pointer"
+            className="h-8.5 px-3 text-[12px] font-medium text-[#b9c5d6] hover:text-[#e8edf5] bg-[#192536]/50 hover:bg-[#192536] border border-[#33445d]/60 rounded-lg transition-colors cursor-pointer"
             disabled={isSubmitting}
             onClick={onClose}
             type="button"
@@ -116,7 +116,7 @@ export function GlossaryForm({ error, onAddTerm, onClose }) {
             Annulla
           </button>
           <button
-            className="h-[34px] px-[14px] text-[12px] font-semibold text-slate-950 bg-cyan-400 hover:bg-cyan-300 rounded-[8px] shadow-[0_0_15px_rgba(34,211,238,0.2)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="h-8.5 px-3.5 text-[12px] font-semibold text-slate-950 bg-cyan-400 hover:bg-cyan-300 rounded-lg shadow-[0_0_15px_rgba(34,211,238,0.2)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isSubmitting}
             type="submit"
           >

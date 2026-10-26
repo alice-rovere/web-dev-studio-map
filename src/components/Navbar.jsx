@@ -51,7 +51,7 @@ const Navbar = () => {
         </NavLink>
 
         {/* Divisore interno verticale */}
-        <div className="w-[1px] h-4 bg-[#33445d]" />
+        <div className="w-px h-4 bg-[#33445d]" />
 
         {/* Pulsantino Piccolo per il Glossario */}
         <Dialog.Root open={isFormOpen} onOpenChange={setIsFormOpen}>
@@ -59,7 +59,7 @@ const Navbar = () => {
             <button
               title="Aggiungi termine al Glossario"
               type="button"
-              className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-[8px] border border-[#33445d]/40 bg-[#192536]/30 text-cyan-400 hover:bg-[#192536] hover:border-[#33445d] hover:text-cyan-300 shadow-[0_0_10px_rgba(34,211,238,0.05)] hover:shadow-[0_0_15px_rgba(34,211,238,0.2)] transition-all duration-150 cursor-pointer"
+              className="inline-flex h-8.5 w-8.5 items-center justify-center rounded-lg border border-[#33445d]/40 bg-[#192536]/30 text-cyan-400 hover:bg-[#192536] hover:border-[#33445d] hover:text-cyan-300 shadow-[0_0_10px_rgba(34,211,238,0.05)] hover:shadow-[0_0_15px_rgba(34,211,238,0.2)] transition-all duration-150 cursor-pointer"
             >
               <BookPlus size={16} />
             </button>
