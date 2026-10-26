@@ -75,6 +75,51 @@ Macro Gruppi (Venn)	✅ Completata	Sfondi cerchiati bloccati in posizione per Fr
 TechNode Interattivo	✅ Completata	Ereditarietà colori neon, toggle icone (+ / -) e gestione dei sotto-nodi.
 Espansione a Cerchio	✅ Completata	Calcolo trigonometrico isolato in geometry.js con protezione anti-duplicati.
 Modale Info (Modal.jsx)	✅ Completata	Integrazione con @radix-ui/react-dialog per sostituire l'attuale alert.
-Glossario (GlossaryText)	⏳ Da fare	Creazione del Context e del parser Regex per i tooltip ad attivazione hover.
+Glossario (GlossaryText)	✅ Completata	Creazione del Context e del parser Regex per i tooltip ad attivazione hover.
 Schema DB (Supabase SQL)	⏳ Da fare	Definizione delle tabelle relazionali e inserimento delle funzioni di fetch.
 Pagine Contenuto	✅ Completata	Sostituzione dei testi mockup nelle pagine Linee Guida, Sicurezza e Percorso.
+
+
+
+
+La logica che permette la visualizzazione automatica dei termini e dei relativi tooltip si basa su un flusso in tre fasi: Centralizzazione, Scansione Regex (Parser) e Sostituzione Dinamica con Radix UI.
+Ecco come funziona nel dettaglio, passo dopo passo:
+
+1. La Base Dati Centralizzata
+
+Tutto parte dallo stato globale contenuto in GlossaryProvider. Questo store mette a disposizione un array di oggetti (la lista dei termini) a tutta l'applicazione:
+javascript
+// La sorgente della verità
+[
+  { term: "Deployment", definition: "Rilascio e attivazione dell'applicazione..." },
+  { term: "Frontend", definition: "La parte di un'applicazione visibile..." }
+]
+Usa il codice con cautela.
+Quando usi il componente <GlossaryText>, quest'ultimo intercetta la lista aggiornata tramite l'hook useGlossary().
+
+2. La Creazione Dinamica della Regex (L'analizzatore)
+
+Per evitare di cercare i termini uno a uno (operazione lenta che rallenterebbe la pagina), il componente GlossaryText compila tutti i termini del glossario in un'unica grande espressione regolare (Regex).
+1. Previene i bug dei caratteri speciali: Prende i termini e applica un escape (es. se un termine contenesse un punto o un più, inserisce il backslash \\).
+2. Ordina per lunghezza decrescente: Ordina i termini dal più lungo al più corto (tramite .sort((a, b) => b.length - a.length)). Questo serve a evitare che se hai nel glossario sia "Web" che "Web Developer", la macchina si fermi a "Web" spezzando la parola più lunga.
+3. Crea l'unione (|): Unisce i termini con il simbolo della "O" logica (|). Il pattern finale risulterà simile a questo: (Deployment|Web Developer|Frontend).
+
+3. La Scansione del Testo (Confini delle Parole)
+
+Il testo inserito dentro <GlossaryText>testo</GlossaryText> viene analizzato usando la Regex creata, con un'accortezza fondamentale per l'italiano e la grammatica: i Confini di Parola Universitari (\p{L}).
+La Regex usa dei controlli chiamati Lookbehind e Lookahead negativi:
+javascript
+`(?<![\\p{L}\\p{N}_])(${glossaryPattern})(?![\\p{L}\\p{N}_])`
+Usa il codice con cautela.
+• Cosa fa? Dice alla macchina: "Trova il termine solo se NON è preceduto o seguito da altre lettere o numeri".
+• Perché è fondamentale? Se nel glossario hai la parola "API", la Regex la troverà nella frase "Le nostre API funzionano", ma la ignorerà intelligentemente dentro la parola "Capire" o "Tapiro", evitando di rompere parole comuni.
+
+4. La Sostituzione Atomica nel DOM
+
+Il componente non usa dangerouslySetInnerHTML (che sarebbe rischioso per la sicurezza), ma esegue una scomposizione del testo puro in un array di elementi React:
+1. Un cursore (cursor) tiene traccia di dove siamo arrivati a leggere.
+2. Quando viene trovato un match, il testo precedente al match viene salvato come testo normale.
+3. Il termine esatto trovato viene rimosso dal flusso del testo semplice e viene trasformato in un componente interattivo (<Tooltip.Root>).
+4. Al termine trovato viene agganciata la sua definizione recuperata istantaneamente dalla Mappa.
+5. Il cursore si sposta in avanti e il ciclo ricomincia fino alla fine del testo.
+Alla fine di questo processo, la stringa di testo originale si è trasformata in una collezione mista di nodi di testo e nodi interattivi pronti per mostrare il badge neon colorato al passaggio del mouse.
