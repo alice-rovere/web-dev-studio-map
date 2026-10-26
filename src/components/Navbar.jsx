@@ -12,7 +12,7 @@ const Navbar = () => {
     }`;
 
   return (
-    <header className="flex min-h-13.5 items-center justify-between gap-4.5 padding-[7px_10px] border border-[rgba(51,68,93,0.9)] rounded-xl bg-[#0e1624]/92 shadow-[0_10px_30px_rgba(0,0,0,0.24)] backdrop-blur-[14px]">
+    <header className="flex min-h-13.5 items-center justify-around gap-4.5 padding-[7px_10px] border border-[rgba(51,68,93,0.9)] rounded-xl bg-[#0e1624]/92 shadow-[0_10px_30px_rgba(0,0,0,0.24)] backdrop-blur-[14px]">
       {" "}
       {/* Logo / Titolo */}
       <NavLink

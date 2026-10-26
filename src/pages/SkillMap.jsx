@@ -1,5 +1,8 @@
 import { useState, useCallback } from "react";
-import { ReactFlow, Background, Controls, MiniMap } from "@xyflow/react";
+import { ReactFlow, Background, Controls } from "@xyflow/react";
+//per ora nascosta minimap
+// import {  MiniMap } from "@xyflow/react";
+
 import { nodeTypes } from "../flow/nodes/index.jsx";
 import { calculateCircularPositions } from "../flow/utils/geometry.js";
 import "@xyflow/react/dist/style.css";
@@ -90,13 +93,13 @@ const SkillMap = () => {
 
   const toggleChildren = useCallback((parentId, parentX, parentY) => {
     setNodes((currentNodes) => {
-      // Controlliamo se i figli sono già visualizzati
-      const areChildrenOpen = currentNodes.some((n) =>
+      // 1. Controlliamo se il nodo cliccato è già aperto
+      const isThisParentOpen = currentNodes.some((n) =>
         n.id.startsWith(`${parentId}-child-`),
       );
 
-      if (areChildrenOpen) {
-        // CHIUSURA: Rimuove i nodi figli e ripulisce in sicurezza gli edge
+      // CASO CHIUSURA: L'utente ha cliccato sul nodo già espanso -> chiudiamo solo questo
+      if (isThisParentOpen) {
         setEdges((currentEdges) =>
           currentEdges.filter((e) => !e.id.startsWith(`edge-${parentId}-`)),
         );
@@ -110,15 +113,23 @@ const SkillMap = () => {
           .filter((n) => !n.id.startsWith(`${parentId}-child-`));
       }
 
-      // APERTURA
+      // CASO APERTURA (con chiusura automatica degli altri):
       const childrenData = MOCK_CHILDREN_DB[parentId] || [];
       if (childrenData.length === 0) return currentNodes;
 
+      // Determiniamo il colore neon dinamico basato sul nodo che si sta aprendo
+      const edgeColor =
+        parentId === "html"
+          ? "#7ab8ff"
+          : parentId === "javascript"
+            ? "#64d9bd"
+            : "#94a3b8";
+
+      // Calcoliamo le posizioni dei nuovi figli con il raggio ampio centrato
       const positions = calculateCircularPositions(
         parentX,
         parentY,
         childrenData.length,
-        140,
       );
 
       const newNodes = childrenData.map((child, index) => ({
@@ -133,23 +144,33 @@ const SkillMap = () => {
         source: parentId,
         target: `${parentId}-child-${child.id}`,
         animated: true,
-        style: { stroke: "#94a3b8", strokeWidth: 1.5 },
+        style: { stroke: edgeColor, strokeWidth: 2 },
       }));
 
-      // Aggiorna gli edge evitando duplicati grazie al filtro preventivo
+      // AGGIORNAMENTO EDGES: Rimpiazziamo completamente i vecchi collegamenti dei figli con i nuovi
       setEdges((currentEdges) => {
+        // Rimuove QUALSIASI collegamento figlio esistente sul canvas
         const cleanEdges = currentEdges.filter(
-          (e) => !e.id.startsWith(`edge-${parentId}-`),
+          (e) => !e.id.includes("-child-"),
         );
         return [...cleanEdges, ...newEdges];
       });
 
-      // Imposta lo stato del nodo padre su isOpen: true
-      return currentNodes
-        .map((n) =>
-          n.id === parentId ? { ...n, data: { ...n.data, isOpen: true } } : n,
-        )
-        .concat(newNodes);
+      // AGGIORNAMENTO NODI:
+      return (
+        currentNodes
+          // Passo 1: Resetta lo stato di apertura di TUTTI i nodi tecnologici principali e rimuove i vecchi figli
+          .filter((n) => !n.id.includes("-child-"))
+          .map((n) => {
+            if (n.type === "tech") {
+              // Imposta isOpen true solo per il nodo corrente, false per gli altri
+              return { ...n, data: { ...n.data, isOpen: n.id === parentId } };
+            }
+            return n;
+          })
+          // Passo 2: Unisce i nuovi nodi figli appena generati
+          .concat(newNodes)
+      );
     });
   }, []);
 
@@ -172,13 +193,16 @@ const SkillMap = () => {
     <div className="absolute inset-0 w-full h-full bg-[#0b1120] bg-linear-to-b from-[#182741]/30 to-transparent">
       <ReactFlow nodes={finalNodes} edges={edges} nodeTypes={nodeTypes} fitView>
         <Background variant="dots" gap={20} size={1} color="#1e293b" />
-        <Controls position="bottom-left" />
-        <MiniMap
+        <Controls
+          className="bg-slate-950/70! backdrop-blur-md! border! border-slate-800! rounded-lg! p-1! shadow-[0_0_15px_rgba(0,0,0,0.5)]!"
+          position="bottom-left"
+        />
+        {/* <MiniMap
           position="bottom-right"
           className="bg-slate-50"
           zoomable
           pannable
-        />
+        /> */}
       </ReactFlow>
     </div>
   );

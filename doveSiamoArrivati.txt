@@ -80,5 +80,3 @@ Modale Info (Modal.jsx)	⏳ Da fare	Integrazione con @radix-ui/react-dialog per 
 Glossario (GlossaryText)	⏳ Da fare	Creazione del Context e del parser Regex per i tooltip ad attivazione hover.
 Schema DB (Supabase SQL)	⏳ Da fare	Definizione delle tabelle relazionali e inserimento delle funzioni di fetch.
 Pagine Contenuto	⏳ Da fare	Sostituzione dei testi mockup nelle pagine Linee Guida, Sicurezza e Percorso.
-
-Ho salvato l'intera mappa concettuale in questo schema.
