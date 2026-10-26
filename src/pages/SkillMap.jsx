@@ -19,6 +19,10 @@ const MOCK_CHILDREN_DB = {
     { id: "es6", label: "ES6+ Features" },
     { id: "storage", label: "Local Storage" },
   ],
+  css: [
+    { id: "bootstrap", label: "bootstrap" },
+    { id: "tailwind", label: "tailwind" },
+  ],
 };
 
 const initialNodes = [
@@ -74,7 +78,7 @@ const initialNodes = [
   {
     id: "css",
     type: "tech",
-    data: { label: "CSS", hasChildren: false, isOpen: false },
+    data: { label: "CSS", hasChildren: true, isOpen: false },
     position: { x: 220, y: 300 },
   },
   {
@@ -90,34 +94,39 @@ const initialEdges = [];
 const SkillMap = () => {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
-
   const toggleChildren = useCallback((parentId, parentX, parentY) => {
     setNodes((currentNodes) => {
-      // 1. Controlliamo se il nodo cliccato è già aperto
-      const isThisParentOpen = currentNodes.some((n) =>
+      const areChildrenOpen = currentNodes.some((n) =>
         n.id.startsWith(`${parentId}-child-`),
       );
 
-      // CASO CHIUSURA: L'utente ha cliccato sul nodo già espanso -> chiudiamo solo questo
-      if (isThisParentOpen) {
+      // --- CASO CHIUSURA ---
+      if (areChildrenOpen) {
         setEdges((currentEdges) =>
-          currentEdges.filter((e) => !e.id.startsWith(`edge-${parentId}-`)),
+          currentEdges
+            .filter((e) => !e.id.startsWith(`edge-${parentId}-`))
+            // Ripristina l'opacità standard su tutti gli edge rimasti
+            .map((e) => ({ ...e, style: { ...e.style, opacity: 1 } })),
         );
 
         return currentNodes
-          .map((n) =>
-            n.id === parentId
-              ? { ...n, data: { ...n.data, isOpen: false } }
-              : n,
+          .map(
+            (n) =>
+              n.id === parentId
+                ? {
+                    ...n,
+                    data: { ...n.data, isOpen: false },
+                    style: { ...n.style, opacity: 1 },
+                  }
+                : { ...n, style: { ...n.style, opacity: 1 } }, // Ripristina tutti i nodi
           )
           .filter((n) => !n.id.startsWith(`${parentId}-child-`));
       }
 
-      // CASO APERTURA (con chiusura automatica degli altri):
+      // --- CASO APERTURA ---
       const childrenData = MOCK_CHILDREN_DB[parentId] || [];
       if (childrenData.length === 0) return currentNodes;
 
-      // Determiniamo il colore neon dinamico basato sul nodo che si sta aprendo
       const edgeColor =
         parentId === "html"
           ? "#7ab8ff"
@@ -125,55 +134,71 @@ const SkillMap = () => {
             ? "#64d9bd"
             : "#94a3b8";
 
-      // Calcoliamo le posizioni dei nuovi figli con il raggio ampio centrato
+      // Chiamata a geometry con raggio a 150px (vicini)
       const positions = calculateCircularPositions(
         parentX,
         parentY,
         childrenData.length,
+        150,
       );
 
+      // Generazione nodi figli
       const newNodes = childrenData.map((child, index) => ({
         id: `${parentId}-child-${child.id}`,
         type: "tech",
         data: { label: child.label, isSubNode: true },
         position: positions[index],
+        style: { opacity: 1 }, // I figli nascono visibili al 100%
       }));
 
+      // Generazione Edges per i nuovi figli
       const newEdges = childrenData.map((child) => ({
         id: `edge-${parentId}-${child.id}`,
         source: parentId,
         target: `${parentId}-child-${child.id}`,
         animated: true,
-        style: { stroke: edgeColor, strokeWidth: 2 },
+        style: { stroke: edgeColor, strokeWidth: 2, opacity: 1 },
       }));
 
-      // AGGIORNAMENTO EDGES: Rimpiazziamo completamente i vecchi collegamenti dei figli con i nuovi
+      // AGGIORNAMENTO EDGES: Opacizza i collegamenti vecchi e aggiunge i nuovi
       setEdges((currentEdges) => {
-        // Rimuove QUALSIASI collegamento figlio esistente sul canvas
         const cleanEdges = currentEdges.filter(
           (e) => !e.id.includes("-child-"),
         );
-        return [...cleanEdges, ...newEdges];
+        const opacifiedEdges = cleanEdges.map((e) => ({
+          ...e,
+          style: { ...e.style, opacity: 0.15 }, // Opacizza linee di sfondo
+        }));
+        return [...opacifiedEdges, ...newEdges];
       });
 
-      // AGGIORNAMENTO NODI:
-      return (
-        currentNodes
-          // Passo 1: Resetta lo stato di apertura di TUTTI i nodi tecnologici principali e rimuove i vecchi figli
-          .filter((n) => !n.id.includes("-child-"))
-          .map((n) => {
-            if (n.type === "tech") {
-              // Imposta isOpen true solo per il nodo corrente, false per gli altri
-              return { ...n, data: { ...n.data, isOpen: n.id === parentId } };
-            }
-            return n;
-          })
-          // Passo 2: Unisce i nuovi nodi figli appena generati
-          .concat(newNodes)
+      // AGGIORNAMENTO NODI: Opacizza gli altri padri, illumina il padre attivo e i suoi figli
+      const cleanedNodes = currentNodes.filter(
+        (n) => !n.id.includes("-child-"),
       );
+
+      const mappedNodes = cleanedNodes.map((n) => {
+        // Il padre cliccato rimane illuminato (opacity 1) e cambia stato in aperto
+        if (n.id === parentId) {
+          return {
+            ...n,
+            data: { ...n.data, isOpen: true },
+            style: { ...n.style, opacity: 1 },
+          };
+        }
+        // I macro-gruppi di sfondo (Frontend, Backend, DB) calano di intensità discretamente
+        if (n.type === "macroGroup") {
+          return { ...n, style: { ...n.style, opacity: 0.4 } };
+        }
+        // Tutti gli altri nodi tecnologici non attivi vengono fortemente opacizzati
+        return { ...n, style: { ...n.style, opacity: 0.2 } };
+      });
+
+      return [...mappedNodes, ...newNodes];
     });
   }, []);
 
+  // Mantiene intatto il passaggio delle funzioni di callback ai nodi
   const finalNodes = nodes.map((node) => {
     if (node.type === "tech") {
       return {
