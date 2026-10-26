@@ -190,3 +190,9 @@ export default function NuovaPaginaStudio() {
 | ------------------------------- | --------------------- | ---------------------------------------- |
 | Pagine statiche / Rotte globali | `page-<nome-pagina>`  | `"page-sicurezza"`, `"page-linee-guida"` |
 | Schede di dettaglio nodi mappa  | `node-<id-nodo-flow>` | `"node-react-19"`, `"node-supabase-db"`  |
+
+# Da implementare
+
+Funzionalità di cerca nodo !
+Collegamento file Percorso Guidato con i nodi reali nel database
+Media Queries per mobile css
