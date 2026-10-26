@@ -1,0 +1,39 @@
+Voglio aggiungere nuovi nodi alla mappa del progetto. Prima di preparare i dati, controlla lo schema e i nodi già presenti nel repository, in particolare:
+- supabase/migrations/0001_init.sql
+- supabase/seed.sql
+- src/services/mapService.js
+
+Crea nodi per questo argomento: [ARGOMENTO]
+Nodi richiesti: [NOMI DEI NODI, oppure “proponili tu”]
+Lingua dei contenuti: italiano.
+
+Segui rigorosamente lo schema esistente e non modificare il codice dell’applicazione né creare nuove tabelle.
+
+Per ogni nodo usa la tabella `public.nodes` con questi campi:
+- `slug`: univoco, minuscolo, parole separate da trattini;
+- `label`;
+- `description`;
+- `best_practices`: array di stringhe;
+- `naming_conventions`: array di stringhe;
+- `study_urls`: array JSON di oggetti `{ "label": "...", "url": "..." }`;
+- `position_x` e `position_y`: solo se il nodo è radice; per i nodi con un padre usa `null`.
+Lascia generare al database gli ID e le date.
+
+Collega poi i nodi nelle tabelle appropriate:
+- `public.node_categories`: usa solo `frontend`, `backend` e `database`; assegna almeno una categoria e una sola categoria primaria per nodo.
+- `public.node_parents`: collega ciascun nodo al padre più pertinente già presente, se esiste; assegna un solo padre primario. Non creare relazioni cicliche. Se un padre necessario non è identificabile con certezza, dichiaralo invece di inventarne l’ID.
+- `public.node_content_sections`: aggiungi approfondimenti ordinati, usando solo i tipi `text`, `code`, `list`, `table` e `timeline`, con payload compatibili con l’interfaccia:
+  - `text`: `{ "text": "..." }`
+  - `code`: `{ "code": "...", "language": "js" }`
+  - `list`: `{ "items": ["...", "..."] }`
+  - `table`: `{ "columns": ["...", "..."], "rows": [["...", "..."]] }`
+  - `timeline`: `{ "entries": [{ "date": "...", "title": "...", "description": "..." }] }`
+
+Prima di scrivere il risultato, controlla che gli slug non esistano già e che i contenuti siano coerenti con stile, livello di dettaglio e struttura dei nodi esistenti. Usa URL di risorse autorevoli e verifica che siano plausibili; non inventare riferimenti o fatti.
+
+Rispondi con:
+1. Una breve descrizione delle scelte fatte: categorie, padri e ordine dei nodi.
+2. Uno script SQL PostgreSQL compatibile con Supabase, completo per inserire i nodi e le relative categorie, relazioni e sezioni. Gestisci correttamente gli ID generati, rispetta i vincoli dello schema e rendi lo script eseguibile senza inserire dati duplicati.
+3. Un elenco di eventuali assunzioni o informazioni che non hai potuto verificare.
+
+Non eseguire lo script sul database. Se manca un’informazione indispensabile per scegliere un padre o una categoria, chiedimi chiarimenti prima di inventarla.
