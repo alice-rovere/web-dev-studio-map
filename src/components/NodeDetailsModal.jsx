@@ -116,12 +116,10 @@ export default function NodeDetailsModal({
                       style={{
                         color:
                           CATEGORY_COLORS[entry.category] ?? "#94a3b8",
-                        borderColor: `${
-                          CATEGORY_COLORS[entry.category] ?? "#94a3b8"
-                        }55`,
-                        backgroundColor: `${
-                          CATEGORY_COLORS[entry.category] ?? "#94a3b8"
-                        }12`,
+                        borderColor: `${CATEGORY_COLORS[entry.category] ?? "#94a3b8"
+                          }55`,
+                        backgroundColor: `${CATEGORY_COLORS[entry.category] ?? "#94a3b8"
+                          }12`,
                       }}
                     >
                       {CATEGORY_LABELS[entry.category] ?? entry.category}
@@ -272,11 +270,6 @@ export default function NodeDetailsModal({
             </section>
           </div>
 
-          <footer className="p-3 border-t border-slate-900 bg-slate-950 text-center font-mono text-[10px] text-slate-600 tracking-widest flex items-center justify-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-            DEV CORE MAP SYSTEM <span className="text-slate-800">·</span>{" "}
-            INSPECTOR ONLINE
-          </footer>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

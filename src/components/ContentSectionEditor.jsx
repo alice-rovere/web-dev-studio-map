@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ArrowDown,
   ArrowUp,
@@ -477,6 +477,40 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
   const [draft, setDraft] = useState(null);
   const [saving, setSaving] = useState(false);
   const [actionError, setActionError] = useState("");
+  const [activeSectionId, setActiveSectionId] = useState(null);
+  const tabRefs = useRef(new Map());
+
+  const activeSection =
+    sections.find((section) => section.id === activeSectionId) ??
+    sections[0] ??
+    null;
+  const activeIndex = activeSection
+    ? sections.findIndex((section) => section.id === activeSection.id)
+    : -1;
+
+  function handleTabKeyDown(event) {
+    const keys = ["ArrowLeft", "ArrowRight", "Home", "End"];
+    if (!keys.includes(event.key) || sections.length === 0) return;
+
+    event.preventDefault();
+
+    let nextIndex;
+    if (event.key === "ArrowRight") {
+      nextIndex = (activeIndex + 1) % sections.length;
+    } else if (event.key === "ArrowLeft") {
+      nextIndex = (activeIndex - 1 + sections.length) % sections.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else {
+      nextIndex = sections.length - 1;
+    }
+
+    const nextSection = sections[nextIndex];
+    if (!nextSection) return;
+
+    setActiveSectionId(nextSection.id);
+    tabRefs.current.get(nextSection.id)?.focus();
+  }
 
   const loadSections = useCallback(async () => {
     if (!nodeId) return;
@@ -525,6 +559,7 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
       type: section.type,
       payload: ensurePayload(section.type, section.payload),
     });
+    setActiveSectionId(section.id);
     setActionError("");
   }
 
@@ -556,12 +591,13 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
           payload: draft.payload,
         });
       } else {
-        await createSection(nodeId, {
+        const created = await createSection(nodeId, {
           title: draft.title.trim(),
           type: draft.type,
           payload: draft.payload,
           sort_order: sections.length,
         });
+        setActiveSectionId(created?.id ?? null);
       }
 
       setDraft(null);
@@ -583,6 +619,7 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
     setSaving(true);
     try {
       await deleteSection(section.id);
+      if (activeSection?.id === section.id) setActiveSectionId(null);
       await loadSections();
     } catch (deleteError) {
       setActionError(
@@ -662,141 +699,191 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
         </p>
       )}
 
-      {draft && (
-        <form
-          className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-900/30 p-5"
-          onSubmit={handleSave}
-        >
-          <div className="flex items-center justify-between">
-            <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-zinc-200">
-              {draft.id ? "Modifica sezione" : "Nuova sezione"}
-            </h3>
-            <button
-              aria-label="Annulla modifica"
-              className="rounded border border-zinc-800 p-1.5 text-zinc-400 hover:text-white"
-              onClick={() => {
-                setDraft(null);
-                setActionError("");
-              }}
-              type="button"
-            >
-              <X size={14} />
-            </button>
-          </div>
-
-          <div className="grid gap-3 md:grid-cols-[1fr_180px]">
-            <label className="block">
-              <Label>Titolo</Label>
-              <input
-                className={fieldClass()}
-                onChange={(event) =>
-                  setDraft((previous) => ({
-                    ...previous,
-                    title: event.target.value,
-                  }))
-                }
-                placeholder="Titolo della sezione"
-                value={draft.title}
-              />
-            </label>
-            <label className="block">
-              <Label>Tipo</Label>
-              <select
-                className={fieldClass()}
-                onChange={(event) => changeType(event.target.value)}
-                value={draft.type}
-              >
-                {SECTION_TYPES.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <PayloadEditor draft={draft} setDraft={setDraft} />
-
-          {actionError && (
-            <p
-              className="rounded-md border border-rose-500/30 bg-rose-950/20 px-3 py-2 text-xs text-rose-300"
-              role="alert"
-            >
-              {actionError}
-            </p>
-          )}
-
-          <div className="flex justify-end gap-2 border-t border-zinc-900 pt-3">
-            <button
-              className="rounded-lg border border-zinc-800 px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-800/50"
-              onClick={() => {
-                setDraft(null);
-                setActionError("");
-              }}
-              type="button"
-            >
-              Annulla
-            </button>
-            <button
-              className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-950 hover:bg-white disabled:opacity-50"
-              disabled={saving}
-              type="submit"
-            >
-              <Save size={13} />
-              {saving ? "Salvataggio…" : "Salva sezione"}
-            </button>
-          </div>
-        </form>
-      )}
-
-      {!loading && !error && sections.length === 0 && !draft && (
-        <p className="rounded-xl border border-dashed border-zinc-800 bg-zinc-950/30 py-12 text-center text-sm italic text-zinc-500">
-          Gli approfondimenti strutturati per questo nodo non sono ancora
-          disponibili.
-        </p>
-      )}
-
       {!loading && sections.length > 0 && (
-        <div className="space-y-6">
-          {sections.map((section, index) => (
-            <SectionCard
-              actions={
-                canEdit ? (
-                  <div className="flex items-center gap-1.5">
-                    <IconButton
-                      label="Sposta su"
-                      onClick={() => moveSection(index, -1)}
-                    >
-                      <ArrowUp size={13} />
-                    </IconButton>
-                    <IconButton
-                      label="Sposta giù"
-                      onClick={() => moveSection(index, 1)}
-                    >
-                      <ArrowDown size={13} />
-                    </IconButton>
-                    <IconButton
-                      label="Modifica sezione"
-                      onClick={() => startEdit(section)}
-                    >
-                      <Pencil size={13} />
-                    </IconButton>
-                    <IconButton
-                      danger
-                      label="Elimina sezione"
-                      onClick={() => handleDelete(section)}
-                    >
-                      <Trash2 size={13} />
-                    </IconButton>
-                  </div>
-                ) : null
-              }
-              key={section.id}
-              section={section}
-            />
-          ))}
+        <div
+          aria-label="Sezioni del nodo"
+          className="flex items-center gap-1 overflow-x-auto border-b border-zinc-900 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          role="tablist"
+        >
+          {sections.map((section) => {
+            const isActive = activeSection?.id === section.id;
+
+            return (
+              <button
+                aria-controls="node-sections-panel"
+                aria-selected={isActive}
+                className={`-mb-px shrink-0 whitespace-nowrap border-b-2 px-3 pt-2 pb-2.5 font-mono text-[11px] tracking-wider uppercase transition-colors ${
+                  isActive
+                    ? "border-cyan-400 text-white"
+                    : "border-transparent text-zinc-500 hover:border-zinc-700 hover:text-zinc-300"
+                }`}
+                id={`node-sections-tab-${section.id}`}
+                key={section.id}
+                onClick={() => {
+                  setActiveSectionId(section.id);
+                  setDraft(null);
+                  setActionError("");
+                }}
+                onKeyDown={handleTabKeyDown}
+                ref={(element) => {
+                  if (element) {
+                    tabRefs.current.set(section.id, element);
+                  } else {
+                    tabRefs.current.delete(section.id);
+                  }
+                }}
+                role="tab"
+                tabIndex={isActive ? 0 : -1}
+                type="button"
+              >
+                {section.title}
+              </button>
+            );
+          })}
         </div>
       )}
+
+      <div
+        aria-labelledby={
+          activeSection ? `node-sections-tab-${activeSection.id}` : undefined
+        }
+        className="space-y-4"
+        id="node-sections-panel"
+        role={sections.length > 0 ? "tabpanel" : undefined}
+        tabIndex={sections.length > 0 ? 0 : undefined}
+      >
+        {draft && (
+          <form
+            className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-900/30 p-5"
+            onSubmit={handleSave}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-zinc-200">
+                {draft.id ? "Modifica sezione" : "Nuova sezione"}
+              </h3>
+              <button
+                aria-label="Annulla modifica"
+                className="rounded border border-zinc-800 p-1.5 text-zinc-400 hover:text-white"
+                onClick={() => {
+                  setDraft(null);
+                  setActionError("");
+                }}
+                type="button"
+              >
+                <X size={14} />
+              </button>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-[1fr_180px]">
+              <label className="block">
+                <Label>Titolo</Label>
+                <input
+                  className={fieldClass()}
+                  onChange={(event) =>
+                    setDraft((previous) => ({
+                      ...previous,
+                      title: event.target.value,
+                    }))
+                  }
+                  placeholder="Titolo della sezione"
+                  value={draft.title}
+                />
+              </label>
+              <label className="block">
+                <Label>Tipo</Label>
+                <select
+                  className={fieldClass()}
+                  onChange={(event) => changeType(event.target.value)}
+                  value={draft.type}
+                >
+                  {SECTION_TYPES.map((type) => (
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <PayloadEditor draft={draft} setDraft={setDraft} />
+
+            {actionError && (
+              <p
+                className="rounded-md border border-rose-500/30 bg-rose-950/20 px-3 py-2 text-xs text-rose-300"
+                role="alert"
+              >
+                {actionError}
+              </p>
+            )}
+
+            <div className="flex justify-end gap-2 border-t border-zinc-900 pt-3">
+              <button
+                className="rounded-lg border border-zinc-800 px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-800/50"
+                onClick={() => {
+                  setDraft(null);
+                  setActionError("");
+                }}
+                type="button"
+              >
+                Annulla
+              </button>
+              <button
+                className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-950 hover:bg-white disabled:opacity-50"
+                disabled={saving}
+                type="submit"
+              >
+                <Save size={13} />
+                {saving ? "Salvataggio…" : "Salva sezione"}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {!loading && !error && sections.length === 0 && !draft && (
+          <p className="rounded-xl border border-dashed border-zinc-800 bg-zinc-950/30 py-12 text-center text-sm italic text-zinc-500">
+            Gli approfondimenti strutturati per questo nodo non sono ancora
+            disponibili.
+          </p>
+        )}
+
+        {!loading && sections.length > 0 && activeSection && !draft && (
+          <SectionCard
+            actions={
+              canEdit ? (
+                <div className="flex items-center gap-1.5">
+                  <IconButton
+                    label="Sposta su"
+                    onClick={() => moveSection(activeIndex, -1)}
+                  >
+                    <ArrowUp size={13} />
+                  </IconButton>
+                  <IconButton
+                    label="Sposta giù"
+                    onClick={() => moveSection(activeIndex, 1)}
+                  >
+                    <ArrowDown size={13} />
+                  </IconButton>
+                  <IconButton
+                    label="Modifica sezione"
+                    onClick={() => startEdit(activeSection)}
+                  >
+                    <Pencil size={13} />
+                  </IconButton>
+                  <IconButton
+                    danger
+                    label="Elimina sezione"
+                    onClick={() => handleDelete(activeSection)}
+                  >
+                    <Trash2 size={13} />
+                  </IconButton>
+                </div>
+              ) : null
+            }
+            key={activeSection.id}
+            section={activeSection}
+          />
+        )}
+      </div>
 
       {actionError && !draft && (
         <p
