@@ -532,7 +532,7 @@ const SkillMapContent = () => {
           zoomOnPinch
           zoomOnScroll
         >
-          <Background variant="dots" gap={24} size={1} color="#1e2d45" />
+          <Background variant="dots" gap={24} size={1.5} color="#64748b" />
           <Controls
             className="bg-slate-950/70! backdrop-blur-md! border! border-slate-800! rounded-lg! p-1! shadow-[0_0_15px_rgba(0,0,0,0.5)]!"
             position="bottom-left"
