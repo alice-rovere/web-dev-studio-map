@@ -96,9 +96,7 @@ const SkillMapContent = () => {
     [graph, expandedIds],
   );
 
-  const selectedNode = selectedNodeId
-    ? toDisplayNode(selectedNodeId)
-    : null;
+  const selectedNode = selectedNodeId ? toDisplayNode(selectedNodeId) : null;
 
   const selectedParents = useMemo(() => {
     if (!selectedNodeId) return [];
@@ -141,13 +139,10 @@ const SkillMapContent = () => {
       if (!position) return;
 
       const isSubNode =
-        (flowNode?.data?.parentCount ??
-          fallbackNode?.data?.parentCount ??
-          0) > 0;
-      const width =
-        flowNode?.measured?.width ?? (isSubNode ? 110 : 190);
-      const height =
-        flowNode?.measured?.height ?? (isSubNode ? 30 : 44);
+        (flowNode?.data?.parentCount ?? fallbackNode?.data?.parentCount ?? 0) >
+        0;
+      const width = flowNode?.measured?.width ?? (isSubNode ? 110 : 190);
+      const height = flowNode?.measured?.height ?? (isSubNode ? 30 : 44);
 
       setCenter(position.x + width / 2, position.y + height / 2, {
         zoom: 1,
@@ -287,7 +282,13 @@ const SkillMapContent = () => {
         },
       })),
     ],
-    [nodes, handleToggleChildren, highlightedIds, selectedNodeId, isDragEnabled],
+    [
+      nodes,
+      handleToggleChildren,
+      highlightedIds,
+      selectedNodeId,
+      isDragEnabled,
+    ],
   );
 
   const finalEdges = useMemo(
@@ -298,7 +299,8 @@ const SkillMapContent = () => {
           ...edge.style,
           opacity:
             highlightedIds &&
-            (!highlightedIds.has(edge.source) || !highlightedIds.has(edge.target))
+            (!highlightedIds.has(edge.source) ||
+              !highlightedIds.has(edge.target))
               ? 0.04
               : 1,
           transition: "opacity 0.25s ease",
@@ -333,7 +335,6 @@ const SkillMapContent = () => {
 
   return (
     <div className="absolute inset-0 w-full h-full bg-[#080e1a]">
-
       {/* Glow ambientale */}
       <div
         className="pointer-events-none absolute inset-0 z-0"
@@ -367,10 +368,7 @@ const SkillMapContent = () => {
         </div>
 
         <div className="pointer-events-auto flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
-          <SkillMapSearch
-            graph={graph}
-            onSelectNode={handleSearchSelectNode}
-          />
+          <SkillMapSearch graph={graph} onSelectNode={handleSearchSelectNode} />
 
           <AnimatePresence>
             {saveStatus && (
@@ -459,7 +457,7 @@ const SkillMapContent = () => {
       </div>
 
       {/* Legenda categorie */}
-      <div className="absolute bottom-[calc(1rem_+_env(safe-area-inset-bottom))] right-[calc(1rem_+_env(safe-area-inset-right))] z-20 hidden flex-col gap-1.5 rounded-xl border border-slate-800/60 bg-slate-950/75 p-3 backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.4)] md:flex">
+      <div className="absolute bottom-[calc(1rem+env(safe-area-inset-bottom))] right-[calc(1rem+env(safe-area-inset-right))] z-20 hidden flex-col gap-1.5 rounded-xl border border-slate-800/60 bg-slate-950/75 p-3 backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.4)] md:flex">
         {[
           { label: "Frontend", color: "#7ab8ff" },
           { label: "Backend", color: "#64d9bd" },
@@ -467,10 +465,15 @@ const SkillMapContent = () => {
         ].map(({ label, color }) => (
           <div key={label} className="flex items-center gap-2">
             <span
-              className="h-2 w-2 rounded-full flex-shrink-0"
-              style={{ backgroundColor: color, boxShadow: `0 0 6px ${color}90` }}
+              className="h-2 w-2 rounded-full shrink-0"
+              style={{
+                backgroundColor: color,
+                boxShadow: `0 0 6px ${color}90`,
+              }}
             />
-            <span className="text-[10px] font-mono text-slate-400">{label}</span>
+            <span className="text-[10px] font-mono text-slate-400">
+              {label}
+            </span>
           </div>
         ))}
       </div>

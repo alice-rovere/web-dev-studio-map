@@ -32,11 +32,14 @@ function ContentBlock({ section }) {
   ) {
     return (
       <div className="w-full overflow-x-auto border border-zinc-800 rounded-lg bg-zinc-950/40 my-4 backdrop-blur-sm">
-        <table className="w-full min-w-[480px] border-collapse text-left text-sm text-zinc-300">
+        <table className="w-full min-w-120 border-collapse text-left text-sm text-zinc-300">
           <thead className="bg-zinc-900/60 uppercase tracking-wider text-xs font-mono text-zinc-400 border-b border-zinc-800">
             <tr>
               {payload.columns.map((column, index) => (
-                <th className="px-4 py-3 font-semibold" key={`${column}-${index}`}>
+                <th
+                  className="px-4 py-3 font-semibold"
+                  key={`${column}-${index}`}
+                >
                   {column}
                 </th>
               ))}
@@ -109,7 +112,9 @@ function ContentBlock({ section }) {
 
 export function SectionCard({ section, actions }) {
   const subtitle =
-    typeof section.payload?.subtitle === "string" ? section.payload.subtitle : "";
+    typeof section.payload?.subtitle === "string"
+      ? section.payload.subtitle
+      : "";
   const blocks = Array.isArray(section.payload?.blocks)
     ? section.payload.blocks
     : [section];
@@ -133,11 +138,7 @@ export function SectionCard({ section, actions }) {
         {blocks.map((block, index) => (
           <ContentBlock
             key={`${block.type}-${index}`}
-            section={
-              Array.isArray(section.payload?.blocks)
-                ? block
-                : section
-            }
+            section={Array.isArray(section.payload?.blocks) ? block : section}
           />
         ))}
       </div>

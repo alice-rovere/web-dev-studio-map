@@ -81,7 +81,9 @@ function ensurePayload(type, payload) {
         Array.isArray(source.rows) && source.rows.length > 0
           ? source.rows.map((row) =>
               columns.map((_, index) =>
-                Array.isArray(row) && row[index] != null ? String(row[index]) : "",
+                Array.isArray(row) && row[index] != null
+                  ? String(row[index])
+                  : "",
               ),
             )
           : [columns.map(() => "")];
@@ -246,7 +248,9 @@ function PayloadEditor({ draft, setDraft }) {
         ))}
         <button
           className="inline-flex w-fit items-center gap-1 rounded border border-zinc-800 px-2 py-1 text-[11px] text-zinc-300 hover:bg-zinc-800/50"
-          onClick={() => update((previous) => ({ items: [...previous.items, ""] }))}
+          onClick={() =>
+            update((previous) => ({ items: [...previous.items, ""] }))
+          }
           type="button"
         >
           <Plus size={12} /> Aggiungi voce
@@ -330,10 +334,7 @@ function PayloadEditor({ draft, setDraft }) {
               onClick={() =>
                 update((previous) => ({
                   columns: previous.columns,
-                  rows: [
-                    ...previous.rows,
-                    previous.columns.map(() => ""),
-                  ],
+                  rows: [...previous.rows, previous.columns.map(() => "")],
                 }))
               }
               type="button"
@@ -345,7 +346,7 @@ function PayloadEditor({ draft, setDraft }) {
             {payload.rows.map((row, rowIndex) => (
               <div className="overflow-x-auto" key={rowIndex}>
                 <div
-                  className="grid min-w-[480px] items-start gap-2"
+                  className="grid min-w-120 items-start gap-2"
                   style={{
                     gridTemplateColumns: `repeat(${payload.columns.length}, minmax(0, 1fr)) auto`,
                   }}
@@ -739,7 +740,7 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
       {!loading && sections.length > 0 && (
         <div
           aria-label="Sezioni del nodo"
-          className="flex items-center gap-1 overflow-x-auto border-b border-zinc-900 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex items-center gap-1 overflow-x-auto border-b border-zinc-900 scrollbar-none [&::-webkit-scrollbar]:hidden"
           role="tablist"
         >
           {sections.map((section) => {
