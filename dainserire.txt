@@ -93,4 +93,5 @@ Tornando al tuo obiettivo iniziale di aggiungere nuovi nodi alla mappa tramite S
 
 
 
-Tipi di file al mondo , strumenti come postman, supabase, firabase eccetera... 
+Tipi di file al mondo nelle linee guida, strumenti come postman, supabase, firabase eccetera... 
+inserire nodi : MPC, npx ( dove va?) Vite, HTTP , .net , nel css inserire media queries, linee guida per i non vedenti , nel css aria label, hidden, nodo apposta . inserire react three, react flow. 
