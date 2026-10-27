@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Background,
   Controls,
@@ -19,6 +19,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { nodeTypes } from "../flow/nodes/index.jsx";
 import NodeDetailsModal from "../components/NodeDetailsModal.jsx";
+import SkillMapSearch from "../components/SkillMapSearch.jsx";
 import NodeKnowledgePage from "./NodeKnowledge.jsx";
 import { useMapGraph } from "../hooks/useMapGraph";
 import { useAuth } from "../hooks/useAuth";
@@ -63,6 +64,7 @@ const SkillMapContent = () => {
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeKnowledgeId, setActiveKnowledgeId] = useState(null);
+  const [pendingFocusId, setPendingFocusId] = useState(null);
 
 
   const toDisplayNode = useCallback(
@@ -148,6 +150,46 @@ const SkillMapContent = () => {
     },
     [expandedIds, toggleNode, expandFocused, getNode, setCenter, nodes],
   );
+
+  const handleSearchSelectNode = useCallback(
+    (nodeId) => {
+      if (!graph.nodesById.has(nodeId)) return;
+
+      expandFocused(nodeId);
+      setSelectedNodeId(nodeId);
+      setIsModalOpen(true);
+      setPendingFocusId(nodeId);
+    },
+    [expandFocused, graph],
+  );
+
+  useEffect(() => {
+    if (!pendingFocusId) return undefined;
+
+    const frame = requestAnimationFrame(() => {
+      const flowNode = getNode(pendingFocusId);
+      const fallbackNode = nodes.find((node) => node.id === pendingFocusId);
+      const position = flowNode?.position ?? fallbackNode?.position;
+
+      if (position) {
+        const isSubNode =
+          (flowNode?.data?.parentCount ??
+            fallbackNode?.data?.parentCount ??
+            0) > 0;
+        const width = flowNode?.measured?.width ?? (isSubNode ? 110 : 190);
+        const height = flowNode?.measured?.height ?? (isSubNode ? 30 : 44);
+
+        setCenter(position.x + width / 2, position.y + height / 2, {
+          zoom: 1.2,
+          duration: 600,
+        });
+      }
+
+      setPendingFocusId(null);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [pendingFocusId, nodes, getNode, setCenter]);
 
   // Nodi rilevanti per focus opacity
   const highlightedIds = useMemo(() => {
@@ -305,6 +347,11 @@ const SkillMapContent = () => {
         </div>
 
         <div className="pointer-events-auto flex items-center gap-2">
+          <SkillMapSearch
+            graph={graph}
+            onSelectNode={handleSearchSelectNode}
+          />
+
           <AnimatePresence>
             {saveStatus && (
               <motion.div
