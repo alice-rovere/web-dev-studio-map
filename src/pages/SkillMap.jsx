@@ -66,6 +66,9 @@ const SkillMapContent = () => {
   const [activeKnowledgeId, setActiveKnowledgeId] = useState(null);
   const [pendingFocusId, setPendingFocusId] = useState(null);
 
+  const toggleNodeFocus = useCallback((nodeId) => {
+    setSelectedNodeId((prev) => (prev === nodeId ? null : nodeId));
+  }, []);
 
   const toDisplayNode = useCallback(
     (nodeId) => {
@@ -122,6 +125,8 @@ const SkillMapContent = () => {
 
   const handleToggleChildren = useCallback(
     (nodeId) => {
+      toggleNodeFocus(nodeId);
+
       if (expandedIds.has(nodeId)) {
         toggleNode(nodeId);
         return;
@@ -148,7 +153,15 @@ const SkillMapContent = () => {
         duration: 500,
       });
     },
-    [expandedIds, toggleNode, expandFocused, getNode, setCenter, nodes],
+    [
+      expandedIds,
+      toggleNode,
+      expandFocused,
+      getNode,
+      setCenter,
+      nodes,
+      toggleNodeFocus,
+    ],
   );
 
   const handleSearchSelectNode = useCallback(
@@ -201,9 +214,10 @@ const SkillMapContent = () => {
   }, [selectedNodeId, graph]);
 
   // Click su un nodo: attiva/disattiva focus e opacità
-  const handleNodeClick = useCallback((_, node) => {
-    setSelectedNodeId((prev) => (prev === node.id ? null : node.id));
-  }, []);
+  const handleNodeClick = useCallback(
+    (_, node) => toggleNodeFocus(node.id),
+    [toggleNodeFocus],
+  );
 
   // Salvataggio posizione con debounce (solo root nodes se il drag è abilitato)
   const handleNodeDragStop = useCallback(
