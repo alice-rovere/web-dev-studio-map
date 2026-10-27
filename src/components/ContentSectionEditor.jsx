@@ -103,6 +103,24 @@ function ensurePayload(type, payload) {
   }
 }
 
+function getSectionBlocks(section) {
+  const payload = section.payload ?? {};
+
+  if (Array.isArray(payload.blocks)) {
+    return payload.blocks.map((block) => ({
+      type: block?.type ?? "text",
+      payload: ensurePayload(block?.type ?? "text", block?.payload),
+    }));
+  }
+
+  return [
+    {
+      type: section.type,
+      payload: ensurePayload(section.type, payload),
+    },
+  ];
+}
+
 function fieldClass() {
   return "w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 outline-none focus:border-zinc-600";
 }
@@ -547,8 +565,8 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
     setDraft({
       id: null,
       title: "",
-      type: "text",
-      payload: emptyPayload("text"),
+      subtitle: "",
+      blocks: [],
     });
     setActionError("");
   }
@@ -557,19 +575,37 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
     setDraft({
       id: section.id,
       title: section.title,
-      type: section.type,
-      payload: ensurePayload(section.type, section.payload),
+      subtitle: section.payload?.subtitle ?? "",
+      blocks: getSectionBlocks(section),
     });
     setActiveSectionId(section.id);
     setActionError("");
   }
 
-  function changeType(type) {
+  function addBlock(type) {
     setDraft((previous) => ({
       ...previous,
-      type,
-      payload: ensurePayload(type, previous.payload),
+      blocks: [...previous.blocks, { type, payload: emptyPayload(type) }],
     }));
+  }
+
+  function updateBlock(index, updater) {
+    setDraft((previous) => ({
+      ...previous,
+      blocks: previous.blocks.map((block, blockIndex) =>
+        blockIndex === index ? updater(block) : block,
+      ),
+    }));
+  }
+
+  function moveBlock(index, direction) {
+    const target = index + direction;
+    setDraft((previous) => {
+      if (target < 0 || target >= previous.blocks.length) return previous;
+      const blocks = [...previous.blocks];
+      [blocks[index], blocks[target]] = [blocks[target], blocks[index]];
+      return { ...previous, blocks };
+    });
   }
 
   async function handleSave(event) {
@@ -588,14 +624,14 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
       if (draft.id) {
         await updateSection(draft.id, {
           title: draft.title.trim(),
-          type: draft.type,
-          payload: draft.payload,
+          type: "text",
+          payload: { subtitle: draft.subtitle.trim(), blocks: draft.blocks },
         });
       } else {
         const created = await createSection(nodeId, {
           title: draft.title.trim(),
-          type: draft.type,
-          payload: draft.payload,
+          type: "text",
+          payload: { subtitle: draft.subtitle.trim(), blocks: draft.blocks },
           sort_order: sections.length,
         });
         setActiveSectionId(created?.id ?? null);
@@ -775,7 +811,7 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
               </button>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-[1fr_180px]">
+            <div className="grid gap-3">
               <label className="block">
                 <Label>Titolo</Label>
                 <input
@@ -791,22 +827,88 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
                 />
               </label>
               <label className="block">
-                <Label>Tipo</Label>
-                <select
+                <Label>Sottotitolo</Label>
+                <input
                   className={fieldClass()}
-                  onChange={(event) => changeType(event.target.value)}
-                  value={draft.type}
-                >
-                  {SECTION_TYPES.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(event) =>
+                    setDraft((previous) => ({
+                      ...previous,
+                      subtitle: event.target.value,
+                    }))
+                  }
+                  placeholder="Sottotitolo della sezione (facoltativo)"
+                  value={draft.subtitle}
+                />
               </label>
             </div>
 
-            <PayloadEditor draft={draft} setDraft={setDraft} />
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <Label>Contenuti della sezione</Label>
+                <span className="text-[11px] text-zinc-500">
+                  Aggiungi tutti i blocchi che vuoi
+                </span>
+              </div>
+
+              {draft.blocks.map((block, index) => (
+                <div
+                  className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-950/40 p-3"
+                  key={`${block.type}-${index}`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-400">
+                      {SECTION_TYPES.find((type) => type.value === block.type)
+                        ?.label ?? "Contenuto"}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <IconButton
+                        label="Sposta contenuto su"
+                        onClick={() => moveBlock(index, -1)}
+                      >
+                        <ArrowUp size={12} />
+                      </IconButton>
+                      <IconButton
+                        label="Sposta contenuto giù"
+                        onClick={() => moveBlock(index, 1)}
+                      >
+                        <ArrowDown size={12} />
+                      </IconButton>
+                      <IconButton
+                        danger
+                        label="Rimuovi contenuto"
+                        onClick={() =>
+                          setDraft((previous) => ({
+                            ...previous,
+                            blocks: previous.blocks.filter(
+                              (_, blockIndex) => blockIndex !== index,
+                            ),
+                          }))
+                        }
+                      >
+                        <Trash2 size={12} />
+                      </IconButton>
+                    </div>
+                  </div>
+                  <PayloadEditor
+                    draft={block}
+                    setDraft={(updater) => updateBlock(index, updater)}
+                  />
+                </div>
+              ))}
+
+              <div className="flex flex-wrap gap-2">
+                {SECTION_TYPES.map((type) => (
+                  <button
+                    className="inline-flex min-h-9 items-center gap-1 rounded-lg border border-zinc-800 px-2.5 py-1.5 text-[11px] text-zinc-300 transition-colors hover:border-zinc-600 hover:bg-zinc-800/50 hover:text-white"
+                    key={type.value}
+                    onClick={() => addBlock(type.value)}
+                    type="button"
+                  >
+                    <Plus size={12} /> {type.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             {actionError && (
               <p

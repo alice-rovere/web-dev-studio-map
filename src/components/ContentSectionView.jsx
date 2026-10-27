@@ -108,15 +108,39 @@ function ContentBlock({ section }) {
 }
 
 export function SectionCard({ section, actions }) {
+  const subtitle =
+    typeof section.payload?.subtitle === "string" ? section.payload.subtitle : "";
+  const blocks = Array.isArray(section.payload?.blocks)
+    ? section.payload.blocks
+    : [section];
+
   return (
     <article className="rounded-xl border border-zinc-900/60 bg-zinc-900/10 p-4 backdrop-blur-sm sm:p-5">
       <div className="flex items-start justify-between gap-3 border-b border-zinc-800/80 pb-2 mb-4">
-        <h3 className="text-base font-bold font-mono tracking-wide text-zinc-200 uppercase">
-          {section.title}
-        </h3>
+        <div>
+          <h3 className="text-base font-bold font-mono tracking-wide text-zinc-200 uppercase">
+            {section.title}
+          </h3>
+          {subtitle && (
+            <p className="mt-1 text-sm leading-relaxed text-zinc-400">
+              {subtitle}
+            </p>
+          )}
+        </div>
         {actions}
       </div>
-      <ContentBlock section={section} />
+      <div className="space-y-4">
+        {blocks.map((block, index) => (
+          <ContentBlock
+            key={`${block.type}-${index}`}
+            section={
+              Array.isArray(section.payload?.blocks)
+                ? block
+                : section
+            }
+          />
+        ))}
+      </div>
     </article>
   );
 }
