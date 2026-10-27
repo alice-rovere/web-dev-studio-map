@@ -91,7 +91,7 @@ export default function GlossaryManager() {
   return (
     <div className="space-y-5">
       <form
-        className="space-y-3 rounded-xl border border-slate-800 bg-slate-950/40 p-5"
+        className="space-y-3 rounded-xl border border-slate-800 bg-slate-950/40 p-4 sm:p-5"
         onSubmit={handleAdd}
       >
         <div>
@@ -101,7 +101,7 @@ export default function GlossaryManager() {
           </p>
         </div>
 
-        <div className="grid gap-3 md:grid-cols-[240px_1fr]">
+        <div className="grid gap-3 sm:grid-cols-[240px_1fr]">
           <input
             className={inputClass}
             disabled={saving}
@@ -128,7 +128,7 @@ export default function GlossaryManager() {
         )}
 
         <button
-          className="inline-flex items-center gap-1.5 rounded-lg bg-cyan-400 px-3 py-2 text-xs font-semibold text-slate-950 hover:bg-cyan-300 disabled:opacity-50"
+          className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-cyan-400 px-3 py-2 text-xs font-semibold text-slate-950 hover:bg-cyan-300 disabled:opacity-50"
           disabled={saving}
           type="submit"
         >
@@ -137,8 +137,8 @@ export default function GlossaryManager() {
         </button>
       </form>
 
-      <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-5">
-        <div className="mb-3 flex items-center justify-between">
+      <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 sm:p-5">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-bold text-white">Termini</h2>
           <button
             className="text-[11px] text-slate-400 hover:text-white"
@@ -173,7 +173,7 @@ export default function GlossaryManager() {
             <li className="py-3" key={entry.id}>
               {editingId === entry.id ? (
                 <form className="space-y-2" onSubmit={handleUpdate}>
-                  <div className="grid gap-2 md:grid-cols-[240px_1fr]">
+                  <div className="grid gap-2 sm:grid-cols-[240px_1fr]">
                     <input
                       className={inputClass}
                       disabled={saving}
@@ -189,14 +189,14 @@ export default function GlossaryManager() {
                   </div>
                   <div className="flex justify-end gap-2">
                     <button
-                      className="rounded border border-slate-800 p-1.5 text-slate-400 hover:text-white"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded border border-slate-800 p-1.5 text-slate-400 hover:text-white"
                       onClick={() => setEditingId(null)}
                       type="button"
                     >
                       <X size={13} />
                     </button>
                     <button
-                      className="inline-flex items-center gap-1 rounded border border-cyan-500/30 px-2 py-1 text-[11px] text-cyan-300 hover:bg-cyan-500/10"
+                      className="inline-flex min-h-9 items-center gap-1 rounded border border-cyan-500/30 px-2 py-1 text-[11px] text-cyan-300 hover:bg-cyan-500/10"
                       disabled={saving}
                       type="submit"
                     >
@@ -217,7 +217,7 @@ export default function GlossaryManager() {
                   <div className="flex shrink-0 gap-1.5">
                     <button
                       aria-label="Modifica termine"
-                      className="rounded border border-slate-800 p-1.5 text-slate-400 hover:text-white"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded border border-slate-800 p-1.5 text-slate-400 hover:text-white"
                       onClick={() => startEdit(entry)}
                       type="button"
                     >
@@ -225,7 +225,7 @@ export default function GlossaryManager() {
                     </button>
                     <button
                       aria-label="Elimina termine"
-                      className="rounded border border-slate-800 p-1.5 text-rose-400 hover:bg-slate-800/60"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded border border-slate-800 p-1.5 text-rose-400 hover:bg-slate-800/60"
                       onClick={() => handleDelete(entry)}
                       type="button"
                     >

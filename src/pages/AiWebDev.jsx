@@ -54,7 +54,7 @@ function CopyButton({ text }) {
 function Card({ children, className = "" }) {
   return (
     <section
-      className={`bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4 ${className}`}
+      className={`space-y-4 rounded-xl border border-slate-800 bg-slate-900 p-4 sm:p-6 ${className}`}
     >
       {children}
     </section>
@@ -65,7 +65,7 @@ function SectionTitle({ id, children }) {
   return (
     <h3
       id={id}
-      className="text-xl font-bold text-white border-b border-slate-800 pb-2"
+      className="border-b border-slate-800 pb-2 text-lg font-bold text-white sm:text-xl"
     >
       {children}
     </h3>
@@ -99,7 +99,7 @@ const TABS = [
             verificabile e con il contesto giusto. Questi criteri valgono sia
             per una chat sia per un agente che modifica il repository.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          <div className="grid grid-cols-1 gap-4 pt-2 sm:grid-cols-2">
             {promptBestPractices.map(({ title, description, tip }) => (
               <article
                 key={title}
@@ -146,7 +146,7 @@ const TABS = [
                   </div>
                   <CopyButton text={prompt} />
                 </div>
-                <pre className="overflow-x-auto rounded-lg border border-slate-800 bg-[#0b1120] p-4 text-xs font-mono leading-relaxed text-slate-300 whitespace-pre-wrap">
+                <pre className="overflow-x-auto whitespace-pre-wrap rounded-lg border border-slate-800 bg-[#0b1120] p-3 font-mono text-xs leading-relaxed text-slate-300 sm:p-4">
                   {prompt}
                 </pre>
               </article>
@@ -205,7 +205,7 @@ const TABS = [
     content: (
       <section aria-labelledby="ai-tools-title" className="space-y-4">
         <SectionTitle id="ai-tools-title">OpenCode e OpenRouter</SectionTitle>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
           {aiTools.map(({ name, role, description, points, href, label }) => (
             <Card key={name} className="h-full">
               <div className="flex items-center gap-2 text-indigo-400">
@@ -253,7 +253,7 @@ const TABS = [
             AGENTS.md e il punto di ingresso delle istruzioni per un agente.
             Vive nel repository, viene versionato e vale per tutte le sessioni.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          <div className="grid grid-cols-1 gap-4 pt-2 sm:grid-cols-2">
             {agentFileSections.map(({ title, description }) => (
               <article
                 key={title}
@@ -296,7 +296,7 @@ const TABS = [
             dell&apos;implementazione e resta consultabile anche quando la chat
             finisce.
           </p>
-          <ol className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <ol className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {openSpecFlow.map(({ step, description }) => (
               <li
                 key={step}
@@ -318,7 +318,7 @@ const TABS = [
               </h4>
               <CopyButton text={openSpecTree} />
             </div>
-            <pre className="overflow-x-auto rounded-lg border border-slate-800 bg-[#0b1120] p-4 text-xs font-mono leading-relaxed text-slate-300 whitespace-pre">
+            <pre className="overflow-x-auto whitespace-pre rounded-lg border border-slate-800 bg-[#0b1120] p-3 font-mono text-xs leading-relaxed text-slate-300 sm:p-4">
               {openSpecTree}
             </pre>
           </div>
@@ -376,7 +376,7 @@ const TABS = [
       <section aria-labelledby="ai-resources-title" className="space-y-4">
         <Card>
           <SectionTitle id="ai-resources-title">Link utili</SectionTitle>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          <ul className="grid grid-cols-1 gap-4 pt-2 sm:grid-cols-2">
             {resources.map(({ label, description, href, category }) => (
               <li key={href} className="group h-full">
                 <a
@@ -413,23 +413,23 @@ export default function AiWebDev() {
   return (
     <section
       aria-labelledby="ai-web-dev-title"
-      className="relative h-full w-full bg-slate-950 text-slate-100 p-6 md:p-12 font-sans overflow-y-auto"
+      className="relative h-full w-full overflow-y-auto bg-slate-950 p-4 font-sans text-slate-100 sm:p-6 md:p-12"
     >
       <StickyNotesCanvas boardId="page-ai-web-dev" />
 
-      <div className="max-w-4xl mx-auto space-y-12 pb-5">
+      <div className="mx-auto max-w-4xl space-y-8 pb-5 sm:space-y-12">
         <header className="space-y-3">
-          <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-cyan-400">
+          <div className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-cyan-400">
             <Sparkles size={14} />
             <span>AI nel web development</span>
           </div>
           <h2
             id="ai-web-dev-title"
-            className="text-3xl md:text-4xl font-extrabold tracking-tight text-white"
+            className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl md:text-4xl"
           >
             Lavorare con l&apos;AI senza perdere il controllo
           </h2>
-          <p className="text-slate-400 text-lg leading-relaxed max-w-3xl">
+          <p className="max-w-3xl text-base leading-relaxed text-slate-400 sm:text-lg">
             Prompt efficaci, gestione dei token, agenti da terminale e
             specifiche versionate: pratiche concrete per usare l&apos;AI come
             strumento di sviluppo, con revisione e sicurezza al centro.

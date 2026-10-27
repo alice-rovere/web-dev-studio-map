@@ -11,12 +11,12 @@ export function StickyNotesCanvas({ boardId }) {
   if (loading) return null;
 
   return (
-    <>
+    <div className="hidden md:block">
       {/* 
         BOTTONE FISSO IN BASSO A DESTRA: 
         Ridisegnato in linea con la UI di DevSkillMap (Sfondo scuro ardesia, bordo e testo indaco)
       */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-[calc(1.5rem_+_env(safe-area-inset-bottom))] right-[calc(1.5rem_+_env(safe-area-inset-right))] z-50">
         <button
           onClick={addNote}
           className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-indigo-400 hover:text-indigo-300 px-4 py-2.5 rounded-full text-xs font-bold shadow-2xl border border-indigo-500/20 hover:border-indigo-500/40 transition-all active:scale-95 cursor-pointer"
@@ -35,7 +35,7 @@ export function StickyNotesCanvas({ boardId }) {
           onUpdate={(fields) => updateNoteFields(note.id, fields)}
         />
       ))}
-    </>
+    </div>
   );
 }
 

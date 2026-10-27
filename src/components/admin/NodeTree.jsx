@@ -106,7 +106,7 @@ export default function NodeTree({ nodes, parents, categories, selectedId, onSel
   }
 
   return (
-    <div className="space-y-1">
+    <div className="max-h-[45dvh] space-y-1 overflow-y-auto pr-1 lg:max-h-none">
       <div className="mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-slate-500">
         <Network size={12} />
         Gerarchia nodi

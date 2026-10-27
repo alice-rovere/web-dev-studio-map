@@ -245,7 +245,7 @@ export default function SkillMapSearch({ graph, onSelectNode }) {
       <button
         aria-expanded={isOpen}
         aria-haspopup="dialog"
-        className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[11px] font-mono backdrop-blur-md transition-all ${
+        className={`flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[11px] font-mono backdrop-blur-md transition-all sm:min-h-0 sm:px-3 ${
           isOpen
             ? "border-cyan-500/50 bg-cyan-950/40 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.2)]"
             : "border-slate-700/60 bg-slate-900/70 text-slate-400 hover:border-cyan-500/40 hover:text-slate-200"
@@ -264,7 +264,7 @@ export default function SkillMapSearch({ graph, onSelectNode }) {
       {isOpen && (
         <div
           aria-label="Ricerca nodi e glossario"
-          className="absolute right-0 top-[calc(100%+8px)] z-50 w-[min(380px,calc(100vw-2rem))] overflow-hidden rounded-xl border border-slate-700/70 bg-slate-950/95 shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-xl"
+          className="fixed left-3 right-3 top-[calc(env(safe-area-inset-top)_+_4.25rem)] z-50 overflow-hidden rounded-xl border border-slate-700/70 bg-slate-950/95 shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-xl sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%_+_8px)] sm:w-[min(380px,calc(100vw-2rem))]"
           role="dialog"
         >
           <div className="flex items-center gap-2 border-b border-slate-800/80 px-3 py-2.5">
@@ -298,7 +298,7 @@ export default function SkillMapSearch({ graph, onSelectNode }) {
             )}
           </div>
 
-          <div className="max-h-[360px] overflow-y-auto p-2">
+          <div className="max-h-[min(360px,45dvh)] overflow-y-auto p-2">
             {!normalizedQuery && (
               <p className="px-2.5 py-6 text-center text-[11px] font-mono text-slate-500">
                 Cerca tra i nodi della mappa e i termini del glossario.

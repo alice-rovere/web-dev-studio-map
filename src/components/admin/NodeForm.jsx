@@ -363,7 +363,7 @@ export default function NodeForm({
 
   return (
     <form
-      className="space-y-6 rounded-xl border border-slate-800 bg-slate-950/40 p-5"
+      className="space-y-6 rounded-xl border border-slate-800 bg-slate-950/40 p-4 sm:p-5"
       onSubmit={handleSubmit}
     >
       <div className="flex items-start justify-between gap-3">
@@ -385,7 +385,7 @@ export default function NodeForm({
         </button>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         <label className="block">
           <FieldLabel>Label</FieldLabel>
           <input
@@ -424,7 +424,7 @@ export default function NodeForm({
 
       <section>
         <FieldLabel>Categorie</FieldLabel>
-        <div className="grid gap-2 md:grid-cols-3">
+        <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
           {CATEGORIES.map((category) => {
             const state = categoryState[category];
             return (
@@ -591,9 +591,9 @@ export default function NodeForm({
             <p className="text-xs text-slate-600">Nessun link configurato.</p>
           )}
           {studyUrls.map((entry, index) => (
-            <div className="flex gap-2" key={index}>
+            <div className="flex flex-col gap-2 sm:flex-row" key={index}>
               <input
-                className={inputClass}
+                className={`${inputClass} min-w-0 flex-1`}
                 onChange={(event) =>
                   updateStudyUrl(index, "label", event.target.value)
                 }
@@ -601,7 +601,7 @@ export default function NodeForm({
                 value={entry.label}
               />
               <input
-                className={inputClass}
+                className={`${inputClass} min-w-0 flex-1`}
                 onChange={(event) =>
                   updateStudyUrl(index, "url", event.target.value)
                 }
@@ -662,7 +662,7 @@ export default function NodeForm({
       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-900 pt-4">
         {node ? (
           <button
-            className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-500/10 disabled:opacity-50"
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-500/10 disabled:opacity-50"
             disabled={saving}
             onClick={handleDelete}
             type="button"
@@ -674,14 +674,14 @@ export default function NodeForm({
         )}
         <div className="flex gap-2">
           <button
-            className="rounded-lg border border-slate-800 px-3 py-2 text-xs text-slate-300 hover:bg-slate-800/50"
+            className="min-h-10 rounded-lg border border-slate-800 px-3 py-2 text-xs text-slate-300 hover:bg-slate-800/50"
             onClick={onCancel}
             type="button"
           >
             Annulla
           </button>
           <button
-            className="inline-flex items-center gap-1.5 rounded-lg bg-cyan-400 px-3 py-2 text-xs font-semibold text-slate-950 hover:bg-cyan-300 disabled:opacity-50"
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-cyan-400 px-3 py-2 text-xs font-semibold text-slate-950 hover:bg-cyan-300 disabled:opacity-50"
             disabled={saving}
             type="submit"
           >

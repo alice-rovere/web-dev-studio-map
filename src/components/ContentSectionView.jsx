@@ -32,7 +32,7 @@ function ContentBlock({ section }) {
   ) {
     return (
       <div className="w-full overflow-x-auto border border-zinc-800 rounded-lg bg-zinc-950/40 my-4 backdrop-blur-sm">
-        <table className="w-full border-collapse text-left text-sm text-zinc-300">
+        <table className="w-full min-w-[480px] border-collapse text-left text-sm text-zinc-300">
           <thead className="bg-zinc-900/60 uppercase tracking-wider text-xs font-mono text-zinc-400 border-b border-zinc-800">
             <tr>
               {payload.columns.map((column, index) => (
@@ -88,7 +88,7 @@ function ContentBlock({ section }) {
   if (section?.type === "code" && typeof payload.code === "string") {
     return (
       <div className="my-4">
-        <pre className="bg-zinc-950 border border-zinc-800/80 rounded-lg p-4 font-mono text-xs text-emerald-400 shadow-inner overflow-x-auto selection:bg-emerald-500/20">
+        <pre className="overflow-x-auto rounded-lg border border-zinc-800/80 bg-zinc-950 p-3 font-mono text-xs text-emerald-400 shadow-inner selection:bg-emerald-500/20 sm:p-4">
           <code>{payload.code}</code>
         </pre>
         {payload.language && (
@@ -109,7 +109,7 @@ function ContentBlock({ section }) {
 
 export function SectionCard({ section, actions }) {
   return (
-    <article className="border border-zinc-900/60 bg-zinc-900/10 p-5 rounded-xl backdrop-blur-sm">
+    <article className="rounded-xl border border-zinc-900/60 bg-zinc-900/10 p-4 backdrop-blur-sm sm:p-5">
       <div className="flex items-start justify-between gap-3 border-b border-zinc-800/80 pb-2 mb-4">
         <h3 className="text-base font-bold font-mono tracking-wide text-zinc-200 uppercase">
           {section.title}

@@ -77,11 +77,11 @@ function GuidelineCard({ id, title, items }) {
   return (
     <section
       aria-labelledby={id}
-      className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4"
+      className="space-y-4 rounded-xl border border-slate-800 bg-slate-900 p-4 sm:p-6"
     >
       <h3
         id={id}
-        className="text-xl font-bold text-white border-b border-slate-800 pb-2"
+        className="border-b border-slate-800 pb-2 text-lg font-bold text-white sm:text-xl"
       >
         {title}
       </h3>
@@ -97,12 +97,12 @@ const TABS = [
     content: (
       <section
         aria-labelledby="guidelines-naming-title"
-        className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-6"
+        className="space-y-6 rounded-xl border border-slate-800 bg-slate-900 p-4 sm:p-6"
       >
         <div className="space-y-2">
           <h3
             id="guidelines-naming-title"
-            className="text-xl font-bold text-white"
+            className="text-lg font-bold text-white sm:text-xl"
           >
             Naming convention
           </h3>
@@ -124,12 +124,12 @@ const TABS = [
         </div>
 
         <div className="overflow-x-auto rounded-lg border border-slate-800 bg-slate-950">
-          <table className="w-full text-left text-sm border-collapse">
+          <table className="w-full min-w-[620px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-slate-800 bg-slate-900/50 text-slate-400 font-semibold">
-                <th className="p-4">Stile</th>
-                <th className="p-4">Uso tipico</th>
-                <th className="p-4">Esempio</th>
+                <th className="p-3 sm:p-4">Stile</th>
+                <th className="p-3 sm:p-4">Uso tipico</th>
+                <th className="p-3 sm:p-4">Esempio</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
@@ -138,11 +138,11 @@ const TABS = [
                   key={name}
                   className="hover:bg-slate-900/30 transition-colors"
                 >
-                  <td className="p-4 font-mono text-indigo-400 font-medium whitespace-nowrap">
+                  <td className="whitespace-nowrap p-3 font-mono font-medium text-indigo-400 sm:p-4">
                     {name}
                   </td>
-                  <td className="p-4 text-slate-300">{usage}</td>
-                  <td className="p-4">
+                  <td className="p-3 text-slate-300 sm:p-4">{usage}</td>
+                  <td className="p-3 sm:p-4">
                     <code className="font-mono text-xs bg-slate-900 border border-slate-800 text-amber-400 px-2 py-1 rounded block md:inline-block max-w-xs md:max-w-none overflow-x-auto">
                       {example}
                     </code>
@@ -205,19 +205,19 @@ export default function Guidelines() {
   return (
     <section
       aria-labelledby="guidelines-page-title"
-      className="relative h-full w-full bg-slate-950 text-slate-100 p-6 md:p-12 font-sans overflow-y-auto"
+      className="relative h-full w-full overflow-y-auto bg-slate-950 p-4 font-sans text-slate-100 sm:p-6 md:p-12"
     >
       <StickyNotesCanvas boardId="page-linee-guida" />
 
-      <div className="max-w-4xl mx-auto space-y-12 pb-5">
+      <div className="mx-auto max-w-4xl space-y-8 pb-5 sm:space-y-12">
         <header className="space-y-3">
           <h2
             id="guidelines-page-title"
-            className="text-3xl md:text-4xl font-extrabold tracking-tight text-white"
+            className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl md:text-4xl"
           >
             Linee guida dello studio
           </h2>
-          <p className="text-slate-400 text-lg leading-relaxed max-w-3xl">
+          <p className="max-w-3xl text-base leading-relaxed text-slate-400 sm:text-lg">
             Convenzioni condivise per mantenere il codice leggibile, accessibile
             e sicuro. Le regole specifiche di una tecnologia possono essere
             approfondite nella relativa scheda della mappa.

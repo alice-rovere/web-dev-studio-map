@@ -119,7 +119,7 @@ function IconButton({ label, onClick, children, danger = false }) {
   return (
     <button
       aria-label={label}
-      className={`rounded border border-zinc-800 p-1.5 transition-colors hover:bg-zinc-800/60 ${
+      className={`inline-flex min-h-8 min-w-8 items-center justify-center rounded border border-zinc-800 p-1.5 transition-colors hover:bg-zinc-800/60 ${
         danger ? "text-rose-400" : "text-zinc-400 hover:text-white"
       }`}
       onClick={onClick}
@@ -325,51 +325,52 @@ function PayloadEditor({ draft, setDraft }) {
           </div>
           <div className="grid gap-2">
             {payload.rows.map((row, rowIndex) => (
-              <div
-                className="grid items-start gap-2"
-                key={rowIndex}
-                style={{
-                  gridTemplateColumns: `repeat(${payload.columns.length}, minmax(0, 1fr)) auto`,
-                }}
-              >
-                {payload.columns.map((_, columnIndex) => (
-                  <input
-                    className={fieldClass()}
-                    key={columnIndex}
-                    onChange={(event) =>
+              <div className="overflow-x-auto" key={rowIndex}>
+                <div
+                  className="grid min-w-[480px] items-start gap-2"
+                  style={{
+                    gridTemplateColumns: `repeat(${payload.columns.length}, minmax(0, 1fr)) auto`,
+                  }}
+                >
+                  {payload.columns.map((_, columnIndex) => (
+                    <input
+                      className={fieldClass()}
+                      key={columnIndex}
+                      onChange={(event) =>
+                        update((previous) => ({
+                          columns: previous.columns,
+                          rows: previous.rows.map((currentRow, index) =>
+                            index === rowIndex
+                              ? currentRow.map((cell, cellIndex) =>
+                                  cellIndex === columnIndex
+                                    ? event.target.value
+                                    : cell,
+                                )
+                              : currentRow,
+                          ),
+                        }))
+                      }
+                      value={row[columnIndex] ?? ""}
+                    />
+                  ))}
+                  <IconButton
+                    danger
+                    label="Rimuovi riga"
+                    onClick={() =>
                       update((previous) => ({
                         columns: previous.columns,
-                        rows: previous.rows.map((currentRow, index) =>
-                          index === rowIndex
-                            ? currentRow.map((cell, cellIndex) =>
-                                cellIndex === columnIndex
-                                  ? event.target.value
-                                  : cell,
+                        rows:
+                          previous.rows.length > 1
+                            ? previous.rows.filter(
+                                (_, index) => index !== rowIndex,
                               )
-                            : currentRow,
-                        ),
+                            : [previous.columns.map(() => "")],
                       }))
                     }
-                    value={row[columnIndex] ?? ""}
-                  />
-                ))}
-                <IconButton
-                  danger
-                  label="Rimuovi riga"
-                  onClick={() =>
-                    update((previous) => ({
-                      columns: previous.columns,
-                      rows:
-                        previous.rows.length > 1
-                          ? previous.rows.filter(
-                              (_, index) => index !== rowIndex,
-                            )
-                          : [previous.columns.map(() => "")],
-                    }))
-                  }
-                >
-                  <Trash2 size={13} />
-                </IconButton>
+                  >
+                    <Trash2 size={13} />
+                  </IconButton>
+                </div>
               </div>
             ))}
           </div>
@@ -659,7 +660,7 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
 
   return (
     <section className="space-y-4">
-      <div className="flex items-center justify-between gap-3 border-b border-zinc-900 pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-900 pb-3">
         <div>
           <h2 className="font-mono text-sm font-bold uppercase tracking-wider text-zinc-200">
             Approfondimenti strutturati
@@ -670,7 +671,7 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
         </div>
         {canEdit && !draft && (
           <button
-            className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-950/20 px-3 py-2 text-xs font-semibold text-cyan-300 hover:bg-cyan-500/15"
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-950/20 px-3 py-2 text-xs font-semibold text-cyan-300 hover:bg-cyan-500/15"
             onClick={startNew}
             type="button"
           >
@@ -712,7 +713,7 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
               <button
                 aria-controls="node-sections-panel"
                 aria-selected={isActive}
-                className={`-mb-px shrink-0 whitespace-nowrap border-b-2 px-3 pt-2 pb-2.5 font-mono text-[11px] tracking-wider uppercase transition-colors ${
+                className={`-mb-px min-h-10 shrink-0 whitespace-nowrap border-b-2 px-2.5 pt-2 pb-2.5 font-mono text-[11px] uppercase tracking-wider transition-colors sm:px-3 ${
                   isActive
                     ? "border-cyan-400 text-white"
                     : "border-transparent text-zinc-500 hover:border-zinc-700 hover:text-zinc-300"
@@ -754,10 +755,10 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
       >
         {draft && (
           <form
-            className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-900/30 p-5"
+            className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 sm:p-5"
             onSubmit={handleSave}
           >
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-zinc-200">
                 {draft.id ? "Modifica sezione" : "Nuova sezione"}
               </h3>
@@ -774,7 +775,7 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
               </button>
             </div>
 
-            <div className="grid gap-3 md:grid-cols-[1fr_180px]">
+            <div className="grid gap-3 sm:grid-cols-[1fr_180px]">
               <label className="block">
                 <Label>Titolo</Label>
                 <input
@@ -818,7 +819,7 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
 
             <div className="flex justify-end gap-2 border-t border-zinc-900 pt-3">
               <button
-                className="rounded-lg border border-zinc-800 px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-800/50"
+                className="min-h-10 rounded-lg border border-zinc-800 px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-800/50"
                 onClick={() => {
                   setDraft(null);
                   setActionError("");
@@ -828,7 +829,7 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
                 Annulla
               </button>
               <button
-                className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-950 hover:bg-white disabled:opacity-50"
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-950 hover:bg-white disabled:opacity-50"
                 disabled={saving}
                 type="submit"
               >

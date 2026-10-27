@@ -99,10 +99,10 @@ export default function NodeDetailsModal({
         <Dialog.Overlay className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-xs data-[state=open]:animate-fade-in" />
 
         <Dialog.Content
-          className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md bg-slate-950/85 backdrop-blur-xl border-l border-slate-900 shadow-[-10px_0_30px_rgba(0,0,0,0.8)] flex flex-col focus:outline-hidden"
+          className="fixed inset-y-0 right-0 z-50 flex h-dvh w-full flex-col border-l border-slate-900 bg-slate-950/85 shadow-[-10px_0_30px_rgba(0,0,0,0.8)] backdrop-blur-xl focus:outline-hidden sm:max-w-md"
           style={{ borderColor: `${accentColor}30` }}
         >
-          <header className="p-4 border-b border-slate-900 flex justify-between items-start bg-slate-950/50">
+          <header className="flex items-start justify-between border-b border-slate-900 bg-slate-950/50 px-4 pt-[calc(0.75rem_+_env(safe-area-inset-top))] pb-3 sm:p-4">
             <div>
               <span className="text-[10px] font-mono font-bold tracking-widest text-cyan-500 block mb-0.5 animate-pulse">
                 &gt;_ NODE INSPECTOR
@@ -136,7 +136,7 @@ export default function NodeDetailsModal({
             <Dialog.Close asChild>
               <button
                 aria-label="Chiudi pannello"
-                className="p-1 rounded border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-900/50 transition-colors cursor-pointer"
+                className="inline-flex h-9 w-9 items-center justify-center rounded border border-slate-800 p-2 text-slate-400 transition-colors hover:bg-slate-900/50 hover:text-white sm:h-auto sm:w-auto sm:p-1"
                 type="button"
               >
                 <X size={16} />
@@ -144,7 +144,7 @@ export default function NodeDetailsModal({
             </Dialog.Close>
           </header>
 
-          <div className="flex-1 overflow-y-auto p-5 font-sans space-y-6 text-sm text-slate-300">
+          <div className="flex-1 space-y-6 overflow-y-auto px-4 pt-4 pb-[calc(1.25rem_+_env(safe-area-inset-bottom))] font-sans text-sm text-slate-300 sm:p-5">
             <div className="flex items-center gap-2 border-b border-slate-900/50 pb-3">
               <span
                 className="text-cyan-400 font-mono font-bold text-lg"

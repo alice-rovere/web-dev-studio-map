@@ -134,7 +134,7 @@ function PathCanvas({ graph }) {
   }, [graph, fitView]);
 
   return (
-    <div className="w-full h-full min-h-137.5 bg-slate-950 rounded-2xl overflow-hidden border border-slate-800">
+    <div className="h-full min-h-0 w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-950 sm:rounded-2xl">
       <ReactFlow
         nodes={graph.nodes}
         edges={graph.edges}
@@ -143,6 +143,9 @@ function PathCanvas({ graph }) {
         nodesConnectable={false}
         nodesDraggable={false}
         fitView
+        fitViewOptions={{ padding: 0.2 }}
+        minZoom={0.2}
+        zoomOnPinch
       >
         <Background color="#334155" gap={24} size={1} variant="dots" />
         <Controls className=" bg-slate-900  border-slate-700  fill-slate-400 [&_button]:border-slate-800" />
@@ -162,18 +165,18 @@ export default function FullStackPathPage() {
     setActiveStep((prev) => Math.min(GUIDED_LESSONS.length - 1, prev + 1));
 
   return (
-    <main className="w-full min-h-screen bg-slate-900 text-slate-100 p-6 flex flex-col gap-6 font-sans">
+    <main className="flex h-full w-full flex-col gap-4 overflow-y-auto bg-slate-900 p-4 font-sans text-slate-100 sm:gap-6 sm:p-6">
       {/* Header statico */}
       <header className="border-b border-slate-800 pb-4">
-        <h1 className="text-2xl font-bold text-white tracking-tight mt-1">
+        <h1 className="mt-1 text-xl font-bold tracking-tight text-white sm:text-2xl">
           Il ciclo di vita di una Richiesta Web
         </h1>
       </header>
 
       {/* Layout a due colonne: Controllo lezione a sinistra, Canvas a destra */}
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 items-start flex-1">
+      <div className="grid flex-1 grid-cols-1 items-start gap-4 sm:gap-6 xl:grid-cols-4">
         {/* Pannello Descrittivo */}
-        <section className="xl:col-span-1 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between h-full min-h-75">
+        <section className="flex h-full min-h-0 flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900 p-4 shadow-xl sm:p-5 xl:col-span-1">
           <div>
             <span className="text-xs font-medium text-slate-500 block mb-2">
               Passo {activeStep + 1} di {GUIDED_LESSONS.length}
@@ -192,7 +195,7 @@ export default function FullStackPathPage() {
               disabled={activeStep === 0}
               onClick={handlePrev}
               type="button"
-              className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-30 disabled:hover:bg-slate-800 text-white transition-colors border border-slate-700"
+              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-700 disabled:opacity-30 disabled:hover:bg-slate-800"
             >
               <ChevronLeft size={16} />
               Indietro
@@ -201,7 +204,7 @@ export default function FullStackPathPage() {
               disabled={activeStep === GUIDED_LESSONS.length - 1}
               onClick={handleNext}
               type="button"
-              className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-30 disabled:hover:bg-blue-600 text-white transition-colors shadow-lg shadow-blue-600/10"
+              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-blue-600/10 transition-colors hover:bg-blue-500 disabled:opacity-30 disabled:hover:bg-blue-600"
             >
               Avanti
               <ChevronRight size={16} />
@@ -210,7 +213,7 @@ export default function FullStackPathPage() {
         </section>
 
         {/* Canvas React Flow */}
-        <div className="xl:col-span-3 h-162.5 w-full">
+        <div className="h-[60dvh] min-h-[360px] w-full xl:col-span-3 xl:h-162.5">
           <ReactFlowProvider>
             <PathCanvas graph={graph} />
           </ReactFlowProvider>

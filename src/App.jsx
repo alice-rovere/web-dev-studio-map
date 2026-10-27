@@ -16,9 +16,9 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <GlossaryProvider>
-          <div className="w-screen h-screen flex flex-col overflow-hidden bg-[#0b1120] text-[#e8edf5]">
+          <div className="flex h-dvh w-full flex-col overflow-hidden bg-[#0b1120] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-[env(safe-area-inset-top)] text-[#e8edf5]">
             <Navbar />
-            <div className="grow relative w-full h-full">
+            <div className="relative min-h-0 w-full grow overflow-hidden">
               <Routes>
                 <Route path="/" element={<SkillMap />} />
                 <Route path="/linee-guida" element={<Guidelines />} />

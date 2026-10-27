@@ -89,7 +89,7 @@ const TechNode = ({ data }) => {
               event.stopPropagation();
               onOpenModal?.();
             }}
-            className="p-1 text-slate-400 hover:text-cyan-300 rounded hover:bg-slate-800/60 transition-colors cursor-pointer"
+            className="inline-flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded p-1.5 text-slate-400 transition-colors hover:bg-slate-800/60 hover:text-cyan-300 sm:min-h-0 sm:min-w-0 sm:p-1"
             title="Mostra dettagli"
             type="button"
           >
@@ -102,7 +102,7 @@ const TechNode = ({ data }) => {
                 event.stopPropagation();
                 onToggleChildren?.();
               }}
-              className="p-1 rounded hover:bg-slate-800/60 transition-colors cursor-pointer flex items-center justify-center"
+              className="flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded p-1.5 transition-colors hover:bg-slate-800/60 sm:min-h-0 sm:min-w-0 sm:p-1"
               style={{ color: isOpen ? accent : "#94a3b8" }}
               title={isOpen ? "Riduci" : "Espandi"}
               type="button"

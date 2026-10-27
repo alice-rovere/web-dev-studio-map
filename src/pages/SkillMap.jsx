@@ -324,8 +324,8 @@ const SkillMapContent = () => {
       />
 
       {/* HUD superiore */}
-      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-5 py-3 pointer-events-none">
-        <div className="flex items-center gap-2.5">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-col gap-2 px-3 py-2 sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-3">
+        <div className="flex min-w-0 items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-xl border border-indigo-500/30 bg-indigo-950/60 backdrop-blur-md shadow-[0_0_12px_rgba(99,102,241,0.2)]">
             <Layers size={15} className="text-indigo-400" />
           </div>
@@ -346,7 +346,7 @@ const SkillMapContent = () => {
           </div>
         </div>
 
-        <div className="pointer-events-auto flex items-center gap-2">
+        <div className="pointer-events-auto flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
           <SkillMapSearch
             graph={graph}
             onSelectNode={handleSearchSelectNode}
@@ -359,7 +359,7 @@ const SkillMapContent = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.18 }}
-                className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-mono backdrop-blur-md ${
+                className={`flex items-center gap-1.5 rounded-full border px-2 py-1 text-[10px] font-mono backdrop-blur-md sm:px-3 ${
                   saveStatus === "saved"
                     ? "border-emerald-500/30 bg-emerald-950/70 text-emerald-400"
                     : saveStatus === "error"
@@ -376,15 +376,17 @@ const SkillMapContent = () => {
                 {saveStatus === "error" && (
                   <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
                 )}
-                {saveStatus === "saving" && "Salvataggio..."}
-                {saveStatus === "saved" && "Posizione salvata"}
-                {saveStatus === "error" && "Errore - controlla RLS"}
+                <span className="hidden sm:inline">
+                  {saveStatus === "saving" && "Salvataggio..."}
+                  {saveStatus === "saved" && "Posizione salvata"}
+                  {saveStatus === "error" && "Errore - controlla RLS"}
+                </span>
               </motion.div>
             )}
           </AnimatePresence>
 
           <button
-            className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[11px] font-mono backdrop-blur-md transition-all ${
+            className={`flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[11px] font-mono backdrop-blur-md transition-all sm:min-h-0 sm:px-3 ${
               isDragEnabled
                 ? "border-cyan-500/50 bg-cyan-950/40 text-cyan-300 hover:border-cyan-400 hover:text-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.2)]"
                 : "border-slate-700/60 bg-slate-900/70 text-slate-400 hover:border-slate-600 hover:text-slate-200"
@@ -402,7 +404,9 @@ const SkillMapContent = () => {
             ) : (
               <Lock size={12} className="text-slate-400" />
             )}
-            <span>{isDragEnabled ? "Sposta nodi: ON" : "Sposta nodi: OFF"}</span>
+            <span className="hidden sm:inline">
+              {isDragEnabled ? "Sposta nodi: ON" : "Sposta nodi: OFF"}
+            </span>
             <span
               className={`h-1.5 w-1.5 rounded-full transition-colors ${
                 isDragEnabled
@@ -413,29 +417,29 @@ const SkillMapContent = () => {
           </button>
 
           <button
-            className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-700/60 bg-slate-900/70 px-3 py-1.5 text-[11px] font-mono text-slate-400 backdrop-blur-md transition-all hover:border-indigo-500/40 hover:text-slate-200"
+            className="flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-slate-700/60 bg-slate-900/70 px-2.5 py-1.5 text-[11px] font-mono text-slate-400 backdrop-blur-md transition-all hover:border-indigo-500/40 hover:text-slate-200 sm:min-h-0 sm:px-3"
             onClick={handleCollapseAll}
             title="Collassa tutti i nodi espansi"
             type="button"
           >
             <ChevronDown size={12} />
-            Collassa tutto
+            <span className="hidden sm:inline">Collassa tutto</span>
           </button>
 
           <button
-            className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-700/60 bg-slate-900/70 px-3 py-1.5 text-[11px] font-mono text-slate-400 backdrop-blur-md transition-all hover:border-rose-500/40 hover:text-rose-300"
+            className="flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-slate-700/60 bg-slate-900/70 px-2.5 py-1.5 text-[11px] font-mono text-slate-400 backdrop-blur-md transition-all hover:border-rose-500/40 hover:text-rose-300 sm:min-h-0 sm:px-3"
             onClick={() => reload()}
             title="Ricarica la mappa"
             type="button"
           >
             <LayoutGrid size={12} />
-            Reset layout
+            <span className="hidden sm:inline">Reset layout</span>
           </button>
         </div>
       </div>
 
       {/* Legenda categorie */}
-      <div className="absolute bottom-4 right-4 z-20 flex flex-col gap-1.5 rounded-xl border border-slate-800/60 bg-slate-950/75 p-3 backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.4)]">
+      <div className="absolute bottom-[calc(1rem_+_env(safe-area-inset-bottom))] right-[calc(1rem_+_env(safe-area-inset-right))] z-20 hidden flex-col gap-1.5 rounded-xl border border-slate-800/60 bg-slate-950/75 p-3 backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.4)] sm:flex">
         {[
           { label: "Frontend", color: "#7ab8ff" },
           { label: "Backend", color: "#64d9bd" },
@@ -488,6 +492,8 @@ const SkillMapContent = () => {
       <ReactFlow
         edges={finalEdges}
         fitView
+        fitViewOptions={{ padding: 0.2 }}
+        minZoom={0.2}
         nodeTypes={nodeTypes}
         nodes={finalNodes}
         nodesDraggable={isDragEnabled}
@@ -498,6 +504,7 @@ const SkillMapContent = () => {
           setIsModalOpen(false);
         }}
         panOnDrag
+        zoomOnPinch
         zoomOnScroll
       >
         <Background variant="dots" gap={24} size={1} color="#1e2d45" />

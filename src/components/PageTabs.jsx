@@ -80,7 +80,7 @@ export default function PageTabs({
             <button
               aria-controls={panelId(tab)}
               aria-selected={isActive}
-              className={`-mb-px shrink-0 cursor-pointer whitespace-nowrap border-b-2 px-3 pt-2 pb-2.5 font-mono text-[11px] tracking-wider uppercase transition-colors ${
+              className={`-mb-px min-h-10 shrink-0 cursor-pointer whitespace-nowrap border-b-2 px-2.5 pt-2 pb-2.5 font-mono text-[11px] uppercase tracking-wider transition-colors sm:px-3 ${
                 isActive ? palette.active : palette.inactive
               }`}
               id={tabId(tab)}

@@ -21,11 +21,11 @@ const TABS = [
     content: (
       <section
         aria-labelledby="security-injection-title"
-        className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4"
+        className="space-y-4 rounded-xl border border-slate-800 bg-slate-900 p-4 sm:p-6"
       >
         <h3
           id="security-injection-title"
-          className="text-xl font-bold text-white border-b border-slate-800 pb-2"
+          className="border-b border-slate-800 pb-2 text-lg font-bold text-white sm:text-xl"
         >
           Che cos’è la script injection?
         </h3>
@@ -58,11 +58,11 @@ const TABS = [
     content: (
       <section
         aria-labelledby="security-load-title"
-        className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4"
+        className="space-y-4 rounded-xl border border-slate-800 bg-slate-900 p-4 sm:p-6"
       >
         <h3
           id="security-load-title"
-          className="text-xl font-bold text-white border-b border-slate-800 pb-2"
+          className="border-b border-slate-800 pb-2 text-lg font-bold text-white sm:text-xl"
         >
           Cosa significa “bombardare” un server?
         </h3>
@@ -88,11 +88,11 @@ const TABS = [
     content: (
       <section
         aria-labelledby="security-practice-title"
-        className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4"
+        className="space-y-4 rounded-xl border border-slate-800 bg-slate-900 p-4 sm:p-6"
       >
         <h3
           id="security-practice-title"
-          className="text-xl font-bold text-white border-b border-slate-800 pb-2"
+          className="border-b border-slate-800 pb-2 text-lg font-bold text-white sm:text-xl"
         >
           Un percorso sicuro per iniziare
         </h3>
@@ -121,15 +121,15 @@ const TABS = [
     content: (
       <section
         aria-labelledby="security-resources-title"
-        className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4 pb"
+        className="space-y-4 rounded-xl border border-slate-800 bg-slate-900 p-4 sm:p-6"
       >
         <h3
           id="security-resources-title"
-          className="text-xl font-bold text-white border-b border-slate-800 pb-2"
+          className="border-b border-slate-800 pb-2 text-lg font-bold text-white sm:text-xl"
         >
           Risorse per approfondire
         </h3>
-        <ul className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+        <ul className="grid grid-cols-1 gap-4 pt-2 sm:grid-cols-2 md:grid-cols-3">
           {learningResources.map(({ label, description, href }) => (
             <li key={href} className="group h-full">
               <a
@@ -162,17 +162,17 @@ export default function Security() {
   return (
     <section
       aria-labelledby="security-learning-title"
-      className="h-full w-full bg-slate-950 text-slate-100 p-6 md:p-12 font-sans overflow-y-auto"
+      className="h-full w-full overflow-y-auto bg-slate-950 p-4 font-sans text-slate-100 sm:p-6 md:p-12"
     >
-      <div className="max-w-4xl mx-auto space-y-12 pb-5">
+      <div className="mx-auto max-w-4xl space-y-8 pb-5 sm:space-y-12">
         <header className="space-y-3">
           <h2
             id="security-learning-title"
-            className="text-3xl md:text-4xl font-extrabold tracking-tight text-white"
+            className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl md:text-4xl"
           >
             Sicurezza informatica e hacking etico
           </h2>
-          <p className="text-slate-400 text-lg leading-relaxed max-w-3xl">
+          <p className="max-w-3xl text-base leading-relaxed text-slate-400 sm:text-lg">
             La sicurezza informatica studia come proteggere applicazioni, dati e
             infrastrutture. L’hacking etico applica le stesse conoscenze per
             individuare e correggere problemi, ma solo con un’autorizzazione

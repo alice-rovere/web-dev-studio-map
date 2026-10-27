@@ -16,7 +16,7 @@ export default function NodeKnowledgePage({
   const accent = CATEGORY_COLORS[primaryCategory] ?? "#94a3b8";
 
   return (
-    <section className="h-full w-full overflow-y-auto bg-zinc-950 text-zinc-100 p-6 md:p-10 font-sans border border-zinc-900 relative shadow-2xl before:absolute before:top-0 before:left-0 before:w-full before:h-px before:bg-linear-to-r before:from-transparent before:via-zinc-700 before:to-transparent">
+    <section className="relative h-full w-full overflow-y-auto border border-zinc-900 bg-zinc-950 p-4 font-sans text-zinc-100 shadow-2xl before:absolute before:top-0 before:left-0 before:h-px before:w-full before:bg-linear-to-r before:from-transparent before:via-zinc-700 before:to-transparent sm:p-6 md:p-10">
       <StickyNotesCanvas boardId="page-node-knowledge" />
 
       <div className="max-w-4xl mx-auto pb-16">
@@ -48,7 +48,7 @@ export default function NodeKnowledgePage({
           <button
             aria-label="Chiudi e torna alla mappa"
             title="Chiudi e torna alla mappa"
-            className="text-zinc-400 hover:text-white transition-colors border border-zinc-800 hover:border-zinc-700 p-2 rounded-lg bg-zinc-900/60 hover:bg-zinc-800 shrink-0 cursor-pointer shadow-sm"
+            className="inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/60 p-2 text-zinc-400 shadow-sm transition-colors hover:border-zinc-700 hover:bg-zinc-800 hover:text-white"
             onClick={onClose}
             type="button"
           >
@@ -57,13 +57,13 @@ export default function NodeKnowledgePage({
         </div>
 
         <h2
-          className="text-3xl font-extrabold tracking-tight text-white mb-2 uppercase border-b border-zinc-900 pb-2"
+          className="mb-2 border-b border-zinc-900 pb-2 text-2xl font-extrabold uppercase tracking-tight text-white sm:text-3xl"
           id="node-knowledge-title"
         >
           {nodeData.label || "Nodo"}
         </h2>
 
-        <p className="mb-8 max-w-3xl text-sm leading-relaxed text-zinc-400">
+        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:mb-8">
           {nodeData.description ||
             "Approfondimento strutturato del nodo selezionato."}
         </p>

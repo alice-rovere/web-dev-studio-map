@@ -105,7 +105,7 @@ export default function Admin() {
 
   return (
     <div className="absolute inset-0 overflow-y-auto bg-[#0b1120]">
-      <div className="mx-auto max-w-7xl p-6">
+      <div className="mx-auto max-w-7xl p-4 sm:p-6">
         <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan-500">
@@ -118,7 +118,7 @@ export default function Admin() {
             </p>
           </div>
           <button
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2 text-xs text-slate-300 hover:bg-slate-900"
+            className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2 text-xs text-slate-300 hover:bg-slate-900"
             onClick={() => reload({ clearPositions: true })}
             type="button"
           >
@@ -132,7 +132,7 @@ export default function Admin() {
             const Icon = entry.icon;
             return (
               <button
-                className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                className={`inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
                   tab === entry.id
                     ? "bg-cyan-400 text-slate-950"
                     : "border border-slate-800 text-slate-300 hover:bg-slate-900"
@@ -215,21 +215,21 @@ export default function Admin() {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <button
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-800 px-3 py-2 text-xs text-slate-300 hover:bg-slate-900"
+                        className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-slate-800 px-3 py-2 text-xs text-slate-300 hover:bg-slate-900"
                         onClick={startEdit}
                         type="button"
                       >
                         <Pencil size={13} /> Modifica
                       </button>
                       <button
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-800 px-3 py-2 text-xs text-slate-300 hover:bg-slate-900"
+                        className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-slate-800 px-3 py-2 text-xs text-slate-300 hover:bg-slate-900"
                         onClick={() => startCreate(selectedNode.id)}
                         type="button"
                       >
                         <Plus size={13} /> Crea figlio
                       </button>
                       <button
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-800 px-3 py-2 text-xs text-slate-300 hover:bg-slate-900"
+                        className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-slate-800 px-3 py-2 text-xs text-slate-300 hover:bg-slate-900"
                         onClick={() => {
                           setContentNodeId(selectedNode.id);
                           setTab("content");

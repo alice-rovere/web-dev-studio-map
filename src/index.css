@@ -1,4 +1,30 @@
 @import "tailwindcss";
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    overscroll-behavior: none;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  button,
+  a,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
 /* Tematizzazione Cyberpunk per i controlli di React Flow */
 /* installare l'estensione ufficiale Tailwind CSS IntelliSense che insegna all'editor a riconoscere le direttive di Tailwind. */
 .react-flow__controls-button {
