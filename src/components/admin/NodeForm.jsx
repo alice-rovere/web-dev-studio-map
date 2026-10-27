@@ -13,7 +13,7 @@ import {
   updateNode,
 } from "../../services/mapService";
 
-const CATEGORIES = ["frontend", "backend", "database"];
+const CATEGORIES = ["frontend", "backend", "database", "devops", "tools"];
 
 function slugify(value) {
   return value

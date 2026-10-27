@@ -12,10 +12,9 @@
 -- - Infrastructure as Code (IaC): Terraform, configurazione dichiarativa
 -- - Monitoraggio & Osservabilità: Prometheus, Grafana, Datadog, ELK Stack
 --
--- NOTA CATEGORIA:
--- Nel rispetto del vincolo CHECK (category in ('frontend', 'backend', 'database')),
--- tutti i nodi DevOps hanno come categoria primaria 'backend', con categoria secondaria
--- 'frontend' per le piattaforme di deploy web (Vercel, PaaS).
+-- NOTA:
+-- Richiede l'esecuzione preventiva della migrazione 0003_add_devops_category.sql
+-- per consentire 'devops' nel vincolo CHECK di public.node_categories.
 -- ============================================================================
 
 -- ----------------------------------------------------------------------------
@@ -23,7 +22,7 @@
 -- ----------------------------------------------------------------------------
 insert into public.nodes (slug, label, description, best_practices, naming_conventions, study_urls, position_x, position_y)
 values
-  -- Root: Containerizzazione Docker
+  -- Root: Containerizzazione Docker (Quadrante DevOps, Bottom-Right)
   (
     'docker-containers',
     'Docker & Containerizzazione',
@@ -38,7 +37,7 @@ values
       {"label":"Docker Official Documentation","url":"https://docs.docker.com/"},
       {"label":"Docker Multi-stage Builds Guide","url":"https://docs.docker.com/build/building/multi-stage/"}
     ]'::jsonb,
-    740, 920
+    -180, 320
   ),
 
   -- Figlio di docker-containers: Kubernetes
@@ -77,7 +76,7 @@ values
     null, null
   ),
 
-  -- Root: CI/CD & Pipeline
+  -- Root: CI/CD & Pipeline (Quadrante DevOps, Bottom-Right)
   (
     'ci-cd-pipelines',
     'CI/CD & Automazione Pipeline',
@@ -92,7 +91,7 @@ values
       {"label":"GitHub Actions Documentation","url":"https://docs.github.com/en/actions"},
       {"label":"GitLab CI/CD Documentation","url":"https://docs.gitlab.com/ee/ci/"}
     ]'::jsonb,
-    960, 720
+    -100, 140
   ),
 
   -- Figlio di ci-cd-pipelines: Monitoraggio & Osservabilità
@@ -114,7 +113,7 @@ values
     null, null
   ),
 
-  -- Root: Cloud Providers
+  -- Root: Cloud Providers (Quadrante DevOps, Bottom-Right)
   (
     'cloud-providers',
     'Cloud Providers (AWS, GCP, Azure)',
@@ -129,7 +128,7 @@ values
       {"label":"AWS Well-Architected Framework","url":"https://aws.amazon.com/architecture/well-architected/"},
       {"label":"Google Cloud Architecture Center","url":"https://cloud.google.com/architecture"}
     ]'::jsonb,
-    960, 920
+    -160, 560
   ),
 
   -- Figlio di cloud-providers: PaaS & Serverless
@@ -181,8 +180,9 @@ on conflict (slug) do update set
 -- ----------------------------------------------------------------------------
 -- 2. CATEGORIE (public.node_categories)
 -- ----------------------------------------------------------------------------
+-- Assegna DEVOPS come categoria primaria ufficiale
 insert into public.node_categories (node_id, category, is_primary)
-select id, 'backend', true from public.nodes where slug in (
+select id, 'devops', true from public.nodes where slug in (
   'docker-containers',
   'kubernetes',
   'web-servers-proxy',
@@ -194,9 +194,20 @@ select id, 'backend', true from public.nodes where slug in (
 )
 on conflict (node_id, category) do update set is_primary = excluded.is_primary;
 
--- Categoria secondaria frontend per piattaforme PaaS/Vercel usate per deploy web
+-- Categorie secondarie di integrazione
 insert into public.node_categories (node_id, category, is_primary)
-select id, 'frontend', false from public.nodes where slug in ('paas-serverless')
+select id, 'backend', false from public.nodes where slug in (
+  'docker-containers',
+  'kubernetes',
+  'web-servers-proxy',
+  'cloud-providers'
+)
+on conflict (node_id, category) do update set is_primary = excluded.is_primary;
+
+insert into public.node_categories (node_id, category, is_primary)
+select id, 'frontend', false from public.nodes where slug in (
+  'paas-serverless'
+)
 on conflict (node_id, category) do update set is_primary = excluded.is_primary;
 
 

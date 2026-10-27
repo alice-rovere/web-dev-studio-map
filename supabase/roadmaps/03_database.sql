@@ -33,7 +33,7 @@ values
       {"label":"PostgreSQL Official Documentation","url":"https://www.postgresql.org/docs/"},
       {"label":"Relational Database Concepts (Stanford)","url":"https://web.stanford.edu/class/cs145/"}
     ]'::jsonb,
-    440, 620
+    420, 640
   ),
 
   -- Figlio di database-relazionali: SQL DML / DDL / ACID
@@ -105,7 +105,7 @@ values
       {"label":"MongoDB What is NoSQL","url":"https://www.mongodb.com/nosql-explained"},
       {"label":"AWS: What is NoSQL?","url":"https://aws.amazon.com/nosql/"}
     ]'::jsonb,
-    720, 620
+    700, 640
   ),
 
   -- Figlio di database-nosql: Document DB (MongoDB)
@@ -177,7 +177,7 @@ values
       {"label":"Prisma ORM Documentation","url":"https://www.prisma.io/docs"},
       {"label":"Martin Fowler: Object-Relational Mapping","url":"https://martinfowler.com/bliki/OrmHate.html"}
     ]'::jsonb,
-    580, 820
+    560, 840
   ),
 
   -- Figlio di orm-odm-tools: Librerie ORM & ODM

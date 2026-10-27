@@ -1,4 +1,3 @@
-import { ArrowLeft } from "lucide-react";
 import { StickyNotesCanvas } from "../components/StickyNotesCanvas";
 
 const namingConventions = [
@@ -73,7 +72,7 @@ function GuidelineList({ items }) {
   );
 }
 
-export default function Guidelines({ onClose }) {
+export default function Guidelines() {
   return (
     // AGGIUNTO: "relative" permette ai post-it di fluttuare su TUTTA la pagina
     <section

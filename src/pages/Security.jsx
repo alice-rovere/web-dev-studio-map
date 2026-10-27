@@ -1,4 +1,4 @@
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
 const learningResources = [
   {
@@ -13,7 +13,7 @@ const learningResources = [
   },
 ];
 
-export default function Security({ onClose }) {
+export default function Security() {
   return (
     <section
       aria-labelledby="security-learning-title"

@@ -120,7 +120,7 @@ values
       {"label":"Google Cloud API Design Guide","url":"https://cloud.google.com/apis/design"},
       {"label":"OpenAPI Specification","url":"https://swagger.io/specification/"}
     ]'::jsonb,
-    780, 160
+    740, 180
   ),
 
   -- Figlio di api-architettura: RESTful API
@@ -228,7 +228,7 @@ values
       {"label":"OWASP Top 10 Web Application Security","url":"https://owasp.org/www-project-top-ten/"},
       {"label":"Auth0 Architecture Guides","url":"https://auth0.com/docs/get-started/authentication-and-authorization-flow"}
     ]'::jsonb,
-    980, 160
+    960, 180
   ),
 
   -- Figlio di backend-security: Auth JWT & OAuth
@@ -334,7 +334,7 @@ values
     '[
       {"label":"roadmap.sh Backend Developer","url":"https://roadmap.sh/backend"}
     ]'::jsonb,
-    1080, 360
+    850, 380
   ),
 
   -- Figlio di backend-languages: Python Backend
