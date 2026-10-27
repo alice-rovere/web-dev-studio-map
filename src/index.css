@@ -11,6 +11,12 @@
     color-scheme: dark;
   }
 
+  :root {
+    --app-canvas: #0b1220;
+    --app-muted-text: #b6c4d0;
+    --app-subtle-text: #d1d9e6;
+  }
+
   body {
     margin: 0;
     overscroll-behavior: none;
@@ -23,6 +29,21 @@
   [role="button"] {
     -webkit-tap-highlight-color: transparent;
   }
+}
+
+/* Raise muted text contrast and lift the darkest surfaces without leaving dark mode. */
+.text-slate-500,
+.text-zinc-500 {
+  color: var(--app-muted-text);
+}
+
+.text-slate-600,
+.text-zinc-600 {
+  color: var(--app-subtle-text);
+}
+
+.bg-slate-950 {
+  background-color: var(--app-canvas);
 }
 
 /* Tematizzazione Cyberpunk per i controlli di React Flow */

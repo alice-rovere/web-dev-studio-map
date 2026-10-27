@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { MotionConfig } from "framer-motion";
 import Navbar from "./components/Navbar";
 import RequireEditor from "./components/RequireEditor";
 import SkillMap from "./pages/SkillMap";
@@ -14,31 +15,33 @@ import { GlossaryProvider } from "./context/GlossaryProvider";
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <GlossaryProvider>
-          <div className="flex h-dvh w-full flex-col overflow-hidden bg-[#0b1120] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-[env(safe-area-inset-top)] text-[#e8edf5]">
-            <Navbar />
-            <div className="relative min-h-0 w-full grow overflow-hidden">
-              <Routes>
-                <Route path="/" element={<SkillMap />} />
-                <Route path="/linee-guida" element={<Guidelines />} />
-                <Route path="/sicurezza" element={<Security />} />
-                <Route path="/ai-web-dev" element={<AiWebDev />} />
-                <Route path="/percorso-guidato" element={<GuidedPath />} />
-                <Route path="/login" element={<Login />} />
-                <Route
-                  path="/admin"
-                  element={
-                    <RequireEditor>
-                      <Admin />
-                    </RequireEditor>
-                  }
-                />
-              </Routes>
+      <MotionConfig reducedMotion="user">
+        <AuthProvider>
+          <GlossaryProvider>
+            <div className="flex h-dvh w-full flex-col overflow-hidden bg-[#0b1220] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-[env(safe-area-inset-top)] text-[#e8edf5]">
+              <Navbar />
+              <div className="relative min-h-0 w-full grow overflow-hidden">
+                <Routes>
+                  <Route path="/" element={<SkillMap />} />
+                  <Route path="/linee-guida" element={<Guidelines />} />
+                  <Route path="/sicurezza" element={<Security />} />
+                  <Route path="/ai-web-dev" element={<AiWebDev />} />
+                  <Route path="/percorso-guidato" element={<GuidedPath />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route
+                    path="/admin"
+                    element={
+                      <RequireEditor>
+                        <Admin />
+                      </RequireEditor>
+                    }
+                  />
+                </Routes>
+              </div>
             </div>
-          </div>
-        </GlossaryProvider>
-      </AuthProvider>
+          </GlossaryProvider>
+        </AuthProvider>
+      </MotionConfig>
     </BrowserRouter>
   );
 }

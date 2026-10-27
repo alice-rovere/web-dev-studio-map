@@ -15,7 +15,7 @@ import {
   RefreshCw,
   Unlock,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 import { nodeTypes } from "../flow/nodes/index.jsx";
 import NodeDetailsModal from "../components/NodeDetailsModal.jsx";
@@ -30,6 +30,7 @@ import { saveNodePosition } from "../services/mapService";
 import "@xyflow/react/dist/style.css";
 
 const SkillMapContent = () => {
+  const shouldReduceMotion = useReducedMotion();
   const { isEditor } = useAuth();
   const {
     graph,
@@ -334,7 +335,7 @@ const SkillMapContent = () => {
   }
 
   return (
-    <div className="absolute inset-0 w-full h-full bg-[#080e1a]">
+    <div className="absolute inset-0 w-full h-full bg-[#0b1220]">
       {/* Glow ambientale */}
       <div
         className="pointer-events-none absolute inset-0 z-0"
@@ -376,7 +377,7 @@ const SkillMapContent = () => {
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.18 }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.18 }}
                 className={`flex items-center gap-1.5 rounded-full border px-2 py-1 text-[10px] font-mono backdrop-blur-md sm:px-3 ${
                   saveStatus === "saved"
                     ? "border-emerald-500/30 bg-emerald-950/70 text-emerald-400"
