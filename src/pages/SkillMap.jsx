@@ -19,6 +19,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { nodeTypes } from "../flow/nodes/index.jsx";
 import NodeDetailsModal from "../components/NodeDetailsModal.jsx";
+import MobileSkillTree from "../components/MobileSkillTree.jsx";
 import SkillMapSearch from "../components/SkillMapSearch.jsx";
 import NodeKnowledgePage from "./NodeKnowledge.jsx";
 import { useMapGraph } from "../hooks/useMapGraph";
@@ -180,6 +181,11 @@ const SkillMapContent = () => {
     if (!pendingFocusId) return undefined;
 
     const frame = requestAnimationFrame(() => {
+      if (window.matchMedia("(max-width: 767px)").matches) {
+        setPendingFocusId(null);
+        return;
+      }
+
       const flowNode = getNode(pendingFocusId);
       const fallbackNode = nodes.find((node) => node.id === pendingFocusId);
       const position = flowNode?.position ?? fallbackNode?.position;
@@ -400,7 +406,7 @@ const SkillMapContent = () => {
           </AnimatePresence>
 
           <button
-            className={`flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[11px] font-mono backdrop-blur-md transition-all sm:min-h-0 sm:px-3 ${
+            className={`hidden min-h-9 cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[11px] font-mono backdrop-blur-md transition-all md:flex md:min-h-0 md:px-3 ${
               isDragEnabled
                 ? "border-cyan-500/50 bg-cyan-950/40 text-cyan-300 hover:border-cyan-400 hover:text-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.2)]"
                 : "border-slate-700/60 bg-slate-900/70 text-slate-400 hover:border-slate-600 hover:text-slate-200"
@@ -453,7 +459,7 @@ const SkillMapContent = () => {
       </div>
 
       {/* Legenda categorie */}
-      <div className="absolute bottom-[calc(1rem_+_env(safe-area-inset-bottom))] right-[calc(1rem_+_env(safe-area-inset-right))] z-20 hidden flex-col gap-1.5 rounded-xl border border-slate-800/60 bg-slate-950/75 p-3 backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.4)] sm:flex">
+      <div className="absolute bottom-[calc(1rem_+_env(safe-area-inset-bottom))] right-[calc(1rem_+_env(safe-area-inset-right))] z-20 hidden flex-col gap-1.5 rounded-xl border border-slate-800/60 bg-slate-950/75 p-3 backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.4)] md:flex">
         {[
           { label: "Frontend", color: "#7ab8ff" },
           { label: "Backend", color: "#64d9bd" },
@@ -503,30 +509,42 @@ const SkillMapContent = () => {
       )}
 
       {/* ReactFlow */}
-      <ReactFlow
-        edges={finalEdges}
-        fitView
-        fitViewOptions={{ padding: 0.2 }}
-        minZoom={0.2}
-        nodeTypes={nodeTypes}
-        nodes={finalNodes}
-        nodesDraggable={isDragEnabled}
-        onNodeClick={handleNodeClick}
-        onNodeDragStop={handleNodeDragStop}
-        onPaneClick={() => {
-          setSelectedNodeId(null);
-          setIsModalOpen(false);
+      <div className="absolute inset-0 hidden md:block">
+        <ReactFlow
+          edges={finalEdges}
+          fitView
+          fitViewOptions={{ padding: 0.2 }}
+          minZoom={0.2}
+          nodeTypes={nodeTypes}
+          nodes={finalNodes}
+          nodesDraggable={isDragEnabled}
+          onNodeClick={handleNodeClick}
+          onNodeDragStop={handleNodeDragStop}
+          onPaneClick={() => {
+            setSelectedNodeId(null);
+            setIsModalOpen(false);
+          }}
+          panOnDrag
+          zoomOnPinch
+          zoomOnScroll
+        >
+          <Background variant="dots" gap={24} size={1} color="#1e2d45" />
+          <Controls
+            className="bg-slate-950/70! backdrop-blur-md! border! border-slate-800! rounded-lg! p-1! shadow-[0_0_15px_rgba(0,0,0,0.5)]!"
+            position="bottom-left"
+          />
+        </ReactFlow>
+      </div>
+
+      <MobileSkillTree
+        expandedIds={expandedIds}
+        graph={graph}
+        onOpenDetails={(nodeId) => {
+          setSelectedNodeId(nodeId);
+          setIsModalOpen(true);
         }}
-        panOnDrag
-        zoomOnPinch
-        zoomOnScroll
-      >
-        <Background variant="dots" gap={24} size={1} color="#1e2d45" />
-        <Controls
-          className="bg-slate-950/70! backdrop-blur-md! border! border-slate-800! rounded-lg! p-1! shadow-[0_0_15px_rgba(0,0,0,0.5)]!"
-          position="bottom-left"
-        />
-      </ReactFlow>
+        onToggleNode={toggleNode}
+      />
 
       {/* Drawer dettagli nodo */}
       <NodeDetailsModal
