@@ -4,6 +4,7 @@ import RequireEditor from "./components/RequireEditor";
 import SkillMap from "./pages/SkillMap";
 import Guidelines from "./pages/Guidelines";
 import Security from "./pages/Security";
+import AiWebDev from "./pages/AiWebDev";
 import GuidedPath from "./pages/GuidedPath";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
@@ -22,6 +23,7 @@ export default function App() {
                 <Route path="/" element={<SkillMap />} />
                 <Route path="/linee-guida" element={<Guidelines />} />
                 <Route path="/sicurezza" element={<Security />} />
+                <Route path="/ai-web-dev" element={<AiWebDev />} />
                 <Route path="/percorso-guidato" element={<GuidedPath />} />
                 <Route path="/login" element={<Login />} />
                 <Route

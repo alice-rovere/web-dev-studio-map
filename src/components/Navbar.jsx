@@ -8,6 +8,7 @@ import {
   Route,
   ShieldAlert,
   ShieldCheck,
+  Sparkles,
   User,
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -60,6 +61,10 @@ const Navbar = () => {
         <NavLink className={linkClass} to="/sicurezza">
           <ShieldAlert size={18} />
           <span>Sicurezza</span>
+        </NavLink>
+        <NavLink className={linkClass} to="/ai-web-dev">
+          <Sparkles size={18} />
+          <span>AI nel Web Dev</span>
         </NavLink>
         <NavLink className={linkClass} to="/percorso-guidato">
           <Route size={18} />
