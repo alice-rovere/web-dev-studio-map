@@ -64,6 +64,15 @@ export function useMapGraph() {
     setExpandedIds(new Set());
   }, []);
 
+  const updateNodePosition = useCallback((nodeId, x, y) => {
+    setData((previous) => ({
+      ...previous,
+      nodes: previous.nodes.map((n) =>
+        n.id === nodeId ? { ...n, position_x: x, position_y: y } : n,
+      ),
+    }));
+  }, []);
+
   const layout = useMemo(() => {
     const { visibleIds, edges } = graph.getVisibleGraph(expandedIds);
     const positionMemo = new Map();
@@ -132,7 +141,7 @@ export function useMapGraph() {
         id: node.id,
         type: "tech",
         position,
-        draggable: false,
+        draggable: !graph.parentsByChild.has(nodeId), // solo root nodes
         data: {
           label: node.label,
           categories: node.categories,
@@ -144,6 +153,7 @@ export function useMapGraph() {
           hasChildren: graph.getChildIds(nodeId).length > 0,
           isOpen: expandedIds.has(nodeId),
           parentCount: graph.getParentIds(nodeId).length,
+          isRoot: !graph.parentsByChild.has(nodeId),
         },
       });
     }
@@ -172,6 +182,7 @@ export function useMapGraph() {
     toggleNode,
     expandFocused,
     collapseAll,
+    updateNodePosition,
     loading,
     error,
     reload,

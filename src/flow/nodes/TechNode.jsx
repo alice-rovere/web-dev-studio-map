@@ -9,6 +9,9 @@ const TechNode = ({ data }) => {
   const {
     label,
     isSubNode,
+    isRoot,
+    isDragEnabled = false,
+    isSelected,
     categories = [],
     primaryCategory = "frontend",
     hasChildren,
@@ -23,18 +26,25 @@ const TechNode = ({ data }) => {
     (entry) => entry.category !== primaryCategory,
   );
 
+  const cursorClass =
+    isRoot && isDragEnabled
+      ? "cursor-grab active:cursor-grabbing"
+      : "cursor-pointer";
+
   const containerClasses = isSubNode
-    ? "px-3 py-1.5 bg-[#141d2d]/90 border rounded-[6px] text-xs text-[#aebbd0] min-w-[110px]"
-    : "px-4 py-3 border rounded-[12px] bg-gradient-to-br from-[#192336]/98 to-[#111928]/98 shadow-[0_8px_24px_rgba(0,0,0,0.2)] text-[13px] font-medium min-w-[190px] transition-all duration-150 ease-in-out";
+    ? `px-3 py-1.5 bg-[#141d2d]/90 border rounded-[6px] text-xs text-[#aebbd0] min-w-[110px] ${cursorClass}`
+    : `px-4 py-3 border rounded-[12px] bg-gradient-to-br from-[#192336]/98 to-[#111928]/98 text-[13px] font-medium min-w-[190px] transition-all duration-150 ease-in-out ${cursorClass}`;
 
   return (
     <div
       className={`flex flex-col gap-1.25 group select-none ${containerClasses} hover:-translate-y-0.5`}
       style={{
-        borderColor: `${accent}66`,
-        boxShadow: isSubNode
-          ? `0 0 8px ${accent}18`
-          : `0 0 0 1px ${accent}12, 0 8px 24px rgba(0,0,0,0.25)`,
+        borderColor: isSelected ? accent : `${accent}66`,
+        boxShadow: isSelected
+          ? `0 0 0 2px ${accent}, 0 0 24px ${accent}60`
+          : isSubNode
+            ? `0 0 8px ${accent}18`
+            : `0 0 0 1px ${accent}12, 0 8px 24px rgba(0,0,0,0.25)`,
       }}
     >
       <Handle

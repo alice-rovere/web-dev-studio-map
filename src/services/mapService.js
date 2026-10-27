@@ -106,6 +106,18 @@ export async function updateNode(nodeId, payload) {
   return data;
 }
 
+export async function saveNodePosition(nodeId, x, y) {
+  const client = requireSupabase();
+  const { error } = await client
+    .from("nodes")
+    .update({ position_x: x, position_y: y })
+    .eq("id", nodeId);
+
+  if (error) {
+    throw toServiceError(error, "Impossibile salvare la posizione del nodo.");
+  }
+}
+
 export async function deleteNode(nodeId) {
   const client = requireSupabase();
   const { error } = await client.from("nodes").delete().eq("id", nodeId);

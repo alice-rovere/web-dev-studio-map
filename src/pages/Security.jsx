@@ -19,25 +19,10 @@ export default function Security({ onClose }) {
       aria-labelledby="security-learning-title"
       className="h-full w-full bg-slate-950 text-slate-100 p-6 md:p-12 font-sans overflow-y-auto"
     >
-      <header className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-800 pb-6 mb-8 gap-4">
-        <button
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-md px-2 py-1 -ml-2"
-          onClick={onClose}
-          type="button"
-        >
-          <ArrowLeft aria-hidden="true" size={16} />
-          Torna alla mappa
-        </button>
-        <span className="text-xs font-bold tracking-widest text-indigo-400 uppercase bg-indigo-500/10 px-2.5 py-1 rounded-md self-start md:self-auto">
-          STUDIO PLAYBOOK
-        </span>
-      </header>
+
 
       <div className="max-w-4xl mx-auto space-y-12 pb-5">
         <header className="space-y-3">
-          <span className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
-            PERCORSO INTRODUTTIVO
-          </span>
           <h2
             id="security-learning-title"
             className="text-3xl md:text-4xl font-extrabold tracking-tight text-white"

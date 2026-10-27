@@ -3,8 +3,9 @@ Voglio aggiungere nuovi nodi alla mappa del progetto. Prima di preparare i dati,
 - supabase/seed.sql
 - src/services/mapService.js
 
-Crea nodi per questo argomento: [ARGOMENTO]
-Nodi richiesti: [NOMI DEI NODI, oppure “proponili tu”]
+Crea nodi per questo argomento: [backend]
+Basati su questo sito : https://roadmap.sh/ per la divisione in categorie. 
+di sicuro partirei da node js, express, e poi scegli tu . vedi anche come collegare npm pnpm bun e yarn ( nel frontend?)
 Lingua dei contenuti: italiano.
 
 Segui rigorosamente lo schema esistente e non modificare il codice dell’applicazione né creare nuove tabelle.
@@ -37,3 +38,5 @@ Rispondi con:
 3. Un elenco di eventuali assunzioni o informazioni che non hai potuto verificare.
 
 Non eseguire lo script sul database. Se manca un’informazione indispensabile per scegliere un padre o una categoria, chiedimi chiarimenti prima di inventarla.
+
+

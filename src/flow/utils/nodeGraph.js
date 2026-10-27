@@ -204,6 +204,14 @@ export function buildNodeGraph({
 }
 
 export function getNodePosition(node, parent, index = 0, total = 1, depth = 0) {
+  // Se il nodo ha una posizione salvata su DB, ha sempre la precedenza (include nodi draggati)
+  if (
+    Number.isFinite(node?.position_x) &&
+    Number.isFinite(node?.position_y)
+  ) {
+    return { x: node.position_x, y: node.position_y };
+  }
+
   if (parent) {
     const radius = 150 + Math.max(0, depth - 1) * 40;
     const positions = calculateCircularPositions(
@@ -213,13 +221,6 @@ export function getNodePosition(node, parent, index = 0, total = 1, depth = 0) {
       radius,
     );
     return positions[index] ?? { x: parent.x, y: parent.y + radius };
-  }
-
-  if (
-    Number.isFinite(node?.position_x) &&
-    Number.isFinite(node?.position_y)
-  ) {
-    return { x: node.position_x, y: node.position_y };
   }
 
   const anchor = CATEGORY_ANCHORS[node?.primaryCategory] ?? CATEGORY_ANCHORS.frontend;

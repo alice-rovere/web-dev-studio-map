@@ -7,12 +7,12 @@ const MacroGroupNode = ({ data }) => {
 
   return (
     <div
-      className={`w-full h-full rounded-[120px] border ${data.borderColor} ${data.bgColor} flex ${alignmentClass} justify-center p-8 select-none pointer-events-none`}
+      className={`w-full h-full rounded-[120px] border border-dashed ${data.borderColor} ${data.bgColor} flex ${alignmentClass} justify-center p-8 select-none pointer-events-none transition-all duration-300`}
     >
       <span
-        className={`inline-flex items-center gap-2 rounded-full border border-hairline/70 bg-canvas/50 px-3.5 py-1 text-[11px] font-semibold tracking-[0.16em] uppercase backdrop-blur-sm ${data.textColor}`}
+        className={`inline-flex items-center gap-2 rounded-full border border-slate-800/80 bg-slate-950/80 px-4 py-1 text-[11px] font-semibold tracking-[0.16em] uppercase backdrop-blur-md shadow-lg ${data.textColor}`}
       >
-        <span className="h-1.5 w-1.5 rounded-full bg-current" />
+        <span className="h-1.5 w-1.5 rounded-full bg-current shadow-[0_0_8px_currentColor]" />
         {data.label}
       </span>
     </div>
