@@ -110,6 +110,14 @@ const SkillMapContent = () => {
     }));
   }, [graph, selectedNodeId]);
 
+  const knowledgeChildren = useMemo(() => {
+    if (!activeKnowledgeId) return [];
+    return graph.getChildIds(activeKnowledgeId).map((childId) => ({
+      id: childId,
+      label: graph.nodesById.get(childId)?.label ?? childId,
+    }));
+  }, [graph, activeKnowledgeId]);
+
   const handleToggleChildren = useCallback(
     (nodeId) => {
       if (expandedIds.has(nodeId)) {
@@ -244,8 +252,10 @@ const SkillMapContent = () => {
       return (
         <NodeKnowledgePage
           canEdit={isEditor}
+          childNodes={knowledgeChildren}
           key={activeKnowledgeId}
           node={knowledgeNode}
+          onSelectChild={(childId) => setActiveKnowledgeId(childId)}
           onBack={() => {
             setActiveKnowledgeId(null);
             setSelectedNodeId(activeKnowledgeId);

@@ -1,12 +1,14 @@
-import { Lock, X } from "lucide-react";
+import { GitFork, Lock, X } from "lucide-react";
 import ContentSectionEditor from "../components/ContentSectionEditor";
 import { CATEGORY_COLORS, CATEGORY_LABELS } from "../data/baseNodes";
 import { StickyNotesCanvas } from "../components/StickyNotesCanvas";
 
 export default function NodeKnowledgePage({
   node,
+  childNodes = [],
   canEdit = false,
   onClose,
+  onSelectChild,
 }) {
   const nodeData = node?.data ?? {};
   const categories = nodeData.categories ?? [];
@@ -65,6 +67,32 @@ export default function NodeKnowledgePage({
           {nodeData.description ||
             "Approfondimento strutturato del nodo selezionato."}
         </p>
+
+        {childNodes.length > 0 && (
+          <div className="mb-8">
+            <h3 className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-zinc-400">
+              <GitFork size={13} style={{ color: accent }} />
+              Nodi figli
+            </h3>
+            <ul className="flex flex-wrap gap-2">
+              {childNodes.map((child) => (
+                <li key={child.id}>
+                  <button
+                    className="cursor-pointer rounded border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-xs font-mono text-zinc-300 transition-all hover:text-white"
+                    onClick={() => onSelectChild?.(child.id)}
+                    style={{
+                      borderColor: `${accent}55`,
+                      boxShadow: `0 0 5px ${accent}20`,
+                    }}
+                    type="button"
+                  >
+                    {child.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {!canEdit && (
           <p className="mb-6 flex items-center gap-2 rounded-lg border border-zinc-900 bg-zinc-950/80 px-4 py-3 text-xs font-mono text-zinc-500">
