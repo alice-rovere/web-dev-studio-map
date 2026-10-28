@@ -371,16 +371,6 @@ const SkillMapContent = () => {
             <Layers size={15} className="text-indigo-400" />
           </div>
           <div>
-            <span
-              className="block text-[11px] font-mono font-bold tracking-[0.18em] uppercase"
-              style={{
-                background: "linear-gradient(90deg, #818cf8 0%, #67e8f9 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              SKILL MAP
-            </span>
             <span className="block text-[9px] font-mono text-slate-500 tracking-widest mt-0.5">
               {nodes.length} nodi visibili
             </span>

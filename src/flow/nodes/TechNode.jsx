@@ -1,9 +1,6 @@
 import { Handle, Position } from "@xyflow/react";
 import { BookOpen, GitFork, Info, Minus, Plus } from "lucide-react";
-import {
-  CATEGORY_COLORS,
-  CATEGORY_LABELS,
-} from "../../data/baseNodes";
+import { CATEGORY_COLORS, CATEGORY_LABELS } from "../../data/baseNodes";
 
 const TechNode = ({ data }) => {
   const {
@@ -33,8 +30,8 @@ const TechNode = ({ data }) => {
       : "cursor-pointer";
 
   const containerClasses = isSubNode
-    ? `px-3 py-1.5 bg-[#141d2d]/90 border rounded-[6px] text-xs text-[#aebbd0] min-w-[110px] ${cursorClass}`
-    : `px-4 py-3 border rounded-[12px] bg-gradient-to-br from-[#192336]/98 to-[#111928]/98 text-[13px] font-medium min-w-[190px] transition-all duration-150 ease-in-out ${cursorClass}`;
+    ? `px-3 py-1.5 bg-[#141d2d]/90 border rounded-[6px] text-[13] text-[#aebbd0] min-w-[110px] ${cursorClass}`
+    : `px-4 py-3 border rounded-[12px] bg-gradient-to-br from-[#192336]/98 to-[#111928]/98 text-[16px] font-medium min-w-[190px] transition-all duration-150 ease-in-out ${cursorClass}`;
 
   return (
     <div
