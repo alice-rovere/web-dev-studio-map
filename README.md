@@ -1,15 +1,19 @@
 # DevSkillMap
 
-Mappa interattiva delle competenze per lo sviluppo web full-stack. I nodi tecnologici sono disposti su un canvas React Flow, espandibili in gerarchie padre-figlio e arricchiti con descrizioni, best practice, convenzioni di naming, link di studio e approfondimenti strutturati. I dati sono persistiti su Supabase.
+Mappa interattiva delle competenze per lo sviluppo web full-stack. I nodi tecnologici sono disposti su un canvas React Flow, espandibili in gerarchie padre-figlio e arricchiti con descrizioni, best practice, convenzioni di naming, link di studio e approfondimenti strutturati. I dati e i contenuti modificabili sono persistiti su Supabase.
 
 ## Funzionalità
 
-- Mappa interattiva con nodi espandibili, accesso diretto agli approfondimenti e categorie `frontend`, `backend`, `database`.
+- Mappa interattiva React Flow con nodi espandibili, relazioni padre-figlio e categorie `frontend`, `backend`, `database`, `devops` e `tools`.
+- Ricerca di nodi e termini del glossario, con selezione rapida e navigazione da tastiera.
+- Vista ad albero ottimizzata per dispositivi mobili.
 - Dettaglio del nodo con relazioni padre/figlio, best practice e risorse esterne.
+- Approfondimenti per nodo organizzati in sezioni e blocchi di contenuto.
 - Glossario con tooltip automatici sui termini presenti nei testi.
 - Percorso guidato che illustra il ciclo di vita di una richiesta web.
 - Pagine dedicate a linee guida e sicurezza.
 - Pagina "AI nel Web Dev" con best practice per i prompt, gestione dei token, OpenCode/OpenRouter, `AGENTS.md`, OpenSpec, sicurezza e link utili (contenuti statici nel codice).
+- Post-it personali associati alle pagine e ai nodi, salvati su Supabase.
 - Pannello di amministrazione per editor/admin: nodi, relazioni, categorie, sezioni di contenuto e glossario.
 - Autenticazione Supabase con ruoli `viewer`, `editor`, `admin` e Row Level Security.
 
@@ -25,7 +29,29 @@ Mappa interattiva delle competenze per lo sviluppo web full-stack. I nodi tecnol
 
 ## Configurazione Supabase
 
-Ruoli disponibili: `viewer` (lettura), `editor` (gestione contenuti), `admin` (gestione contenuti e profili a livello database).
+### Avvio in locale
+
+Prerequisiti: Node.js e pnpm.
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Per collegare l'app a Supabase, copia `.env.example` in `.env` e imposta i valori del tuo progetto:
+
+```dotenv
+VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-public-key
+```
+
+Vite legge le variabili con prefisso `VITE_` nel browser. Usa solo la chiave anon/publishable: non inserire mai chiavi `service_role` o altri segreti in variabili `VITE_*`.
+
+### Database e ruoli
+
+Applica in ordine numerico tutte le migrazioni in `supabase/migrations/`. Per un database vuoto, esegui poi `supabase/seed.sql` una sola volta. Il seed contiene i dati iniziali e non va rieseguito su un database già popolato.
+
+I ruoli sono gestiti nei profili Supabase: `viewer` può consultare i contenuti, `editor` può gestirli e `admin` può inoltre gestire i profili secondo le policy RLS. L'accesso editor/admin a `/admin` richiede un utente autenticato con il ruolo corrispondente.
 
 ## Script
 
@@ -43,7 +69,9 @@ Ruoli disponibili: `viewer` (lettura), `editor` (gestione contenuti), `admin` (g
 | `/`                 | Mappa delle competenze | Pubblico                 |
 | `/linee-guida`      | Linee guida            | Pubblico                 |
 | `/sicurezza`        | Sicurezza              | Pubblico                 |
+| `/ai-web-dev`       | AI nel Web Dev         | Pubblico                 |
 | `/percorso-guidato` | Percorso guidato       | Pubblico                 |
+| `/glossario`        | Glossario              | Pubblico                 |
 | `/login`            | Accesso                | Pubblico                 |
 | `/admin`            | Pannello editor        | Editor/admin autenticati |
 
@@ -51,22 +79,22 @@ Ruoli disponibili: `viewer` (lettura), `editor` (gestione contenuti), `admin` (g
 
 ```text
 src/
-├── components/          # UI generica, modali, glossario e viste contenuto
-│   └── admin/           # Gestione nodi, albero e glossario
-├── context/             # Auth e glossario globali
-├── data/                # Configurazione nodi, categorie e percorso guidato
-├── flow/                # Nodi React Flow e algoritmi di layout
-│   ├── nodes/
-│   └── utils/
-├── hooks/               # useAuth, useGlossary, useMapGraph
-├── pages/               # SkillMap, Admin, Login, contenuti e percorso
-├── services/            # Client Supabase e chiamate CRUD
+├── components/          # UI condivisa, blocchi, glossario e post-it
+│   ├── admin/           # Gestione nodi, albero e glossario
+│   └── blocks/          # Blocchi per gli approfondimenti
+├── context/             # Provider globali di autenticazione e glossario
+├── data/                # Categorie, dati e percorso guidato
+├── flow/                # Nodi React Flow e utilità per il grafo
+├── hooks/               # Hook per auth, glossario, mappa e post-it
+├── pages/               # Pagine applicative e viste di contenuto
+├── services/            # Client Supabase e accesso ai dati
 ├── App.jsx              # Router e provider globali
-├── index.css            # Tailwind e stili React Flow
+├── index.css            # Tailwind e stili globali
 └── main.jsx             # Entry point
 supabase/
-├── migrations/          # Schema, trigger e policy RLS
-└── seed.sql             # Dati iniziali
+├── migrations/          # Schema, trigger, storage e policy RLS
+├── roadmaps/            # Script SQL per popolare i nodi per categoria
+└── seed.sql             # Dati iniziali per un database vuoto
 ```
 
 ## Deploy su Vercel
@@ -100,6 +128,7 @@ pnpm build
 
 - Il file `.env` è escluso dal repository: non committare chiavi o segreti.
 - Attualmente non è presente una suite di test automatici.
+- Prima di modificare schema o policy Supabase, crea una nuova migrazione e verifica che sia compatibile con i dati già presenti.
 
 ## Sistema Sticky Notes (Memo Fluttuanti)
 
@@ -150,9 +179,3 @@ export default function NuovaPaginaStudio() {
 | ------------------------------- | --------------------- | ---------------------------------------- |
 | Pagine statiche / Rotte globali | `page-<nome-pagina>`  | `"page-sicurezza"`, `"page-linee-guida"` |
 | Schede di dettaglio nodi mappa  | `node-<id-nodo-flow>` | `"node-react-19"`, `"node-supabase-db"`  |
-
-# Da implementare
-
-Funzionalità di cerca nodo !
-Collegamento file Percorso Guidato con i nodi reali nel database
-Media Queries per mobile css
