@@ -2,7 +2,6 @@ import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   BookOpen,
-  BookPlus,
   LogOut,
   Map,
   Menu,
@@ -14,9 +13,7 @@ import {
   X,
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useGlossary } from "../hooks/useGlossary";
 import { useAuth } from "../hooks/useAuth";
-import { GlossaryForm } from "./GlossaryForm";
 
 const NAV_ITEMS = [
   { to: "/linee-guida", label: "Linee Guida", icon: BookOpen },
@@ -30,7 +27,6 @@ const INACTIVE_CLASSES =
   "border-transparent text-[#b9c5d6] hover:border-[#33445d] hover:text-[#e8edf5] hover:bg-[#192536]";
 
 const Navbar = () => {
-  const { error, addTerm, loading: glossaryLoading } = useGlossary();
   const {
     session,
     profile,
@@ -40,7 +36,6 @@ const Navbar = () => {
     signOut,
   } = useAuth();
   const navigate = useNavigate();
-  const [isFormOpen, setIsFormOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const linkClass = ({ isActive }) =>
@@ -57,11 +52,6 @@ const Navbar = () => {
     setIsMenuOpen(false);
     await signOut();
     navigate("/");
-  }
-
-  function openGlossaryForm() {
-    setIsMenuOpen(false);
-    setIsFormOpen(true);
   }
 
   return (
@@ -89,20 +79,21 @@ const Navbar = () => {
 
         {/* DESKTOP: Glossario, Separatore e Area Utente */}
         <div className="hidden items-center gap-2 lg:flex lg:gap-4">
-          {isEditor && (
-            <>
-              <button
-                className="inline-flex h-8.5 w-8.5 cursor-pointer items-center justify-center rounded-lg border border-[#33445d]/40 bg-[#192536]/30 text-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.05)] transition-all duration-150 hover:border-[#33445d] hover:bg-[#192536] hover:text-cyan-300 hover:shadow-[0_0_15px_rgba(34,211,238,0.2)]"
-                onClick={() => setIsFormOpen(true)}
-                title="Aggiungi termine al Glossario"
-                type="button"
-              >
-                <BookPlus size={16} />
-              </button>
-
-              <div className="h-4 w-px bg-[#33445d]" />
-            </>
-          )}
+          <NavLink
+            aria-label="Glossario"
+            className={({ isActive }) =>
+              `inline-flex h-8.5 w-8.5 items-center justify-center rounded-lg border shadow-[0_0_10px_rgba(34,211,238,0.05)] transition-all duration-150 ${
+                isActive
+                  ? "border-cyan-400/50 bg-[#192536] text-cyan-300"
+                  : "border-[#33445d]/40 bg-[#192536]/30 text-cyan-400 hover:border-[#33445d] hover:bg-[#192536] hover:text-cyan-300 hover:shadow-[0_0_15px_rgba(34,211,238,0.2)]"
+              }`
+            }
+            title="Glossario"
+            to="/glossario"
+          >
+            <BookOpen size={16} />
+          </NavLink>
+          <div className="h-4 w-px bg-[#33445d]" />
 
           {authLoading ? (
             <span className="font-mono text-[11px] text-slate-500">…</span>
@@ -153,7 +144,7 @@ const Navbar = () => {
           </Dialog.Trigger>
           <Dialog.Portal>
             <Dialog.Overlay className="fixed inset-0 z-50 bg-[#060b13]/70 backdrop-blur-sm lg:hidden" />
-            <Dialog.Content className="fixed inset-y-0 right-0 z-50 flex h-dvh w-[min(88vw,340px)] flex-col border-l border-[#33445d] bg-[#0e1624] px-4 pt-[calc(1rem_+_env(safe-area-inset-top))] pb-[calc(1rem_+_env(safe-area-inset-bottom))] shadow-[-20px_0_50px_rgba(0,0,0,0.5)] focus:outline-none lg:hidden">
+            <Dialog.Content className="fixed inset-y-0 right-0 z-50 flex h-dvh w-[min(88vw,340px)] flex-col border-l border-[#33445d] bg-[#0e1624] px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-[-20px_0_50px_rgba(0,0,0,0.5)] focus:outline-none lg:hidden">
               <div className="flex items-center justify-between border-b border-[#33445d]/70 pb-3">
                 <Dialog.Title className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-cyan-400">
                   Menu
@@ -181,6 +172,14 @@ const Navbar = () => {
                     <span>{label}</span>
                   </NavLink>
                 ))}
+                <NavLink
+                  className={mobileLinkClass}
+                  onClick={() => setIsMenuOpen(false)}
+                  to="/glossario"
+                >
+                  <BookOpen size={18} />
+                  <span>Glossario</span>
+                </NavLink>
                 {session && isEditor && (
                   <NavLink
                     className={mobileLinkClass}
@@ -209,17 +208,6 @@ const Navbar = () => {
                       </p>
                     </div>
 
-                    {isEditor && (
-                      <button
-                        className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#33445d]/60 bg-[#192536]/50 px-3 text-xs font-medium text-cyan-300 transition-colors hover:bg-[#192536] hover:text-cyan-200"
-                        onClick={openGlossaryForm}
-                        type="button"
-                      >
-                        <BookPlus size={16} />
-                        Aggiungi termine
-                      </button>
-                    )}
-
                     <button
                       className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#33445d]/60 px-3 text-xs font-medium text-[#b9c5d6] transition-colors hover:bg-[#192536] hover:text-[#e8edf5]"
                       onClick={handleLogout}
@@ -244,20 +232,6 @@ const Navbar = () => {
           </Dialog.Portal>
         </Dialog.Root>
       </header>
-
-      {/* Dialog glossario condiviso tra desktop e mobile */}
-      <Dialog.Root open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-50 bg-[#060b13]/60 backdrop-blur-sm animate-in fade-in duration-150" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[85dvh] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-[#33445d] bg-[#0e1624] p-5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] focus:outline-none animate-in fade-in zoom-in-95 duration-150 sm:p-6">
-            <GlossaryForm
-              error={glossaryLoading ? null : error}
-              onAddTerm={addTerm}
-              onClose={() => setIsFormOpen(false)}
-            />
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
     </>
   );
 };

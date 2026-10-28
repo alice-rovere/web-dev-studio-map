@@ -9,6 +9,7 @@ import AiWebDev from "./pages/AiWebDev";
 import GuidedPath from "./pages/GuidedPath";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
+import Glossary from "./pages/Glossary";
 import { AuthProvider } from "./context/AuthContext";
 import { GlossaryProvider } from "./context/GlossaryProvider";
 
@@ -27,6 +28,7 @@ export default function App() {
                   <Route path="/sicurezza" element={<Security />} />
                   <Route path="/ai-web-dev" element={<AiWebDev />} />
                   <Route path="/percorso-guidato" element={<GuidedPath />} />
+                  <Route path="/glossario" element={<Glossary />} />
                   <Route path="/login" element={<Login />} />
                   <Route
                     path="/admin"

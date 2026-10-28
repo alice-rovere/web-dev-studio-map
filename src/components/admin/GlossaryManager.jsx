@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Loader2, Pencil, Plus, Save, Trash2, X } from "lucide-react";
 import { useGlossary } from "../../hooks/useGlossary";
+import { useAuth } from "../../hooks/useAuth";
 
 const inputClass =
   "w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-200 outline-none focus:border-slate-600";
 
 export default function GlossaryManager() {
+  const { isEditor } = useAuth();
   const {
     glossary,
     loading,
@@ -23,6 +25,9 @@ export default function GlossaryManager() {
   const [editDefinition, setEditDefinition] = useState("");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const sortedGlossary = [...glossary].sort((a, b) =>
+    a.term.localeCompare(b.term, "it", { sensitivity: "base" }),
+  );
 
   async function handleAdd(event) {
     event.preventDefault();
@@ -90,52 +95,54 @@ export default function GlossaryManager() {
 
   return (
     <div className="space-y-5">
-      <form
-        className="space-y-3 rounded-xl border border-slate-800 bg-slate-950/40 p-4 sm:p-5"
-        onSubmit={handleAdd}
-      >
-        <div>
-          <h2 className="text-sm font-bold text-white">Nuovo termine</h2>
-          <p className="mt-1 text-xs text-slate-500">
-            Il glossario alimenta i tooltip automatici in tutta l'app.
-          </p>
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-[240px_1fr]">
-          <input
-            className={inputClass}
-            disabled={saving}
-            onChange={(event) => setTerm(event.target.value)}
-            placeholder="Termine"
-            value={term}
-          />
-          <input
-            className={inputClass}
-            disabled={saving}
-            onChange={(event) => setDefinition(event.target.value)}
-            placeholder="Definizione"
-            value={definition}
-          />
-        </div>
-
-        {message && (
-          <p
-            className="rounded-md border border-rose-500/30 bg-rose-950/20 px-3 py-2 text-xs text-rose-300"
-            role="alert"
-          >
-            {message}
-          </p>
-        )}
-
-        <button
-          className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-cyan-400 px-3 py-2 text-xs font-semibold text-slate-950 hover:bg-cyan-300 disabled:opacity-50"
-          disabled={saving}
-          type="submit"
+      {isEditor && (
+        <form
+          className="space-y-3 rounded-xl border border-slate-800 bg-slate-950/40 p-4 sm:p-5"
+          onSubmit={handleAdd}
         >
-          <Plus size={13} />
-          {saving ? "Salvataggio…" : "Aggiungi termine"}
-        </button>
-      </form>
+          <div>
+            <h2 className="text-sm font-bold text-white">Nuovo termine</h2>
+            <p className="mt-1 text-xs text-slate-500">
+              Il glossario alimenta i tooltip automatici in tutta l'app.
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-[240px_1fr]">
+            <input
+              className={inputClass}
+              disabled={saving}
+              onChange={(event) => setTerm(event.target.value)}
+              placeholder="Termine"
+              value={term}
+            />
+            <input
+              className={inputClass}
+              disabled={saving}
+              onChange={(event) => setDefinition(event.target.value)}
+              placeholder="Definizione"
+              value={definition}
+            />
+          </div>
+
+          {message && (
+            <p
+              className="rounded-md border border-rose-500/30 bg-rose-950/20 px-3 py-2 text-xs text-rose-300"
+              role="alert"
+            >
+              {message}
+            </p>
+          )}
+
+          <button
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-cyan-400 px-3 py-2 text-xs font-semibold text-slate-950 hover:bg-cyan-300 disabled:opacity-50"
+            disabled={saving}
+            type="submit"
+          >
+            <Plus size={13} />
+            {saving ? "Salvataggio…" : "Aggiungi termine"}
+          </button>
+        </form>
+      )}
 
       <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 sm:p-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -169,7 +176,7 @@ export default function GlossaryManager() {
         )}
 
         <ul className="divide-y divide-slate-900">
-          {glossary.map((entry) => (
+          {sortedGlossary.map((entry) => (
             <li className="py-3" key={entry.id}>
               {editingId === entry.id ? (
                 <form className="space-y-2" onSubmit={handleUpdate}>
@@ -214,24 +221,26 @@ export default function GlossaryManager() {
                       {entry.definition}
                     </p>
                   </div>
-                  <div className="flex shrink-0 gap-1.5">
-                    <button
-                      aria-label="Modifica termine"
-                      className="inline-flex h-9 w-9 items-center justify-center rounded border border-slate-800 p-1.5 text-slate-400 hover:text-white"
-                      onClick={() => startEdit(entry)}
-                      type="button"
-                    >
-                      <Pencil size={13} />
-                    </button>
-                    <button
-                      aria-label="Elimina termine"
-                      className="inline-flex h-9 w-9 items-center justify-center rounded border border-slate-800 p-1.5 text-rose-400 hover:bg-slate-800/60"
-                      onClick={() => handleDelete(entry)}
-                      type="button"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
+                  {isEditor && (
+                    <div className="flex shrink-0 gap-1.5">
+                      <button
+                        aria-label="Modifica termine"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded border border-slate-800 p-1.5 text-slate-400 hover:text-white"
+                        onClick={() => startEdit(entry)}
+                        type="button"
+                      >
+                        <Pencil size={13} />
+                      </button>
+                      <button
+                        aria-label="Elimina termine"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded border border-slate-800 p-1.5 text-rose-400 hover:bg-slate-800/60"
+                        onClick={() => handleDelete(entry)}
+                        type="button"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </li>
