@@ -697,16 +697,8 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
 
   return (
     <section className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-900 pb-3">
-        <div>
-          <h2 className="font-mono text-sm font-bold uppercase tracking-wider text-zinc-200">
-            Approfondimenti strutturati
-          </h2>
-          <p className="text-xs text-zinc-500">
-            {sections.length} sezioni caricate dal database
-          </p>
-        </div>
-        {canEdit && !draft && (
+      {canEdit && !draft && (
+        <div className="flex justify-end">
           <button
             className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-950/20 px-3 py-2 text-xs font-semibold text-cyan-300 hover:bg-cyan-500/15"
             onClick={startNew}
@@ -714,8 +706,8 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
           >
             <Plus size={13} /> Nuova sezione
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {error && (
         <div className="flex items-center justify-between gap-3 rounded-lg border border-rose-500/30 bg-rose-950/10 px-3 py-2 text-xs text-rose-300">
