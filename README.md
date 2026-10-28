@@ -23,69 +23,9 @@ Mappa interattiva delle competenze per lo sviluppo web full-stack. I nodi tecnol
 - Radix UI (dialog e tooltip)
 - Lucide React (icone)
 
-## Requisiti
-
-- Node.js `^20.19.0 || >=22.12.0`
-- pnpm
-
-## Setup
-
-1. Installa le dipendenze:
-
-   ```bash
-   pnpm install
-   ```
-
-2. Crea il file di ambiente partendo dall'esempio:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-   Su Windows PowerShell:
-
-   ```powershell
-   Copy-Item .env.example .env
-   ```
-
-3. Compila `.env`:
-
-   ```env
-   VITE_SUPABASE_URL=https://<project-ref>.supabase.co
-   VITE_SUPABASE_ANON_KEY=<anon-o-publishable-key>
-   ```
-
-4. Configura Supabase (vedi sezione successiva).
-
-5. Avvia il server di sviluppo:
-
-   ```bash
-   pnpm dev
-   ```
-
-   L'app è disponibile su `http://localhost:5173`.
-
 ## Configurazione Supabase
 
-1. Crea un progetto su [supabase.com](https://supabase.com).
-2. Apri lo **SQL Editor** ed esegui i file nell'ordine:
-   - `supabase/migrations/0001_init.sql`
-   - `supabase/migrations/0002_rls.sql`
-   - `supabase/seed.sql`
-
-   Il seed va eseguito una sola volta su un database vuoto.
-
-3. In **Authentication > Providers** abilita Email/Password e disabilita la registrazione pubblica.
-4. Crea l'utente amministratore da **Authentication > Users**.
-5. Assegna il ruolo desiderato nella tabella `profiles`:
-
-   ```sql
-   update public.profiles
-   set role = 'editor'
-   where email = 'editor@example.com';
-   ```
-
-   Ruoli disponibili: `viewer` (lettura), `editor` (gestione contenuti), `admin` (gestione contenuti e profili a livello database).
+Ruoli disponibili: `viewer` (lettura), `editor` (gestione contenuti), `admin` (gestione contenuti e profili a livello database).
 
 ## Script
 
@@ -135,9 +75,9 @@ supabase/
 2. Seleziona **Add New... > Project**, importa `alice-rovere/web-dev-studio-map` e lascia che Vercel rilevi Vite.
 3. Imposta queste variabili in **Settings > Environment Variables**, almeno per l'ambiente **Production** (e anche **Preview** se vuoi provare i deploy di anteprima):
 
-   | Nome | Valore |
-   | ---- | ----- |
-   | `VITE_SUPABASE_URL` | Lo stesso URL già usato nel file `.env` locale |
+   | Nome                     | Valore                                                             |
+   | ------------------------ | ------------------------------------------------------------------ |
+   | `VITE_SUPABASE_URL`      | Lo stesso URL già usato nel file `.env` locale                     |
    | `VITE_SUPABASE_ANON_KEY` | La stessa chiave anon/publishable già usata nel file `.env` locale |
 
    Sono valori pubblici usati dal browser. Non inserire mai una chiave `service_role` o altri segreti nelle variabili `VITE_*`.

@@ -1,5 +1,6 @@
 import { ArrowLeft, GitFork, Lock, X } from "lucide-react";
 import ContentSectionEditor from "../components/ContentSectionEditor";
+import GlossaryText from "../components/GlossaryText";
 import { CATEGORY_COLORS, CATEGORY_LABELS } from "../data/baseNodes";
 import { StickyNotesCanvas } from "../components/StickyNotesCanvas";
 
@@ -75,12 +76,14 @@ export default function NodeKnowledgePage({
           className="mb-2 border-b border-zinc-900 pb-2 text-2xl font-extrabold uppercase tracking-tight text-white sm:text-3xl"
           id="node-knowledge-title"
         >
-          {nodeData.label || "Nodo"}
+          <GlossaryText>{nodeData.label || "Nodo"}</GlossaryText>
         </h2>
 
         <p className="mb-6 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:mb-8">
-          {nodeData.description ||
-            "Approfondimento strutturato del nodo selezionato."}
+          <GlossaryText>
+            {nodeData.description ||
+              "Approfondimento strutturato del nodo selezionato."}
+          </GlossaryText>
         </p>
 
         {childNodes.length > 0 && (
@@ -101,7 +104,7 @@ export default function NodeKnowledgePage({
                     }}
                     type="button"
                   >
-                    {child.label}
+                    <GlossaryText>{child.label}</GlossaryText>
                   </button>
                 </li>
               ))}

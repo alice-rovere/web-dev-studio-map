@@ -10,10 +10,7 @@ import {
   X,
 } from "lucide-react";
 import GlossaryText from "./GlossaryText.jsx";
-import {
-  CATEGORY_COLORS,
-  CATEGORY_LABELS,
-} from "../data/baseNodes";
+import { CATEGORY_COLORS, CATEGORY_LABELS } from "../data/baseNodes";
 
 const emptyDetails = {
   description:
@@ -54,7 +51,7 @@ function RelationGroup({ title, icon, nodes, empty, onSelect, accentColor }) {
               onClick={() => onSelect?.(relatedNode.id)}
               type="button"
             >
-              {relatedNode.label}
+              <GlossaryText>{relatedNode.label}</GlossaryText>
             </button>
           </li>
         ))}
@@ -102,7 +99,7 @@ export default function NodeDetailsModal({
           className="fixed inset-y-0 right-0 z-50 flex h-dvh w-full flex-col border-l border-slate-900 bg-slate-950/85 shadow-[-10px_0_30px_rgba(0,0,0,0.8)] backdrop-blur-xl focus:outline-hidden sm:max-w-md"
           style={{ borderColor: `${accentColor}30` }}
         >
-          <header className="flex items-start justify-between border-b border-slate-900 bg-slate-950/50 px-4 pt-[calc(0.75rem_+_env(safe-area-inset-top))] pb-3 sm:p-4">
+          <header className="flex items-start justify-between border-b border-slate-900 bg-slate-950/50 px-4 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-3 sm:p-4">
             <div>
               <span className="text-[10px] font-mono font-bold tracking-widest text-cyan-500 block mb-0.5 animate-pulse">
                 &gt;_ NODE INSPECTOR
@@ -114,12 +111,13 @@ export default function NodeDetailsModal({
                       className="rounded border px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-wider"
                       key={entry.category}
                       style={{
-                        color:
-                          CATEGORY_COLORS[entry.category] ?? "#94a3b8",
-                        borderColor: `${CATEGORY_COLORS[entry.category] ?? "#94a3b8"
-                          }55`,
-                        backgroundColor: `${CATEGORY_COLORS[entry.category] ?? "#94a3b8"
-                          }12`,
+                        color: CATEGORY_COLORS[entry.category] ?? "#94a3b8",
+                        borderColor: `${
+                          CATEGORY_COLORS[entry.category] ?? "#94a3b8"
+                        }55`,
+                        backgroundColor: `${
+                          CATEGORY_COLORS[entry.category] ?? "#94a3b8"
+                        }12`,
                       }}
                     >
                       {CATEGORY_LABELS[entry.category] ?? entry.category}
@@ -144,7 +142,7 @@ export default function NodeDetailsModal({
             </Dialog.Close>
           </header>
 
-          <div className="flex-1 space-y-6 overflow-y-auto px-4 pt-4 pb-[calc(1.25rem_+_env(safe-area-inset-bottom))] font-sans text-sm text-slate-300 sm:p-5">
+          <div className="flex-1 space-y-6 overflow-y-auto px-4 pt-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))] font-sans text-sm text-slate-300 sm:p-5">
             <div className="flex items-center gap-2 border-b border-slate-900/50 pb-3">
               <span
                 className="text-cyan-400 font-mono font-bold text-lg"
@@ -153,7 +151,7 @@ export default function NodeDetailsModal({
                 &gt;_
               </span>
               <Dialog.Title className="text-xl font-bold font-mono tracking-tight text-white">
-                {nodeInfo.label || "Nodo"}
+                <GlossaryText>{nodeInfo.label || "Nodo"}</GlossaryText>
               </Dialog.Title>
             </div>
 
@@ -256,7 +254,9 @@ export default function NodeDetailsModal({
                         target="_blank"
                         className="flex items-center justify-between p-2 rounded bg-slate-900/40 border border-slate-900 text-xs text-slate-400 hover:text-cyan-400 hover:border-cyan-500/30 transition-all"
                       >
-                        <span>{link.label || link.url}</span>
+                        <span>
+                          <GlossaryText>{link.label || link.url}</GlossaryText>
+                        </span>
                         <ExternalLink size={12} />
                       </a>
                     </li>
@@ -269,7 +269,6 @@ export default function NodeDetailsModal({
               )}
             </section>
           </div>
-
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

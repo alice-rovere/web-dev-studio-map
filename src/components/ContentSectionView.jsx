@@ -1,10 +1,12 @@
+import GlossaryText from "./GlossaryText";
+
 function ContentBlock({ section }) {
   const payload = section?.payload ?? {};
 
   if (section?.type === "text" && typeof payload.text === "string") {
     return (
       <p className="text-zinc-300 leading-relaxed text-base mb-4 font-light whitespace-pre-line">
-        {payload.text}
+        <GlossaryText>{payload.text}</GlossaryText>
       </p>
     );
   }
@@ -18,7 +20,7 @@ function ContentBlock({ section }) {
             className="flex items-start text-zinc-300 text-sm"
           >
             <span className="text-[#64d9bd] mr-2 select-none">⚡</span>
-            {item}
+            <GlossaryText>{item}</GlossaryText>
           </li>
         ))}
       </ul>
@@ -40,7 +42,7 @@ function ContentBlock({ section }) {
                   className="px-4 py-3 font-semibold"
                   key={`${column}-${index}`}
                 >
-                  {column}
+                  <GlossaryText>{column}</GlossaryText>
                 </th>
               ))}
             </tr>
@@ -53,7 +55,7 @@ function ContentBlock({ section }) {
               >
                 {row.map((cell, cellIndex) => (
                   <td className="px-4 py-3" key={`${rowIndex}-${cellIndex}`}>
-                    {cell}
+                    <GlossaryText>{cell}</GlossaryText>
                   </td>
                 ))}
               </tr>
@@ -74,13 +76,13 @@ function ContentBlock({ section }) {
           >
             <span className="absolute w-3 h-3 bg-zinc-950 border border-[#7ab8ff] shadow-[0_0_8px_rgba(122,184,255,0.5)] rounded-full -left-1.5 top-1.5 group-hover:scale-125 transition-transform" />
             <span className="inline-block text-xs font-mono bg-zinc-900 border border-zinc-800 text-zinc-400 px-2 py-0.5 rounded mb-1">
-              {entry.date}
+              <GlossaryText>{entry.date}</GlossaryText>
             </span>
             <h4 className="text-zinc-200 text-sm font-semibold tracking-wide">
-              {entry.title}
+              <GlossaryText>{entry.title}</GlossaryText>
             </h4>
             <p className="text-zinc-400 text-xs font-light mt-1">
-              {entry.description}
+              <GlossaryText>{entry.description}</GlossaryText>
             </p>
           </li>
         ))}
@@ -124,11 +126,11 @@ export function SectionCard({ section, actions }) {
       <div className="flex items-start justify-between gap-3 border-b border-zinc-800/80 pb-2 mb-4">
         <div>
           <h3 className="text-base font-bold font-mono tracking-wide text-zinc-200 uppercase">
-            {section.title}
+            <GlossaryText>{section.title}</GlossaryText>
           </h3>
           {subtitle && (
             <p className="mt-1 text-sm leading-relaxed text-zinc-400">
-              {subtitle}
+              <GlossaryText>{subtitle}</GlossaryText>
             </p>
           )}
         </div>
