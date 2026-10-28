@@ -7,6 +7,8 @@ export function useStickyNotes(boardId) {
 
   // Carica i post-it associati a questa board/nodo
   useEffect(() => {
+    let cancelled = false;
+
     async function fetchNotes() {
       setLoading(true);
       const { data, error } = await supabase
@@ -15,6 +17,7 @@ export function useStickyNotes(boardId) {
         .eq('board_id', boardId)
         .order('created_at', { ascending: true });
 
+      if (cancelled) return;
       if (!error && data) {
         setNotes(data);
       }
@@ -22,6 +25,10 @@ export function useStickyNotes(boardId) {
     }
 
     if (boardId) fetchNotes();
+
+    return () => {
+      cancelled = true;
+    };
   }, [boardId]);
 
   // Crea un nuovo post-it

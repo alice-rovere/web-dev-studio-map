@@ -1,4 +1,4 @@
-import { GitFork, Lock, X } from "lucide-react";
+import { ArrowLeft, GitFork, Lock, X } from "lucide-react";
 import ContentSectionEditor from "../components/ContentSectionEditor";
 import { CATEGORY_COLORS, CATEGORY_LABELS } from "../data/baseNodes";
 import { StickyNotesCanvas } from "../components/StickyNotesCanvas";
@@ -8,6 +8,8 @@ export default function NodeKnowledgePage({
   childNodes = [],
   canEdit = false,
   onClose,
+  onBack,
+  parentNode,
   onSelectChild,
 }) {
   const nodeData = node?.data ?? {};
@@ -17,11 +19,24 @@ export default function NodeKnowledgePage({
 
   return (
     <section className="relative h-full w-full overflow-y-auto border border-zinc-900 bg-zinc-950 p-4 font-sans text-zinc-100 shadow-2xl before:absolute before:top-0 before:left-0 before:h-px before:w-full before:bg-linear-to-r before:from-transparent before:via-zinc-700 before:to-transparent sm:p-6 md:p-10">
-      <StickyNotesCanvas boardId="page-node-knowledge" />
+      {node?.id && (
+        <StickyNotesCanvas key={node.id} boardId={`node-${node.id}`} />
+      )}
 
       <div className="max-w-4xl mx-auto pb-16">
         <div className="flex items-center justify-between gap-4 mb-4">
           <div className="flex flex-wrap items-center gap-2">
+            {parentNode && (
+              <button
+                aria-label={`Torna al nodo ${parentNode.label}`}
+                className="inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded border border-zinc-800 bg-zinc-900/60 text-zinc-400 transition-colors hover:border-zinc-700 hover:bg-zinc-800 hover:text-white"
+                onClick={onBack}
+                title={`Torna al nodo ${parentNode.label}`}
+                type="button"
+              >
+                <ArrowLeft size={13} />
+              </button>
+            )}
             {categories.length > 0 ? (
               categories.map((entry) => (
                 <span

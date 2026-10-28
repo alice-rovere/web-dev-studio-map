@@ -123,6 +123,17 @@ const SkillMapContent = () => {
     }));
   }, [graph, activeKnowledgeId]);
 
+  const knowledgeParent = useMemo(() => {
+    if (!activeKnowledgeId) return null;
+    const parentId = graph.getParentIds(activeKnowledgeId)[0];
+    if (!parentId) return null;
+
+    return {
+      id: parentId,
+      label: graph.nodesById.get(parentId)?.label ?? parentId,
+    };
+  }, [graph, activeKnowledgeId]);
+
   const handleToggleChildren = useCallback(
     (nodeId) => {
       toggleNodeFocus(nodeId);
@@ -320,11 +331,9 @@ const SkillMapContent = () => {
           childNodes={knowledgeChildren}
           key={activeKnowledgeId}
           node={knowledgeNode}
+          onBack={() => setActiveKnowledgeId(knowledgeParent.id)}
           onSelectChild={(childId) => setActiveKnowledgeId(childId)}
-          onBack={() => {
-            setActiveKnowledgeId(null);
-            setSelectedNodeId(activeKnowledgeId);
-          }}
+          parentNode={knowledgeParent}
           onClose={() => {
             setActiveKnowledgeId(null);
             setSelectedNodeId(null);
