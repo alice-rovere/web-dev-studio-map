@@ -40,6 +40,7 @@ const SkillMapContent = () => {
     toggleNode,
     expandFocused,
     updateNodePosition,
+    updateNodeData,
     loading,
     error,
     reload,
@@ -331,6 +332,7 @@ const SkillMapContent = () => {
           childNodes={knowledgeChildren}
           key={activeKnowledgeId}
           node={knowledgeNode}
+          onNodeUpdated={updateNodeData}
           onBack={() => setActiveKnowledgeId(knowledgeParent.id)}
           onSelectChild={(childId) => setActiveKnowledgeId(childId)}
           parentNode={knowledgeParent}

@@ -73,6 +73,15 @@ export function useMapGraph() {
     }));
   }, []);
 
+  const updateNodeData = useCallback((updatedNode) => {
+    setData((previous) => ({
+      ...previous,
+      nodes: previous.nodes.map((node) =>
+        node.id === updatedNode.id ? { ...node, ...updatedNode } : node,
+      ),
+    }));
+  }, []);
+
   const layout = useMemo(() => {
     const { visibleIds, edges } = graph.getVisibleGraph(expandedIds);
     const positionMemo = new Map();
@@ -183,6 +192,7 @@ export function useMapGraph() {
     expandFocused,
     collapseAll,
     updateNodePosition,
+    updateNodeData,
     loading,
     error,
     reload,

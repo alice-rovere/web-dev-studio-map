@@ -1,5 +1,6 @@
 import { ArrowLeft, GitFork, Lock, X } from "lucide-react";
 import ContentSectionEditor from "../components/ContentSectionEditor";
+import NodeGenericInfo from "../components/NodeGenericInfo";
 import GlossaryText from "../components/GlossaryText";
 import { CATEGORY_COLORS, CATEGORY_LABELS } from "../data/baseNodes";
 import { StickyNotesCanvas } from "../components/StickyNotesCanvas";
@@ -12,6 +13,7 @@ export default function NodeKnowledgePage({
   onBack,
   parentNode,
   onSelectChild,
+  onNodeUpdated,
 }) {
   const nodeData = node?.data ?? {};
   const categories = nodeData.categories ?? [];
@@ -119,6 +121,13 @@ export default function NodeKnowledgePage({
             questi contenuti.
           </p>
         )}
+
+        <NodeGenericInfo
+          canEdit={canEdit}
+          nodeData={nodeData}
+          nodeId={node?.id}
+          onNodeUpdated={onNodeUpdated}
+        />
 
         <div
           style={{ borderTopColor: `${accent}22` }}
