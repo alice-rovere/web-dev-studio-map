@@ -26,112 +26,118 @@ export default function NodeKnowledgePage({
         <StickyNotesCanvas key={node.id} boardId={`node-${node.id}`} />
       )}
 
-      <div className="max-w-4xl mx-auto pb-16">
-        <div className="flex items-center justify-between gap-4 mb-4">
-          <div className="flex flex-wrap items-center gap-2">
-            {parentNode && (
-              <button
-                aria-label={`Torna al nodo ${parentNode.label}`}
-                className="inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded border border-zinc-800 bg-zinc-900/60 text-zinc-400 transition-colors hover:border-zinc-700 hover:bg-zinc-800 hover:text-white"
-                onClick={onBack}
-                title={`Torna al nodo ${parentNode.label}`}
-                type="button"
-              >
-                <ArrowLeft size={13} />
-              </button>
-            )}
-            {categories.length > 0 ? (
-              categories.map((entry) => (
-                <span
-                  className="text-[10px] font-mono tracking-widest font-bold px-2 py-0.5 rounded border uppercase"
-                  key={entry.category}
-                  style={{
-                    color: CATEGORY_COLORS[entry.category] ?? "#94a3b8",
-                    borderColor: `${CATEGORY_COLORS[entry.category] ?? "#94a3b8"
-                      }66`,
-                    backgroundColor: `${CATEGORY_COLORS[entry.category] ?? "#94a3b8"
-                      }12`,
-                  }}
+      <div className="mx-auto grid w-full gap-5 pb-16 2xl:grid-cols-[minmax(0,1fr)_minmax(0,56rem)_minmax(0,1fr)]">
+        <div className="order-1 min-w-0 2xl:col-start-2 2xl:row-start-1">
+          <div className="mb-4 flex items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-2">
+              {parentNode && (
+                <button
+                  aria-label={`Torna al nodo ${parentNode.label}`}
+                  className="inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded border border-zinc-800 bg-zinc-900/60 text-zinc-400 transition-colors hover:border-zinc-700 hover:bg-zinc-800 hover:text-white"
+                  onClick={onBack}
+                  title={`Torna al nodo ${parentNode.label}`}
+                  type="button"
                 >
-                  {CATEGORY_LABELS[entry.category] ?? entry.category}
+                  <ArrowLeft size={13} />
+                </button>
+              )}
+              {categories.length > 0 ? (
+                categories.map((entry) => (
+                  <span
+                    className="text-[10px] font-mono tracking-widest font-bold px-2 py-0.5 rounded border uppercase"
+                    key={entry.category}
+                    style={{
+                      color: CATEGORY_COLORS[entry.category] ?? "#94a3b8",
+                      borderColor: `${
+                        CATEGORY_COLORS[entry.category] ?? "#94a3b8"
+                      }66`,
+                      backgroundColor: `${
+                        CATEGORY_COLORS[entry.category] ?? "#94a3b8"
+                      }12`,
+                    }}
+                  >
+                    {CATEGORY_LABELS[entry.category] ?? entry.category}
+                  </span>
+                ))
+              ) : (
+                <span className="text-[10px] font-mono tracking-widest text-zinc-500 uppercase">
+                  Senza categoria
                 </span>
-              ))
-            ) : (
-              <span className="text-[10px] font-mono tracking-widest text-zinc-500 uppercase">
-                Senza categoria
-              </span>
-            )}
+              )}
+            </div>
+
+            <button
+              aria-label="Chiudi e torna alla mappa"
+              title="Chiudi e torna alla mappa"
+              className="inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/60 p-2 text-zinc-400 shadow-sm transition-colors hover:border-zinc-700 hover:bg-zinc-800 hover:text-white"
+              onClick={onClose}
+              type="button"
+            >
+              <X size={18} />
+            </button>
           </div>
 
-          <button
-            aria-label="Chiudi e torna alla mappa"
-            title="Chiudi e torna alla mappa"
-            className="inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/60 p-2 text-zinc-400 shadow-sm transition-colors hover:border-zinc-700 hover:bg-zinc-800 hover:text-white"
-            onClick={onClose}
-            type="button"
+          <h2
+            className="mb-2 border-b border-zinc-900 pb-2 text-2xl font-extrabold uppercase tracking-tight text-white sm:text-3xl"
+            id="node-knowledge-title"
           >
-            <X size={18} />
-          </button>
+            <GlossaryText>{nodeData.label || "Nodo"}</GlossaryText>
+          </h2>
+
+          <p className="mb-6 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:mb-8">
+            <GlossaryText>
+              {nodeData.description ||
+                "Approfondimento strutturato del nodo selezionato."}
+            </GlossaryText>
+          </p>
+
+          {childNodes.length > 0 && (
+            <div className="mb-8">
+              <h3 className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                <GitFork size={13} style={{ color: accent }} />
+                Nodi figli
+              </h3>
+              <ul className="flex flex-wrap gap-2">
+                {childNodes.map((child) => (
+                  <li key={child.id}>
+                    <button
+                      className="cursor-pointer rounded border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-xs font-mono text-zinc-300 transition-all hover:text-white"
+                      onClick={() => onSelectChild?.(child.id)}
+                      style={{
+                        borderColor: `${accent}55`,
+                        boxShadow: `0 0 5px ${accent}20`,
+                      }}
+                      type="button"
+                    >
+                      <GlossaryText>{child.label}</GlossaryText>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {!canEdit && (
+            <p className="mb-6 flex items-center gap-2 rounded-lg border border-zinc-900 bg-zinc-950/80 px-4 py-3 text-xs font-mono text-zinc-500">
+              <Lock size={13} />
+              Modalità sola lettura. Accedi con un ruolo editor per modificare
+              questi contenuti.
+            </p>
+          )}
         </div>
 
-        <h2
-          className="mb-2 border-b border-zinc-900 pb-2 text-2xl font-extrabold uppercase tracking-tight text-white sm:text-3xl"
-          id="node-knowledge-title"
-        >
-          <GlossaryText>{nodeData.label || "Nodo"}</GlossaryText>
-        </h2>
-
-        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-zinc-400 sm:mb-8">
-          <GlossaryText>
-            {nodeData.description ||
-              "Approfondimento strutturato del nodo selezionato."}
-          </GlossaryText>
-        </p>
-
-        {childNodes.length > 0 && (
-          <div className="mb-8">
-            <h3 className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-zinc-400">
-              <GitFork size={13} style={{ color: accent }} />
-              Nodi figli
-            </h3>
-            <ul className="flex flex-wrap gap-2">
-              {childNodes.map((child) => (
-                <li key={child.id}>
-                  <button
-                    className="cursor-pointer rounded border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-xs font-mono text-zinc-300 transition-all hover:text-white"
-                    onClick={() => onSelectChild?.(child.id)}
-                    style={{
-                      borderColor: `${accent}55`,
-                      boxShadow: `0 0 5px ${accent}20`,
-                    }}
-                    type="button"
-                  >
-                    <GlossaryText>{child.label}</GlossaryText>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {!canEdit && (
-          <p className="mb-6 flex items-center gap-2 rounded-lg border border-zinc-900 bg-zinc-950/80 px-4 py-3 text-xs font-mono text-zinc-500">
-            <Lock size={13} />
-            Modalità sola lettura. Accedi con un ruolo editor per modificare
-            questi contenuti.
-          </p>
-        )}
-
-        <NodeGenericInfo
-          canEdit={canEdit}
-          nodeData={nodeData}
-          nodeId={node?.id}
-          onNodeUpdated={onNodeUpdated}
-        />
+        <div className="order-2 min-w-0 2xl:col-start-1 2xl:row-start-1">
+          <NodeGenericInfo
+            canEdit={canEdit}
+            nodeData={nodeData}
+            nodeId={node?.id}
+            onNodeUpdated={onNodeUpdated}
+          />
+        </div>
 
         <div
+          className="order-3 min-w-0 border-t pt-6 2xl:col-start-2 2xl:row-start-2"
           style={{ borderTopColor: `${accent}22` }}
-          className="border-t pt-6"
         >
           <ContentSectionEditor canEdit={canEdit} nodeId={node?.id} />
         </div>
