@@ -634,6 +634,16 @@ on conflict (parent_id, child_id) do update set
   sort_order = excluded.sort_order,
   is_primary = excluded.is_primary;
 
+-- Package Managers is shared with Node.js; JavaScript remains its primary parent.
+insert into public.node_parents (parent_id, child_id, sort_order, is_primary)
+select p.id, c.id, 5, false
+from public.nodes p
+join public.nodes c on c.slug = 'package-managers'
+where p.slug = 'nodejs'
+on conflict (parent_id, child_id) do update set
+  sort_order = excluded.sort_order,
+  is_primary = false;
+
 
 -- ----------------------------------------------------------------------------
 -- 4. SEZIONI DI CONTENUTO STRUTTURATO (public.node_content_sections)

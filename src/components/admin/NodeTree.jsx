@@ -13,7 +13,7 @@ export default function NodeTree({ nodes, parents, categories, selectedId, onSel
         categoryMap.set(entry.node_id, list);
       }
 
-      const primaryParent = new Map();
+      const parentIds = new Set();
       const childRelations = new Map();
 
       for (const relation of parents) {
@@ -21,10 +21,7 @@ export default function NodeTree({ nodes, parents, categories, selectedId, onSel
           continue;
         }
 
-        if (relation.is_primary) {
-          primaryParent.set(relation.child_id, relation.parent_id);
-        }
-
+        parentIds.add(relation.child_id);
         const list = childRelations.get(relation.parent_id) ?? [];
         list.push(relation);
         childRelations.set(relation.parent_id, list);
@@ -35,7 +32,7 @@ export default function NodeTree({ nodes, parents, categories, selectedId, onSel
       }
 
       return {
-        roots: nodes.filter((node) => !primaryParent.has(node.id)),
+        roots: nodes.filter((node) => !parentIds.has(node.id)),
         nodeById: nodeMap,
         childrenByParent: childRelations,
         categoriesByNode: categoryMap,
@@ -53,9 +50,7 @@ export default function NodeTree({ nodes, parents, categories, selectedId, onSel
     const parentCount = parents.filter(
       (relation) => relation.child_id === nodeId,
     ).length;
-    const children = (childrenByParent.get(nodeId) ?? []).filter(
-      (relation) => relation.is_primary,
-    );
+    const children = childrenByParent.get(nodeId) ?? [];
     const nextVisited = new Set(visited).add(nodeId);
 
     return (

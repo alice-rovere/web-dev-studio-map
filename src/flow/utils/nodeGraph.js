@@ -95,7 +95,6 @@ export function buildNodeGraph({
       expandedIds instanceof Set ? expandedIds : new Set(expandedIds ?? []);
     const visibleIds = new Set(roots);
     const queue = [...roots];
-    const edges = [];
     const visited = new Set();
 
     while (queue.length > 0) {
@@ -112,14 +111,21 @@ export function buildNodeGraph({
           visibleIds.add(childId);
           queue.push(childId);
         }
+      }
+    }
 
-        if (visibleIds.has(childId)) {
-          edges.push({
-            id: `edge-${parentId}-${childId}`,
-            source: parentId,
-            target: childId,
-          });
-        }
+    const edges = [];
+    for (const [parentId, relations] of childrenByParent) {
+      if (!visibleIds.has(parentId)) continue;
+
+      for (const relation of relations) {
+        if (!visibleIds.has(relation.child_id)) continue;
+
+        edges.push({
+          id: `edge-${parentId}-${relation.child_id}`,
+          source: parentId,
+          target: relation.child_id,
+        });
       }
     }
 
