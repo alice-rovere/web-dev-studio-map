@@ -10,8 +10,13 @@ import {
   X,
 } from "lucide-react";
 import { SectionCard } from "./ContentSectionView";
+import { CalloutEditor } from "./blocks/CalloutBlock";
+import { ImageEditor } from "./blocks/ImageBlock";
+import { MermaidEditor } from "./blocks/MermaidBlock";
+import { WhiteboardEditor } from "./blocks/WhiteboardBlock";
 import {
   createSection,
+  deleteNoteImages,
   deleteSection,
   fetchNodeSections,
   reorderSections,
@@ -24,6 +29,10 @@ const SECTION_TYPES = [
   { value: "list", label: "Lista" },
   { value: "table", label: "Tabella" },
   { value: "timeline", label: "Timeline" },
+  { value: "callout", label: "Callout" },
+  { value: "image", label: "Immagine" },
+  { value: "mermaid", label: "Diagramma" },
+  { value: "whiteboard", label: "Lavagna" },
 ];
 
 const CODE_LANGUAGES = [
@@ -49,6 +58,14 @@ function emptyPayload(type) {
       return { columns: ["Colonna 1"], rows: [[""]] };
     case "timeline":
       return { entries: [{ date: "", title: "", description: "" }] };
+    case "callout":
+      return { variant: "note", title: "", text: "" };
+    case "image":
+      return { url: "", path: "", caption: "", alt: "" };
+    case "mermaid":
+      return { code: "" };
+    case "whiteboard":
+      return { elements: [], files: {} };
     default:
       return { text: "" };
   }
@@ -100,9 +117,36 @@ function ensurePayload(type, payload) {
               }))
             : [{ date: "", title: "", description: "" }],
       };
+    case "callout":
+      return {
+        variant: source.variant || "note",
+        title: typeof source.title === "string" ? source.title : "",
+        text: typeof source.text === "string" ? source.text : "",
+      };
+    case "image":
+      return {
+        url: typeof source.url === "string" ? source.url : "",
+        path: typeof source.path === "string" ? source.path : "",
+        caption: typeof source.caption === "string" ? source.caption : "",
+        alt: typeof source.alt === "string" ? source.alt : "",
+      };
+    case "mermaid":
+      return { code: typeof source.code === "string" ? source.code : "" };
+    case "whiteboard":
+      return {
+        elements: Array.isArray(source.elements) ? source.elements : [],
+        files:
+          source.files && typeof source.files === "object" ? source.files : {},
+      };
     default:
       return emptyPayload(type);
   }
+}
+
+function imagePaths(blocks) {
+  return blocks
+    .filter((block) => block?.type === "image" && block.payload?.path)
+    .map((block) => block.payload.path);
 }
 
 function getSectionBlocks(section) {
@@ -398,6 +442,13 @@ function PayloadEditor({ draft, setDraft }) {
     );
   }
 
+  const shared = { payload, update, fieldClass: fieldClass(), Label };
+
+  if (type === "callout") return <CalloutEditor {...shared} />;
+  if (type === "image") return <ImageEditor {...shared} />;
+  if (type === "mermaid") return <MermaidEditor {...shared} />;
+  if (type === "whiteboard") return <WhiteboardEditor {...shared} />;
+
   return (
     <div className="grid gap-3">
       <div className="flex items-center justify-between">
@@ -623,11 +674,20 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
 
     try {
       if (draft.id) {
+        const previousSection = sections.find((item) => item.id === draft.id);
         await updateSection(draft.id, {
           title: draft.title.trim(),
           type: "text",
           payload: { subtitle: draft.subtitle.trim(), blocks: draft.blocks },
         });
+        if (previousSection) {
+          const kept = new Set(imagePaths(draft.blocks));
+          await deleteNoteImages(
+            imagePaths(getSectionBlocks(previousSection)).filter(
+              (path) => !kept.has(path),
+            ),
+          ).catch(() => {});
+        }
       } else {
         const created = await createSection(nodeId, {
           title: draft.title.trim(),
@@ -657,6 +717,9 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
     setSaving(true);
     try {
       await deleteSection(section.id);
+      await deleteNoteImages(imagePaths(getSectionBlocks(section))).catch(
+        () => {},
+      );
       if (activeSection?.id === section.id) setActiveSectionId(null);
       await loadSections();
     } catch (deleteError) {

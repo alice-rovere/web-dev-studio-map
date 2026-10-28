@@ -230,6 +230,41 @@ export async function deleteSection(sectionId) {
   }
 }
 
+const NOTE_IMAGES_BUCKET = "note-images";
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
+export async function uploadNoteImage(file) {
+  if (!file?.type?.startsWith("image/")) {
+    throw new Error("Il file selezionato non è un'immagine.");
+  }
+  if (file.size > MAX_IMAGE_BYTES) {
+    throw new Error("L'immagine supera il limite di 5 MB.");
+  }
+
+  const client = requireSupabase();
+  const extension = (file.type.split("/")[1] || "png").replace("jpeg", "jpg");
+  const path = `${new Date().getFullYear()}/${crypto.randomUUID()}.${extension}`;
+
+  const { error } = await client.storage
+    .from(NOTE_IMAGES_BUCKET)
+    .upload(path, file, { contentType: file.type, cacheControl: "31536000" });
+
+  if (error) {
+    throw toServiceError(error, "Impossibile caricare l'immagine.");
+  }
+
+  const { data } = client.storage.from(NOTE_IMAGES_BUCKET).getPublicUrl(path);
+  return { url: data.publicUrl, path };
+}
+
+export async function deleteNoteImages(paths) {
+  const valid = paths.filter(Boolean);
+  if (valid.length === 0) return;
+
+  const client = requireSupabase();
+  await client.storage.from(NOTE_IMAGES_BUCKET).remove(valid);
+}
+
 export async function reorderSections(sections) {
   const client = requireSupabase();
 
