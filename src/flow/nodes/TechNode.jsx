@@ -1,5 +1,5 @@
 import { Handle, Position } from "@xyflow/react";
-import { GitFork, Info, Minus, Plus } from "lucide-react";
+import { BookOpen, GitFork, Info, Minus, Plus } from "lucide-react";
 import {
   CATEGORY_COLORS,
   CATEGORY_LABELS,
@@ -19,6 +19,7 @@ const TechNode = ({ data }) => {
     parentCount = 0,
     onToggleChildren,
     onOpenModal,
+    onOpenKnowledge,
   } = data;
 
   const accent = CATEGORY_COLORS[primaryCategory] ?? "#94a3b8";
@@ -94,6 +95,19 @@ const TechNode = ({ data }) => {
             type="button"
           >
             <Info size={isSubNode ? 12 : 14} />
+          </button>
+
+          <button
+            aria-label={`Apri approfondimento di ${label}`}
+            onClick={(event) => {
+              event.stopPropagation();
+              onOpenKnowledge?.();
+            }}
+            className="inline-flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded p-1.5 text-slate-400 transition-colors hover:bg-slate-800/60 hover:text-cyan-300 sm:min-h-0 sm:min-w-0 sm:p-1"
+            title="Apri approfondimento"
+            type="button"
+          >
+            <BookOpen size={isSubNode ? 12 : 14} />
           </button>
 
           {hasChildren && (

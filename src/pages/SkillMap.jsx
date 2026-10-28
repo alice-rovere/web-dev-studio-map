@@ -69,6 +69,12 @@ const SkillMapContent = () => {
   const [activeKnowledgeId, setActiveKnowledgeId] = useState(null);
   const [pendingFocusId, setPendingFocusId] = useState(null);
 
+  const handleOpenKnowledge = useCallback((nodeId) => {
+    setActiveKnowledgeId(nodeId);
+    setIsModalOpen(false);
+    setSelectedNodeId(null);
+  }, []);
+
   const toggleNodeFocus = useCallback((nodeId) => {
     setSelectedNodeId((prev) => (prev === nodeId ? null : nodeId));
   }, []);
@@ -292,12 +298,14 @@ const SkillMapContent = () => {
             setSelectedNodeId(node.id);
             setIsModalOpen(true);
           },
+          onOpenKnowledge: () => handleOpenKnowledge(node.id),
         },
       })),
     ],
     [
       nodes,
       handleToggleChildren,
+      handleOpenKnowledge,
       highlightedIds,
       selectedNodeId,
       isDragEnabled,
@@ -558,6 +566,7 @@ const SkillMapContent = () => {
           setSelectedNodeId(nodeId);
           setIsModalOpen(true);
         }}
+        onOpenKnowledge={handleOpenKnowledge}
         onToggleNode={toggleNode}
       />
 
@@ -568,11 +577,7 @@ const SkillMapContent = () => {
         node={selectedNode}
         onClose={() => setIsModalOpen(false)}
         onOpenKnowledge={() => {
-          if (selectedNodeId) {
-            setActiveKnowledgeId(selectedNodeId);
-            setIsModalOpen(false);
-            setSelectedNodeId(null);
-          }
+          if (selectedNodeId) handleOpenKnowledge(selectedNodeId);
         }}
         onSelectRelated={(relatedId) => setSelectedNodeId(relatedId)}
         parents={selectedParents}

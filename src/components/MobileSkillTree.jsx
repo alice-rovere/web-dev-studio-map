@@ -1,4 +1,4 @@
-import { Info, Minus, Plus } from "lucide-react";
+import { BookOpen, Info, Minus, Plus } from "lucide-react";
 import { CATEGORY_COLORS, CATEGORY_LABELS } from "../data/baseNodes";
 
 function TreeNode({
@@ -7,6 +7,7 @@ function TreeNode({
   expandedIds,
   onToggleNode,
   onOpenDetails,
+  onOpenKnowledge,
   ancestors,
 }) {
   const node = graph.nodesById.get(nodeId);
@@ -36,6 +37,15 @@ function TreeNode({
         >
           <Info size={16} />
         </button>
+        <button
+          aria-label={`Apri approfondimento di ${node.label}`}
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-800 hover:text-cyan-300"
+          onClick={() => onOpenKnowledge(nodeId)}
+          title="Apri approfondimento"
+          type="button"
+        >
+          <BookOpen size={16} />
+        </button>
         {hasChildren && (
           <button
             aria-expanded={isExpanded}
@@ -60,6 +70,7 @@ function TreeNode({
               key={childId}
               nodeId={childId}
               onOpenDetails={onOpenDetails}
+              onOpenKnowledge={onOpenKnowledge}
               onToggleNode={onToggleNode}
             />
           ))}
@@ -74,6 +85,7 @@ export default function MobileSkillTree({
   expandedIds,
   onToggleNode,
   onOpenDetails,
+  onOpenKnowledge,
 }) {
   const rootsByCategory = new Map(
     Object.keys(CATEGORY_LABELS).map((category) => [category, []]),
@@ -122,6 +134,7 @@ export default function MobileSkillTree({
                     key={rootId}
                     nodeId={rootId}
                     onOpenDetails={onOpenDetails}
+                    onOpenKnowledge={onOpenKnowledge}
                     onToggleNode={onToggleNode}
                   />
                 ))}

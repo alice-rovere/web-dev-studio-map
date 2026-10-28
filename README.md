@@ -4,7 +4,7 @@ Mappa interattiva delle competenze per lo sviluppo web full-stack. I nodi tecnol
 
 ## Funzionalità
 
-- Mappa interattiva con nodi espandibili e categorie `frontend`, `backend`, `database`.
+- Mappa interattiva con nodi espandibili, accesso diretto agli approfondimenti e categorie `frontend`, `backend`, `database`.
 - Dettaglio del nodo con relazioni padre/figlio, best practice e risorse esterne.
 - Glossario con tooltip automatici sui termini presenti nei testi.
 - Percorso guidato che illustra il ciclo di vita di una richiesta web.
