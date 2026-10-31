@@ -265,6 +265,72 @@ export async function deleteNoteImages(paths) {
   await client.storage.from(NOTE_IMAGES_BUCKET).remove(valid);
 }
 
+export async function addNodeStudyUrl(nodeId, url) {
+  const client = requireSupabase();
+  const { data: node, error: readError } = await client
+    .from("nodes")
+    .select("study_urls")
+    .eq("id", nodeId)
+    .single();
+
+  if (readError) {
+    throw toServiceError(readError, "Impossibile leggere il nodo selezionato.");
+  }
+
+  const current = Array.isArray(node.study_urls) ? node.study_urls : [];
+  if (current.some((entry) => entry?.url === url)) {
+    throw new Error("Questo link è già presente nel nodo.");
+  }
+
+  let label = url;
+  try {
+    label = new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    // URL già validato dal chiamante
+  }
+
+  const { error } = await client
+    .from("nodes")
+    .update({ study_urls: [...current, { label, url }] })
+    .eq("id", nodeId);
+
+  if (error) {
+    throw toServiceError(error, "Impossibile aggiungere il link al nodo.");
+  }
+}
+
+export async function fetchInboxLinks() {
+  const client = requireSupabase();
+  const { data, error } = await client
+    .from("inbox_links")
+    .select("id, url, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw toServiceError(error, "Impossibile caricare l'inbox.");
+  }
+
+  return data ?? [];
+}
+
+export async function addInboxLink(url) {
+  const client = requireSupabase();
+  const { error } = await client.from("inbox_links").insert({ url });
+
+  if (error) {
+    throw toServiceError(error, "Impossibile salvare il link nell'inbox.");
+  }
+}
+
+export async function deleteInboxLink(id) {
+  const client = requireSupabase();
+  const { error } = await client.from("inbox_links").delete().eq("id", id);
+
+  if (error) {
+    throw toServiceError(error, "Impossibile rimuovere il link dall'inbox.");
+  }
+}
+
 export async function reorderSections(sections) {
   const client = requireSupabase();
 

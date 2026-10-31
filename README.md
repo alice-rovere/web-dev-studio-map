@@ -74,6 +74,11 @@ I ruoli sono gestiti nei profili Supabase: `viewer` può consultare i contenuti,
 | `/glossario`        | Glossario              | Pubblico                 |
 | `/login`            | Accesso                | Pubblico                 |
 | `/admin`            | Pannello editor        | Editor/admin autenticati |
+| `/quick-add`        | Aggiunta rapida link   | Editor/admin autenticati |
+
+### App installabile e Quick Add (Android)
+
+L'app è una PWA: da Chrome su Android scegli **Installa app**. Una volta installata compare nel menu **Condividi** (ad esempio da Instagram o dal browser): condividendo un link si apre `/quick-add` con l'URL precompilato. Scegli il nodo (ricerca o usati di recente) e salva il link nei suoi collegamenti di studio, oppure salvalo nell'inbox e assegnalo dopo. L'inbox richiede la migrazione `0005_inbox_links.sql`. Lo Share Target funziona solo in HTTPS (deploy Vercel) e non è supportato su iOS.
 
 ## Struttura del progetto
 

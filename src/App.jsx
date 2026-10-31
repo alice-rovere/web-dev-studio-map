@@ -14,6 +14,7 @@ const GuidedPath = lazy(() => import("./pages/GuidedPath"));
 const Login = lazy(() => import("./pages/Login"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Glossary = lazy(() => import("./pages/Glossary"));
+const QuickAdd = lazy(() => import("./pages/QuickAdd"));
 
 function PageLoader() {
   return (
@@ -41,6 +42,14 @@ export default function App() {
                   <Route path="/percorso-guidato" element={<GuidedPath />} />
                   <Route path="/glossario" element={<Glossary />} />
                   <Route path="/login" element={<Login />} />
+                  <Route
+                    path="/quick-add"
+                    element={
+                      <RequireEditor>
+                        <QuickAdd />
+                      </RequireEditor>
+                    }
+                  />
                   <Route
                     path="/admin"
                     element={

@@ -12,7 +12,8 @@ export default function Login() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const redirectTo = location.state?.from?.pathname || "/";
+  const from = location.state?.from;
+  const redirectTo = from ? `${from.pathname}${from.search || ""}` : "/";
 
   useEffect(() => {
     if (session) {
