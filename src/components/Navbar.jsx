@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   BookOpen,
+  Inbox,
   LogOut,
   Map,
   Menu,
@@ -14,6 +15,16 @@ import {
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useAuth } from "../hooks/useAuth";
+import { countInboxLinks, INBOX_CHANGED_EVENT } from "../services/mapService";
+
+function InboxBadge({ count }) {
+  if (!count) return null;
+  return (
+    <span className="rounded-full bg-cyan-400 px-1.5 text-[10px] font-bold leading-4 text-slate-950">
+      {count}
+    </span>
+  );
+}
 
 const NAV_ITEMS = [
   { to: "/linee-guida", label: "Linee Guida", icon: BookOpen },
@@ -37,6 +48,28 @@ const Navbar = () => {
   } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [inboxCount, setInboxCount] = useState(0);
+  const canQuickAdd = Boolean(session && isEditor);
+
+  useEffect(() => {
+    if (!canQuickAdd) return undefined;
+
+    let cancelled = false;
+    const refresh = () => {
+      countInboxLinks()
+        .then((count) => {
+          if (!cancelled) setInboxCount(count);
+        })
+        .catch(() => {});
+    };
+
+    refresh();
+    window.addEventListener(INBOX_CHANGED_EVENT, refresh);
+    return () => {
+      cancelled = true;
+      window.removeEventListener(INBOX_CHANGED_EVENT, refresh);
+    };
+  }, [canQuickAdd]);
 
   const linkClass = ({ isActive }) =>
     `inline-flex h-[34px] items-center gap-[7px] px-[10px] border rounded-[8px] text-[12px] font-medium whitespace-nowrap transition-all duration-120 ${
@@ -99,6 +132,13 @@ const Navbar = () => {
             <span className="font-mono text-[11px] text-slate-500">…</span>
           ) : session ? (
             <>
+              {isEditor && (
+                <NavLink className={linkClass} to="/quick-add">
+                  <Inbox size={17} />
+                  <span>Quick Add</span>
+                  <InboxBadge count={inboxCount} />
+                </NavLink>
+              )}
               {isEditor && (
                 <NavLink className={linkClass} to="/admin">
                   <ShieldCheck size={17} />
@@ -180,6 +220,17 @@ const Navbar = () => {
                   <BookOpen size={18} />
                   <span>Glossario</span>
                 </NavLink>
+                {session && isEditor && (
+                  <NavLink
+                    className={mobileLinkClass}
+                    onClick={() => setIsMenuOpen(false)}
+                    to="/quick-add"
+                  >
+                    <Inbox size={18} />
+                    <span>Quick Add</span>
+                    <InboxBadge count={inboxCount} />
+                  </NavLink>
+                )}
                 {session && isEditor && (
                   <NavLink
                     className={mobileLinkClass}

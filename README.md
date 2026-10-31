@@ -78,7 +78,7 @@ I ruoli sono gestiti nei profili Supabase: `viewer` può consultare i contenuti,
 
 ### App installabile e Quick Add (Android)
 
-L'app è una PWA: da Chrome su Android scegli **Installa app**. Una volta installata compare nel menu **Condividi** (ad esempio da Instagram o dal browser): condividendo un link si apre `/quick-add` con l'URL precompilato. Scegli il nodo (ricerca o usati di recente) e salva il link nei suoi collegamenti di studio, oppure salvalo nell'inbox e assegnalo dopo. L'inbox richiede la migrazione `0005_inbox_links.sql`. Lo Share Target funziona solo in HTTPS (deploy Vercel) e non è supportato su iOS.
+L'app è una PWA: da Chrome su Android scegli **Installa app**. Tenendo premuta l'icona compare lo shortcut **Quick Add**, e la voce **Quick Add** della navbar (editor/admin) mostra il numero di link in inbox. Una volta installata compare nel menu **Condividi** (ad esempio da Instagram o dal browser): condividendo un link si apre `/quick-add` con l'URL precompilato. Scegli il nodo (ricerca o usati di recente) e salva il link nei suoi collegamenti di studio, oppure salvalo nell'inbox e assegnalo dopo. L'inbox richiede la migrazione `0005_inbox_links.sql`. Lo Share Target funziona solo in HTTPS (deploy Vercel) e non è supportato su iOS.
 
 ## Struttura del progetto
 

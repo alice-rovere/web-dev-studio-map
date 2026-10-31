@@ -7,6 +7,7 @@ import {
   deleteInboxLink,
   fetchInboxLinks,
   fetchMapGraph,
+  INBOX_CHANGED_EVENT,
 } from "../services/mapService";
 
 const RECENT_KEY = "quick-add-recent-nodes";
@@ -46,6 +47,10 @@ function rememberNode(nodeId) {
   } catch {
     // le preferenze locali non sono essenziali
   }
+}
+
+function notifyInboxChanged() {
+  window.dispatchEvent(new Event(INBOX_CHANGED_EVENT));
 }
 
 export default function QuickAdd() {
@@ -107,6 +112,7 @@ export default function QuickAdd() {
     try {
       await action();
       setSuccess(message);
+      notifyInboxChanged();
       return true;
     } catch (actionError) {
       setError(actionError.message);

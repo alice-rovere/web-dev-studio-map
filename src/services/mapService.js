@@ -331,6 +331,21 @@ export async function deleteInboxLink(id) {
   }
 }
 
+export async function countInboxLinks() {
+  const client = requireSupabase();
+  const { count, error } = await client
+    .from("inbox_links")
+    .select("id", { count: "exact", head: true });
+
+  if (error) {
+    throw toServiceError(error, "Impossibile contare i link in inbox.");
+  }
+
+  return count ?? 0;
+}
+
+export const INBOX_CHANGED_EVENT = "inbox-changed";
+
 export async function reorderSections(sections) {
   const client = requireSupabase();
 

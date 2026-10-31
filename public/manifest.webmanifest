@@ -16,6 +16,15 @@
       "purpose": "any"
     }
   ],
+  "shortcuts": [
+    {
+      "name": "Quick Add",
+      "short_name": "Quick Add",
+      "description": "Aggiungi un link o apri l'inbox",
+      "url": "/quick-add",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ],
   "share_target": {
     "action": "/quick-add",
     "method": "GET",
