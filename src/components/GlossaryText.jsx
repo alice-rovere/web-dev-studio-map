@@ -57,7 +57,7 @@ export default function GlossaryText({ children }) {
               <div className="font-semibold text-cyan-400 mb-0.5">
                 {term.term}
               </div>
-              <p className="text-xs leading-relaxed text-slate-300">
+              <p className="line-clamp-3 whitespace-pre-wrap break-words text-xs leading-relaxed text-slate-300">
                 {term.definition}
               </p>
               <Tooltip.Arrow className="fill-slate-950 border-t border-cyan-500/30" />

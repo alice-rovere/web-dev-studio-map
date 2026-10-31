@@ -9,7 +9,7 @@ Mappa interattiva delle competenze per lo sviluppo web full-stack. I nodi tecnol
 - Vista ad albero ottimizzata per dispositivi mobili.
 - Dettaglio del nodo con relazioni padre/figlio, best practice e risorse esterne.
 - Approfondimenti per nodo organizzati in sezioni e blocchi di contenuto.
-- Glossario con tooltip automatici sui termini presenti nei testi.
+- Glossario con definizioni su più paragrafi e tooltip automatici con anteprima dei termini presenti nei testi.
 - Percorso guidato che illustra il ciclo di vita di una richiesta web.
 - Pagine dedicate a linee guida e sicurezza.
 - Pagina "AI nel Web Dev" con best practice per i prompt, gestione dei token, OpenCode/OpenRouter, `AGENTS.md`, OpenSpec, sicurezza e link utili (contenuti statici nel codice).

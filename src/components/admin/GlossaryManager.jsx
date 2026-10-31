@@ -103,7 +103,8 @@ export default function GlossaryManager() {
           <div>
             <h2 className="text-sm font-bold text-white">Nuovo termine</h2>
             <p className="mt-1 text-xs text-slate-500">
-              Il glossario alimenta i tooltip automatici in tutta l'app.
+              Il testo completo sarà visibile nel glossario; nei tooltip comparirà
+              un'anteprima.
             </p>
           </div>
 
@@ -112,14 +113,17 @@ export default function GlossaryManager() {
               className={inputClass}
               disabled={saving}
               onChange={(event) => setTerm(event.target.value)}
+              aria-label="Termine"
               placeholder="Termine"
               value={term}
             />
-            <input
-              className={inputClass}
+            <textarea
+              className={`${inputClass} resize-y leading-relaxed`}
               disabled={saving}
               onChange={(event) => setDefinition(event.target.value)}
-              placeholder="Definizione"
+              aria-label="Definizione"
+              placeholder="Definizione (puoi usare più paragrafi)"
+              rows={4}
               value={definition}
             />
           </div>
@@ -185,12 +189,15 @@ export default function GlossaryManager() {
                       className={inputClass}
                       disabled={saving}
                       onChange={(event) => setEditTerm(event.target.value)}
+                      aria-label="Termine"
                       value={editTerm}
                     />
-                    <input
-                      className={inputClass}
+                    <textarea
+                      className={`${inputClass} resize-y leading-relaxed`}
                       disabled={saving}
                       onChange={(event) => setEditDefinition(event.target.value)}
+                      aria-label="Definizione"
+                      rows={4}
                       value={editDefinition}
                     />
                   </div>
@@ -217,7 +224,7 @@ export default function GlossaryManager() {
                     <p className="text-xs font-semibold text-slate-200">
                       {entry.term}
                     </p>
-                    <p className="mt-0.5 text-xs text-slate-500">
+                    <p className="mt-0.5 whitespace-pre-wrap break-words text-xs leading-relaxed text-slate-400">
                       {entry.definition}
                     </p>
                   </div>
