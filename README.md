@@ -14,7 +14,7 @@ Mappa interattiva delle competenze per lo sviluppo web full-stack. I nodi tecnol
 - Pagine dedicate a linee guida e sicurezza.
 - Pagina "AI nel Web Dev" con best practice per i prompt, gestione dei token, OpenCode/OpenRouter, `AGENTS.md`, OpenSpec, sicurezza e link utili (contenuti statici nel codice).
 - Post-it personali associati alle pagine e ai nodi, salvati su Supabase.
-- Pannello di amministrazione per editor/admin: nodi, relazioni, categorie, sezioni di contenuto e glossario.
+- Pannello di amministrazione per editor/admin: ricerca gerarchica dei nodi con antenati, scorrimento automatico ai dettagli del nodo selezionato, relazioni, categorie, sezioni di contenuto e glossario.
 - Autenticazione Supabase con ruoli `viewer`, `editor`, `admin` e Row Level Security.
 
 ## Stack

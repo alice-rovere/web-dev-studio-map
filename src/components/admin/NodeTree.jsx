@@ -1,9 +1,16 @@
-import { useMemo } from "react";
-import { GitFork, Network } from "lucide-react";
+import { useMemo, useState } from "react";
+import { GitFork, Network, Search } from "lucide-react";
 import { CATEGORY_COLORS } from "../../data/baseNodes";
 
 export default function NodeTree({ nodes, parents, categories, selectedId, onSelect }) {
-  const { roots, nodeById, childrenByParent, categoriesByNode } = useMemo(() => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const {
+    roots,
+    nodeById,
+    childrenByParent,
+    categoriesByNode,
+    parentsByChild,
+  } = useMemo(() => {
       const nodeMap = new Map(nodes.map((node) => [node.id, node]));
       const categoryMap = new Map();
 
@@ -15,6 +22,7 @@ export default function NodeTree({ nodes, parents, categories, selectedId, onSel
 
       const parentIds = new Set();
       const childRelations = new Map();
+      const parentsByChild = new Map();
 
       for (const relation of parents) {
         if (!nodeMap.has(relation.parent_id) || !nodeMap.has(relation.child_id)) {
@@ -25,6 +33,10 @@ export default function NodeTree({ nodes, parents, categories, selectedId, onSel
         const list = childRelations.get(relation.parent_id) ?? [];
         list.push(relation);
         childRelations.set(relation.parent_id, list);
+
+        const nodeParents = parentsByChild.get(relation.child_id) ?? [];
+        nodeParents.push(relation.parent_id);
+        parentsByChild.set(relation.child_id, nodeParents);
       }
 
       for (const list of childRelations.values()) {
@@ -36,11 +48,37 @@ export default function NodeTree({ nodes, parents, categories, selectedId, onSel
         nodeById: nodeMap,
         childrenByParent: childRelations,
         categoriesByNode: categoryMap,
+        parentsByChild,
       };
     }, [nodes, parents, categories]);
 
+  const visibleNodeIds = useMemo(() => {
+    const query = searchQuery.trim().toLocaleLowerCase();
+    if (!query) return null;
+
+    const visibleIds = new Set();
+    const ancestorsToVisit = [];
+
+    for (const node of nodes) {
+      if (node.label.toLocaleLowerCase().includes(query)) {
+        ancestorsToVisit.push(node.id);
+      }
+    }
+
+    while (ancestorsToVisit.length > 0) {
+      const nodeId = ancestorsToVisit.pop();
+      if (visibleIds.has(nodeId)) continue;
+
+      visibleIds.add(nodeId);
+      ancestorsToVisit.push(...(parentsByChild.get(nodeId) ?? []));
+    }
+
+    return visibleIds;
+  }, [nodes, parentsByChild, searchQuery]);
+
   function renderNode(nodeId, depth, visited) {
     if (visited.has(nodeId)) return null;
+    if (visibleNodeIds && !visibleNodeIds.has(nodeId)) return null;
     const node = nodeById.get(nodeId);
     if (!node) return null;
 
@@ -106,7 +144,24 @@ export default function NodeTree({ nodes, parents, categories, selectedId, onSel
         <Network size={12} />
         Gerarchia nodi
       </div>
-      {roots.map((node) => renderNode(node.id, 0, new Set()))}
+      <label className="mb-2 flex items-center gap-2 rounded-md border border-slate-800 bg-slate-950 px-2.5 text-slate-500 focus-within:border-slate-600">
+        <Search aria-hidden="true" size={13} />
+        <input
+          aria-label="Cerca nodi per nome"
+          className="min-h-9 min-w-0 flex-1 bg-transparent text-xs text-slate-200 outline-none placeholder:text-slate-600"
+          onChange={(event) => setSearchQuery(event.target.value)}
+          placeholder="Cerca un nodo..."
+          type="search"
+          value={searchQuery}
+        />
+      </label>
+      {visibleNodeIds?.size === 0 ? (
+        <p className="rounded-lg border border-dashed border-slate-800 p-4 text-center text-xs text-slate-500">
+          Nessun nodo corrispondente alla ricerca.
+        </p>
+      ) : (
+        roots.map((node) => renderNode(node.id, 0, new Set()))
+      )}
     </div>
   );
 }
