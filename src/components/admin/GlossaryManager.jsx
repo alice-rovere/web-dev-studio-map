@@ -103,8 +103,8 @@ export default function GlossaryManager() {
           <div>
             <h2 className="text-sm font-bold text-white">Nuovo termine</h2>
             <p className="mt-1 text-xs text-slate-500">
-              Il testo completo sarà visibile nel glossario; nei tooltip comparirà
-              un'anteprima.
+              Il testo completo sarà visibile nel glossario; nei tooltip
+              comparirà un'anteprima.
             </p>
           </div>
 
@@ -195,7 +195,9 @@ export default function GlossaryManager() {
                     <textarea
                       className={`${inputClass} resize-y leading-relaxed`}
                       disabled={saving}
-                      onChange={(event) => setEditDefinition(event.target.value)}
+                      onChange={(event) =>
+                        setEditDefinition(event.target.value)
+                      }
                       aria-label="Definizione"
                       rows={4}
                       value={editDefinition}
@@ -224,7 +226,7 @@ export default function GlossaryManager() {
                     <p className="text-xs font-semibold text-slate-200">
                       {entry.term}
                     </p>
-                    <p className="mt-0.5 whitespace-pre-wrap break-words text-xs leading-relaxed text-slate-400">
+                    <p className="mt-0.5 whitespace-pre-wrap wrap-break-word text-xs leading-relaxed text-slate-400">
                       {entry.definition}
                     </p>
                   </div>
