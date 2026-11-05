@@ -75,6 +75,16 @@ I ruoli sono gestiti nei profili Supabase: `viewer` può consultare i contenuti,
 | `/login`            | Accesso                | Pubblico                 |
 | `/admin`            | Pannello editor        | Editor/admin autenticati |
 | `/quick-add`        | Aggiunta rapida link   | Editor/admin autenticati |
+| `/notebook/:slug`   | Appunti Visivi         | Pubblico                 |
+
+### Appunti Visivi (simulazioni a step)
+
+Dalla pagina di approfondimento di un nodo con un notebook associato compare il pulsante **Apri Appunti Visivi**, che apre `/notebook/:slug` a schermo intero (frecce ←/→ per gli step, Esc per chiudere). Per aggiungerne uno:
+
+1. Crea `src/notebooks/configs/<nome>Config.js` con config JSON pura: `{ slug, title, subtitle, phases, steps }` (esempio: `prismaFlowConfig.js`). Ogni step ha `phase`, `title`, `description` e `panels` di tipo `code`, `table` o `text`.
+2. Registra lo slug in `src/notebooks/registry.js`. Lo slug deve coincidere con lo `slug` del nodo.
+
+Il nodo `prisma-orm` richiede la migrazione `0006_prisma_orm_node.sql`.
 
 ### App installabile e Quick Add (Android)
 

@@ -15,6 +15,7 @@ const Login = lazy(() => import("./pages/Login"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Glossary = lazy(() => import("./pages/Glossary"));
 const QuickAdd = lazy(() => import("./pages/QuickAdd"));
+const VisualNotebook = lazy(() => import("./pages/VisualNotebook"));
 
 function PageLoader() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
                   <Route path="/ai-web-dev" element={<AiWebDev />} />
                   <Route path="/percorso-guidato" element={<GuidedPath />} />
                   <Route path="/glossario" element={<Glossary />} />
+                  <Route path="/notebook/:slug" element={<VisualNotebook />} />
                   <Route path="/login" element={<Login />} />
                   <Route
                     path="/quick-add"

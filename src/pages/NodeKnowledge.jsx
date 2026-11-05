@@ -1,4 +1,6 @@
-import { ArrowLeft, GitFork, Lock, X } from "lucide-react";
+import { ArrowLeft, GitFork, Lock, Presentation, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { hasNotebook } from "../notebooks/registry";
 import ContentSectionEditor from "../components/ContentSectionEditor";
 import NodeGenericInfo from "../components/NodeGenericInfo";
 import GlossaryText from "../components/GlossaryText";
@@ -19,6 +21,8 @@ export default function NodeKnowledgePage({
   const categories = nodeData.categories ?? [];
   const primaryCategory = nodeData.primaryCategory ?? "frontend";
   const accent = CATEGORY_COLORS[primaryCategory] ?? "#94a3b8";
+  const navigate = useNavigate();
+  const notebookSlug = hasNotebook(nodeData.slug) ? nodeData.slug : null;
 
   return (
     <section className="relative h-full w-full overflow-y-auto border border-zinc-900 bg-zinc-950 p-4 font-sans text-zinc-100 shadow-2xl before:absolute before:top-0 before:left-0 before:h-px before:w-full before:bg-linear-to-r before:from-transparent before:via-zinc-700 before:to-transparent sm:p-6 md:p-10">
@@ -90,6 +94,21 @@ export default function NodeKnowledgePage({
                 "Approfondimento strutturato del nodo selezionato."}
             </GlossaryText>
           </p>
+
+          {notebookSlug && (
+            <button
+              className="mb-6 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-cyan-400/50 bg-linear-to-r from-fuchsia-500/10 to-cyan-400/10 px-4 py-2 font-mono text-xs font-bold uppercase tracking-widest text-cyan-200 shadow-[0_0_14px_rgba(34,211,238,0.15)] transition-colors hover:border-cyan-300 hover:text-white"
+              onClick={() =>
+                navigate(`/notebook/${notebookSlug}`, {
+                  state: { knowledgeNodeId: node.id },
+                })
+              }
+              type="button"
+            >
+              <Presentation size={14} />
+              Apri Appunti Visivi
+            </button>
+          )}
 
           {childNodes.length > 0 && (
             <div className="mb-8">

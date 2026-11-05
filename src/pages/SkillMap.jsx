@@ -16,6 +16,7 @@ import {
   Unlock,
 } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { useLocation } from "react-router-dom";
 
 import { nodeTypes } from "../flow/nodes/index.jsx";
 import NodeDetailsModal from "../components/NodeDetailsModal.jsx";
@@ -63,10 +64,13 @@ const SkillMapContent = () => {
   }, []);
 
   const { getNode, setCenter } = useReactFlow();
+  const location = useLocation();
 
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeKnowledgeId, setActiveKnowledgeId] = useState(null);
+  const [activeKnowledgeId, setActiveKnowledgeId] = useState(
+    () => location.state?.knowledgeNodeId ?? null,
+  );
   const [pendingFocusId, setPendingFocusId] = useState(null);
 
   const handleOpenKnowledge = useCallback((nodeId) => {
@@ -89,6 +93,7 @@ const SkillMapContent = () => {
         type: "tech",
         data: {
           label: node.label,
+          slug: node.slug,
           categories: node.categories,
           primaryCategory: node.primaryCategory,
           description: node.description,
