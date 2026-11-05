@@ -11,12 +11,18 @@ import {
   Terminal,
   X,
 } from "lucide-react";
+import { useReducedMotion } from "framer-motion";
+import PrismaFlowDiagram from "./PrismaFlowDiagram.jsx";
 
 const PHASE_ICONS = {
   server: Server,
   code: Code2,
   terminal: Terminal,
   database: Database,
+};
+
+const ILLUSTRATIONS = {
+  "prisma-flow": PrismaFlowDiagram,
 };
 
 const AUTOPLAY_MS = 3200;
@@ -118,6 +124,7 @@ function Panel({ panel }) {
  * `config`: { title, subtitle, phases: [{id,label,hint,icon}], steps: [{id,phase,title,description,panels}] }
  */
 export default function VisualNotebookLayout({ config, onClose }) {
+  const shouldReduceMotion = useReducedMotion();
   const steps = useMemo(() => config?.steps ?? [], [config]);
   const phases = useMemo(() => config?.phases ?? [], [config]);
   const [stepIndex, setStepIndex] = useState(0);
@@ -172,6 +179,7 @@ export default function VisualNotebookLayout({ config, onClose }) {
   }
 
   const progress = ((stepIndex + 1) / steps.length) * 100;
+  const Illustration = ILLUSTRATIONS[currentStep.illustration];
 
   return (
     <div
@@ -269,6 +277,15 @@ export default function VisualNotebookLayout({ config, onClose }) {
               {currentStep.description}
             </p>
           </div>
+
+          {Illustration && (
+            <div className="shrink-0 px-3 pt-3 sm:px-4">
+              <Illustration
+                isPlaying={isPlaying && !shouldReduceMotion}
+                stepId={currentStep.id}
+              />
+            </div>
+          )}
 
           <div className="nowheel grid min-h-0 grow auto-rows-min gap-3 overflow-y-auto p-3 sm:p-4 lg:grid-flow-col lg:auto-cols-fr lg:auto-rows-auto">
             {phases.map((phase) => {

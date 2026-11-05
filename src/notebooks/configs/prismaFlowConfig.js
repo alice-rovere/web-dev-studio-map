@@ -45,6 +45,7 @@ export const prismaFlowConfig = {
     {
       id: "request",
       phase: "express",
+      illustration: "prisma-flow",
       title: "Richiesta in arrivo",
       description:
         "Il client invia POST /users con un JSON. Express esegue il parsing del body e passa il controllo all'handler della rotta.",
@@ -67,6 +68,7 @@ export const prismaFlowConfig = {
     {
       id: "client-call",
       phase: "prisma",
+      illustration: "prisma-flow",
       title: "Chiamata a Prisma Client",
       description:
         "L'handler chiama prisma.user.create(). Il client è generato dallo schema, quindi `data` è tipizzato e validato prima di toccare il database.",
@@ -83,6 +85,7 @@ export const prismaFlowConfig = {
     {
       id: "translation",
       phase: "sql",
+      illustration: "prisma-flow",
       title: "Traduzione in SQL",
       description:
         "Il query engine converte la chiamata in una query SQL parametrizzata: i valori viaggiano come parametri, non concatenati (niente SQL injection).",
@@ -94,6 +97,7 @@ export const prismaFlowConfig = {
     {
       id: "write",
       phase: "database",
+      illustration: "prisma-flow",
       title: "Scrittura sul database",
       description:
         "Postgres esegue l'INSERT. La riga compare nella tabella User e RETURNING restituisce il record creato.",
@@ -113,6 +117,7 @@ export const prismaFlowConfig = {
     {
       id: "response",
       phase: "express",
+      illustration: "prisma-flow",
       title: "Risposta al client",
       description:
         "Prisma restituisce l'oggetto creato; Express risponde con 201 e il JSON del nuovo utente.",

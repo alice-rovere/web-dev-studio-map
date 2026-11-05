@@ -9,6 +9,7 @@ Mappa interattiva delle competenze per lo sviluppo web full-stack. I nodi tecnol
 - Vista ad albero ottimizzata per dispositivi mobili.
 - Dettaglio del nodo con relazioni padre/figlio, best practice e risorse esterne.
 - Approfondimenti per nodo organizzati in sezioni e blocchi di contenuto.
+- Appunti Visivi a step, con un diagramma SVG animato per il flusso di Prisma ORM.
 - Glossario con definizioni su più paragrafi e tooltip automatici con anteprima dei termini presenti nei testi.
 - Percorso guidato che illustra il ciclo di vita di una richiesta web.
 - Pagine dedicate a linee guida e sicurezza.
@@ -81,7 +82,7 @@ I ruoli sono gestiti nei profili Supabase: `viewer` può consultare i contenuti,
 
 Dalla pagina di approfondimento di un nodo con un notebook associato compare il pulsante **Apri Appunti Visivi**, che apre `/notebook/:slug` a schermo intero (frecce ←/→ per gli step, Esc per chiudere). Per aggiungerne uno:
 
-1. Crea `src/notebooks/configs/<nome>Config.js` con config JSON pura: `{ slug, title, subtitle, phases, steps }` (esempio: `prismaFlowConfig.js`). Ogni step ha `phase`, `title`, `description` e `panels` di tipo `code`, `table` o `text`.
+1. Crea `src/notebooks/configs/<nome>Config.js` con config JSON pura: `{ slug, title, subtitle, phases, steps }` (esempio: `prismaFlowConfig.js`). Ogni step ha `phase`, `title`, `description` e `panels` di tipo `code`, `table` o `text`; il campo facoltativo `illustration` seleziona una scena SVG registrata nel layout.
 2. Registra lo slug in `src/notebooks/registry.js`. Lo slug deve coincidere con lo `slug` del nodo.
 
 Il nodo `prisma-orm` richiede la migrazione `0006_prisma_orm_node.sql`.

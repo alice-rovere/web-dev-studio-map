@@ -55,3 +55,19 @@
 .react-flow__controls-button svg {
   @apply fill-current!;
 }
+
+@keyframes prisma-flow-dash {
+  to {
+    stroke-dashoffset: -40;
+  }
+}
+
+.prisma-flow-dash {
+  animation: prisma-flow-dash 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prisma-flow-dash {
+    animation: none;
+  }
+}
