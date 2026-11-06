@@ -6,7 +6,6 @@ import {
   FileText,
   GitBranch,
   ShieldCheck,
-  Sparkles,
   Terminal,
 } from "lucide-react";
 import { StickyNotesCanvas } from "../components/notes/StickyNotesCanvas";
@@ -419,10 +418,6 @@ export default function AiWebDev() {
 
       <div className="mx-auto max-w-4xl space-y-8 pb-5 sm:space-y-12">
         <header className="space-y-3">
-          <div className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-cyan-400">
-            <Sparkles size={14} />
-            <span>AI nel web development</span>
-          </div>
           <h2
             id="ai-web-dev-title"
             className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl md:text-4xl"

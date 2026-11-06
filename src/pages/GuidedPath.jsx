@@ -1,4 +1,4 @@
-import { ArrowUpRight, Layers3, MapPin, Presentation } from "lucide-react";
+import { ArrowUpRight, MapPin, Presentation } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getNotebookCatalog } from "../notebooks/registry";
 
@@ -9,10 +9,6 @@ export default function GuidedPathPage() {
     <main className="h-full w-full overflow-y-auto bg-[#0b1120] p-4 font-sans text-slate-100 sm:p-6 lg:p-10">
       <div className="mx-auto w-full max-w-6xl">
         <header className="mb-8 border-b border-slate-800 pb-5 sm:mb-10">
-          <p className="mb-2 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">
-            <Layers3 size={15} />
-            Appunti visivi
-          </p>
           <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
             Percorsi guidati
           </h1>
