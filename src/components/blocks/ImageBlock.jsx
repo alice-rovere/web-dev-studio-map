@@ -74,7 +74,7 @@ export function ImageView({ payload }) {
   );
 }
 
-export function ImageEditor({ payload, update, fieldClass, Label }) {
+export function ImageEditor({ payload, update, fieldClass, Label, onUploadingChange, onUploaded }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
@@ -84,9 +84,11 @@ export function ImageEditor({ payload, update, fieldClass, Label }) {
     if (!file) return;
 
     setUploading(true);
+    onUploadingChange?.(true);
     setError("");
     try {
       const uploaded = await uploadNoteImage(await shrinkImage(file));
+      onUploaded?.(uploaded.path);
       update((previous) => ({ ...previous, ...uploaded }));
     } catch (uploadError) {
       setError(
@@ -96,6 +98,7 @@ export function ImageEditor({ payload, update, fieldClass, Label }) {
       );
     } finally {
       setUploading(false);
+      onUploadingChange?.(false);
     }
   }
 

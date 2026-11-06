@@ -3,9 +3,14 @@ import { CalloutView } from "./blocks/CalloutBlock";
 import { ImageView } from "./blocks/ImageBlock";
 import { MermaidView } from "./blocks/MermaidBlock";
 import { WhiteboardView } from "./blocks/WhiteboardBlock";
+import { RichTextView } from "./blocks/RichTextBlock";
 
 function ContentBlock({ section }) {
   const payload = section?.payload ?? {};
+
+  if (section?.type === "text" && payload.richText) {
+    return <RichTextView document={payload.richText} />;
+  }
 
   if (section?.type === "text" && typeof payload.text === "string") {
     return (
@@ -123,7 +128,7 @@ function ContentBlock({ section }) {
   );
 }
 
-export function SectionCard({ section, actions }) {
+export function SectionCard({ section, actions, blockActions }) {
   const subtitle =
     typeof section.payload?.subtitle === "string"
       ? section.payload.subtitle
@@ -149,10 +154,12 @@ export function SectionCard({ section, actions }) {
       </div>
       <div className="space-y-4">
         {blocks.map((block, index) => (
-          <ContentBlock
-            key={`${block.type}-${index}`}
-            section={Array.isArray(section.payload?.blocks) ? block : section}
-          />
+          <div className="min-w-0" key={block.id ?? `${block.type}-${index}`}>
+            {blockActions?.(block, index)}
+            <ContentBlock
+              section={Array.isArray(section.payload?.blocks) ? block : section}
+            />
+          </div>
         ))}
       </div>
     </article>

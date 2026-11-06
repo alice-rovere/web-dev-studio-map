@@ -78,7 +78,7 @@ export async function fetchNodeSections(nodeId) {
   const client = requireSupabase();
   const { data, error } = await client
     .from("node_content_sections")
-    .select("id, node_id, sort_order, title, type, payload")
+    .select("id, node_id, sort_order, title, type, payload, updated_at")
     .eq("node_id", nodeId)
     .order("sort_order", { ascending: true });
 
@@ -162,7 +162,7 @@ export async function createSection(nodeId, payload) {
   const { data, error } = await client
     .from("node_content_sections")
     .insert({ node_id: nodeId, ...payload })
-    .select("id, node_id, sort_order, title, type, payload")
+    .select("id, node_id, sort_order, title, type, payload, updated_at")
     .single();
 
   if (error) {
@@ -172,31 +172,41 @@ export async function createSection(nodeId, payload) {
   return data;
 }
 
-export async function updateSection(sectionId, payload) {
+export async function updateSection(sectionId, payload, expectedUpdatedAt) {
   const client = requireSupabase();
   const { data, error } = await client
     .from("node_content_sections")
     .update(payload)
     .eq("id", sectionId)
-    .select("id, node_id, sort_order, title, type, payload")
-    .single();
+    .eq("updated_at", expectedUpdatedAt)
+    .select("id, node_id, sort_order, title, type, payload, updated_at")
+    .maybeSingle();
 
   if (error) {
     throw toServiceError(error, "Impossibile aggiornare la sezione.");
   }
 
+  if (!data) {
+    throw new Error("La sezione è stata modificata o eliminata in un'altra scheda. Aggiorna i dati e controlla eventuali bozze prima di riprovare.");
+  }
   return data;
 }
 
-export async function deleteSection(sectionId) {
+export async function deleteSection(sectionId, expectedUpdatedAt) {
   const client = requireSupabase();
-  const { error } = await client
+  const { data, error } = await client
     .from("node_content_sections")
     .delete()
-    .eq("id", sectionId);
+    .eq("id", sectionId)
+    .eq("updated_at", expectedUpdatedAt)
+    .select("id")
+    .maybeSingle();
 
   if (error) {
     throw toServiceError(error, "Impossibile eliminare la sezione.");
+  }
+  if (!data) {
+    throw new Error("La sezione è stata modificata o eliminata in un'altra scheda. Ricarica prima di riprovare.");
   }
 }
 
@@ -232,7 +242,10 @@ export async function deleteNoteImages(paths) {
   if (valid.length === 0) return;
 
   const client = requireSupabase();
-  await client.storage.from(NOTE_IMAGES_BUCKET).remove(valid);
+  const { error } = await client.storage.from(NOTE_IMAGES_BUCKET).remove(valid);
+  if (error) {
+    throw toServiceError(error, "Impossibile rimuovere le immagini non utilizzate.");
+  }
 }
 
 export async function addNodeStudyUrl(nodeId, url) {

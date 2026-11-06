@@ -213,7 +213,7 @@ export default function FullStackPathPage() {
         </section>
 
         {/* Canvas React Flow */}
-        <div className="h-[60dvh] min-h-[360px] w-full xl:col-span-3 xl:h-162.5">
+        <div className="h-[60dvh] min-h-90 w-full xl:col-span-3 xl:h-162.5">
           <ReactFlowProvider>
             <PathCanvas graph={graph} />
           </ReactFlowProvider>

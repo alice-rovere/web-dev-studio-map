@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   BookOpen,
   Boxes,
@@ -36,6 +36,9 @@ export default function Admin() {
   const [defaultParentId, setDefaultParentId] = useState(null);
   const [contentNodeId, setContentNodeId] = useState("");
   const selectedPanelRef = useRef(null);
+  const contentDraftGuard = useRef(null);
+  const onContentDraftChange = useCallback((guard) => { contentDraftGuard.current = guard; }, []);
+  const confirmContentNavigation = async () => !contentDraftGuard.current || await contentDraftGuard.current();
 
   const nodes = data.nodes;
   const selectedNode = useMemo(
@@ -148,7 +151,9 @@ export default function Admin() {
                     : "border border-slate-800 text-slate-300 hover:bg-slate-900"
                 }`}
                 key={entry.id}
-                onClick={() => setTab(entry.id)}
+                onClick={async () => {
+                  if (entry.id === tab || await confirmContentNavigation()) setTab(entry.id);
+                }}
                 type="button"
               >
                 <Icon size={14} />
@@ -349,7 +354,10 @@ export default function Admin() {
               </span>
               <select
                 className="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-200 outline-none focus:border-slate-600"
-                onChange={(event) => setContentNodeId(event.target.value)}
+                onChange={async (event) => {
+                  const nextNodeId = event.target.value;
+                  if (await confirmContentNavigation()) setContentNodeId(nextNodeId);
+                }}
                 value={contentNodeId}
               >
                 <option value="">Seleziona un nodo…</option>
@@ -366,6 +374,7 @@ export default function Admin() {
                 canEdit
                 key={contentNodeId}
                 nodeId={contentNodeId}
+                onDraftChange={onContentDraftChange}
               />
             ) : (
               <p className="py-8 text-center text-xs italic text-slate-600">

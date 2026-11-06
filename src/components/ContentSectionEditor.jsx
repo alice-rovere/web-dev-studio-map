@@ -14,6 +14,8 @@ import { CalloutEditor } from "./blocks/CalloutBlock";
 import { ImageEditor } from "./blocks/ImageBlock";
 import { MermaidEditor } from "./blocks/MermaidBlock";
 import { WhiteboardEditor } from "./blocks/WhiteboardBlock";
+import { RichTextEditor } from "./blocks/RichTextBlock";
+import { getSectionBlocks, payloadWithBlocks, rebaseDraft } from "./sectionBlocks";
 import {
   createSection,
   deleteNoteImages,
@@ -76,7 +78,7 @@ function ensurePayload(type, payload) {
 
   switch (type) {
     case "text":
-      return { text: typeof source.text === "string" ? source.text : "" };
+      return { ...source, text: typeof source.text === "string" ? source.text : "" };
     case "code":
       return {
         code: typeof source.code === "string" ? source.code : "",
@@ -97,7 +99,7 @@ function ensurePayload(type, payload) {
       const rows =
         Array.isArray(source.rows) && source.rows.length > 0
           ? source.rows.map((row) =>
-              columns.map((_, index) =>
+              Array.from({ length: Math.max(columns.length, Array.isArray(row) ? row.length : 0) }, (_, index) =>
                 Array.isArray(row) && row[index] != null
                   ? String(row[index])
                   : "",
@@ -111,7 +113,8 @@ function ensurePayload(type, payload) {
         entries:
           Array.isArray(source.entries) && source.entries.length > 0
             ? source.entries.map((entry) => ({
-                date: entry?.date ?? "",
+              ...entry,
+              date: entry?.date ?? "",
                 title: entry?.title ?? "",
                 description: entry?.description ?? "",
               }))
@@ -143,30 +146,6 @@ function ensurePayload(type, payload) {
   }
 }
 
-function imagePaths(blocks) {
-  return blocks
-    .filter((block) => block?.type === "image" && block.payload?.path)
-    .map((block) => block.payload.path);
-}
-
-function getSectionBlocks(section) {
-  const payload = section.payload ?? {};
-
-  if (Array.isArray(payload.blocks)) {
-    return payload.blocks.map((block) => ({
-      type: block?.type ?? "text",
-      payload: ensurePayload(block?.type ?? "text", block?.payload),
-    }));
-  }
-
-  return [
-    {
-      type: section.type,
-      payload: ensurePayload(section.type, payload),
-    },
-  ];
-}
-
 function fieldClass() {
   return "w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 outline-none focus:border-zinc-600";
 }
@@ -179,7 +158,7 @@ function Label({ children }) {
   );
 }
 
-function IconButton({ label, onClick, children, danger = false }) {
+function IconButton({ label, onClick, children, danger = false, disabled = false }) {
   return (
     <button
       aria-label={label}
@@ -187,6 +166,7 @@ function IconButton({ label, onClick, children, danger = false }) {
         danger ? "text-rose-400" : "text-zinc-400 hover:text-white"
       }`}
       onClick={onClick}
+      disabled={disabled}
       title={label}
       type="button"
     >
@@ -195,26 +175,21 @@ function IconButton({ label, onClick, children, danger = false }) {
   );
 }
 
-function PayloadEditor({ draft, setDraft }) {
+function PayloadEditor({ draft, setDraft, onUploadingChange, onUploaded }) {
   const { type, payload } = draft;
 
   const update = (updater) =>
     setDraft((previous) => ({
       ...previous,
-      payload: updater(previous.payload),
+      payload: { ...previous.payload, ...updater(previous.payload) },
     }));
 
   if (type === "text") {
     return (
-      <label className="block">
+      <div>
         <Label>Testo</Label>
-        <textarea
-          className={`${fieldClass()} min-h-28 resize-y`}
-          onChange={(event) => update(() => ({ text: event.target.value }))}
-          placeholder="Scrivi il contenuto della sezione…"
-          value={payload.text}
-        />
-      </label>
+        <RichTextEditor payload={payload} update={update} />
+      </div>
     );
   }
 
@@ -442,7 +417,7 @@ function PayloadEditor({ draft, setDraft }) {
     );
   }
 
-  const shared = { payload, update, fieldClass: fieldClass(), Label };
+  const shared = { payload, update, fieldClass: fieldClass(), Label, onUploadingChange, onUploaded };
 
   if (type === "callout") return <CalloutEditor {...shared} />;
   if (type === "image") return <ImageEditor {...shared} />;
@@ -541,7 +516,7 @@ function PayloadEditor({ draft, setDraft }) {
   );
 }
 
-export default function ContentSectionEditor({ nodeId, canEdit = false }) {
+export default function ContentSectionEditor({ nodeId, canEdit = false, onDraftChange }) {
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(Boolean(nodeId));
   const [error, setError] = useState(null);
@@ -550,6 +525,8 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
   const [actionError, setActionError] = useState("");
   const [activeSectionId, setActiveSectionId] = useState(null);
   const tabRefs = useRef(new Map());
+  const [uploading, setUploading] = useState(false);
+  const uploadedPaths = useRef([]);
 
   const activeSection =
     sections.find((section) => section.id === activeSectionId) ??
@@ -559,7 +536,48 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
     ? sections.findIndex((section) => section.id === activeSection.id)
     : -1;
 
-  function handleTabKeyDown(event) {
+  useEffect(() => {
+    if (!draft) return undefined;
+    const warn = (event) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [draft]);
+
+  const cleanupUploads = useCallback(async (paths) => {
+    if (!paths.length) return;
+    await deleteNoteImages(paths);
+    uploadedPaths.current = uploadedPaths.current.filter((path) => !paths.includes(path));
+  }, []);
+
+  const discardDraft = useCallback(async () => {
+    if (uploading || saving) return false;
+    if (draft && !window.confirm("Abbandonare le modifiche non salvate?")) return false;
+    setActionError("");
+    const paths = [...uploadedPaths.current];
+    try {
+      if (paths.length) {
+        setSaving(true);
+        await cleanupUploads(paths);
+      }
+    } catch (cleanupError) {
+      setActionError(cleanupError instanceof Error ? cleanupError.message : "Impossibile rimuovere le immagini non utilizzate.");
+      return false;
+    } finally {
+      if (paths.length) setSaving(false);
+    }
+    setDraft(null);
+    return true;
+  }, [cleanupUploads, draft, saving, uploading]);
+
+  useEffect(() => {
+    onDraftChange?.(draft ? discardDraft : null);
+    return () => onDraftChange?.(null);
+  }, [discardDraft, draft, onDraftChange]);
+
+  async function handleTabKeyDown(event) {
     const keys = ["ArrowLeft", "ArrowRight", "Home", "End"];
     if (!keys.includes(event.key) || sections.length === 0) return;
 
@@ -578,6 +596,7 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
 
     const nextSection = sections[nextIndex];
     if (!nextSection) return;
+    if (!(await discardDraft())) return;
 
     setActiveSectionId(nextSection.id);
     tabRefs.current.get(nextSection.id)?.focus();
@@ -613,8 +632,29 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
     await loadSections();
   }
 
+  async function refreshDraft() {
+    setSaving(true);
+    try {
+      const latestSections = await fetchNodeSections(nodeId);
+      setSections(latestSections);
+      const latest = latestSections.find((section) => section.id === draft.section.id);
+      const rebased = rebaseDraft(draft, latest);
+      if (!rebased) {
+        setActionError("Il contenuto che stai modificando è cambiato o è stato eliminato. La tua bozza rimane qui: confrontala con la sezione aggiornata e copiala prima di annullare.");
+      } else {
+        setDraft(rebased);
+        setActionError("Dati aggiornati: la tua bozza è conservata e puoi riprovare a salvarla.");
+      }
+    } catch (refreshError) {
+      setActionError(refreshError instanceof Error ? refreshError.message : "Impossibile aggiornare la sezione.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   function startNew() {
     setDraft({
+      mode: "section",
       id: null,
       title: "",
       subtitle: "",
@@ -625,20 +665,36 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
 
   function startEdit(section) {
     setDraft({
+      mode: "section",
       id: section.id,
+      section,
       title: section.title,
       subtitle: section.payload?.subtitle ?? "",
-      blocks: getSectionBlocks(section),
+      blocks: [],
     });
     setActiveSectionId(section.id);
     setActionError("");
   }
 
   function addBlock(type) {
-    setDraft((previous) => ({
-      ...previous,
-      blocks: [...previous.blocks, { type, payload: emptyPayload(type) }],
-    }));
+    setDraft({
+      mode: "block",
+      section: activeSection,
+      blockIndex: null,
+      blocks: [{ id: crypto.randomUUID(), type, payload: emptyPayload(type) }],
+    });
+    setActionError("");
+  }
+
+  function startBlock(section, index) {
+    const block = getSectionBlocks(section)[index];
+    setDraft({
+      mode: "block",
+      section,
+      blockIndex: index,
+      blocks: [{ ...block, payload: { ...block.payload, ...ensurePayload(block.type, block.payload) } }],
+    });
+    setActionError("");
   }
 
   function updateBlock(index, updater) {
@@ -650,21 +706,40 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
     }));
   }
 
+  async function changeBlocks(section, blocks) {
+    setSaving(true);
+    setActionError("");
+    try {
+      await updateSection(section.id, {
+        type: "text",
+        payload: payloadWithBlocks(section, blocks),
+      }, section.updated_at);
+      await loadSections();
+    } catch (saveError) {
+      setActionError(saveError instanceof Error ? saveError.message : "Impossibile aggiornare il contenuto.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   function moveBlock(index, direction) {
     const target = index + direction;
-    setDraft((previous) => {
-      if (target < 0 || target >= previous.blocks.length) return previous;
-      const blocks = [...previous.blocks];
-      [blocks[index], blocks[target]] = [blocks[target], blocks[index]];
-      return { ...previous, blocks };
-    });
+    const blocks = [...getSectionBlocks(activeSection)];
+    if (target < 0 || target >= blocks.length) return;
+    [blocks[index], blocks[target]] = [blocks[target], blocks[index]];
+    changeBlocks(activeSection, blocks);
+  }
+
+  function removeBlock(index) {
+    if (!window.confirm("Eliminare questo contenuto? L'operazione non può essere annullata.")) return;
+    changeBlocks(activeSection, getSectionBlocks(activeSection).filter((_, current) => current !== index));
   }
 
   async function handleSave(event) {
     event.preventDefault();
     if (!draft) return;
 
-    if (!draft.title.trim()) {
+    if (draft.mode === "section" && !draft.title.trim()) {
       setActionError("Il titolo della sezione è obbligatorio.");
       return;
     }
@@ -673,26 +748,33 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
     setActionError("");
 
     try {
-      if (draft.id) {
-        const previousSection = sections.find((item) => item.id === draft.id);
+      if (draft.mode === "block") {
+        const section = draft.section;
+        const blocks = [...getSectionBlocks(section)];
+        if (draft.blockIndex === null) blocks.push(draft.blocks[0]);
+        else blocks[draft.blockIndex] = draft.blocks[0];
+        await updateSection(section.id, {
+          type: "text",
+          payload: payloadWithBlocks(section, blocks),
+        }, section.updated_at);
+        const keptPath = draft.blocks[0].type === "image" ? draft.blocks[0].payload.path : null;
+        const unusedPaths = uploadedPaths.current.filter((path) => path !== keptPath);
+        uploadedPaths.current = unusedPaths;
+        try {
+          await cleanupUploads(unusedPaths);
+        } catch (cleanupError) {
+          setActionError(cleanupError instanceof Error ? cleanupError.message : "Impossibile rimuovere le immagini non utilizzate.");
+        }
+      } else if (draft.id) {
         await updateSection(draft.id, {
           title: draft.title.trim(),
-          type: "text",
-          payload: { subtitle: draft.subtitle.trim(), blocks: draft.blocks },
-        });
-        if (previousSection) {
-          const kept = new Set(imagePaths(draft.blocks));
-          await deleteNoteImages(
-            imagePaths(getSectionBlocks(previousSection)).filter(
-              (path) => !kept.has(path),
-            ),
-          ).catch(() => {});
-        }
+          payload: { ...draft.section.payload, subtitle: draft.subtitle.trim() },
+        }, draft.section.updated_at);
       } else {
         const created = await createSection(nodeId, {
           title: draft.title.trim(),
           type: "text",
-          payload: { subtitle: draft.subtitle.trim(), blocks: draft.blocks },
+          payload: { subtitle: draft.subtitle.trim(), blocks: [] },
           sort_order: sections.length,
         });
         setActiveSectionId(created?.id ?? null);
@@ -716,10 +798,7 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
 
     setSaving(true);
     try {
-      await deleteSection(section.id);
-      await deleteNoteImages(imagePaths(getSectionBlocks(section))).catch(
-        () => {},
-      );
+      await deleteSection(section.id, section.updated_at);
       if (activeSection?.id === section.id) setActiveSectionId(null);
       await loadSections();
     } catch (deleteError) {
@@ -764,6 +843,7 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
         <div className="flex justify-end">
           <button
             className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-950/20 px-3 py-2 text-xs font-semibold text-cyan-300 hover:bg-cyan-500/15"
+            disabled={saving}
             onClick={startNew}
             type="button"
           >
@@ -812,10 +892,10 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
                 }`}
                 id={`node-sections-tab-${section.id}`}
                 key={section.id}
-                onClick={() => {
+                onClick={async () => {
+                  if (section.id === activeSection?.id) return;
+                  if (!(await discardDraft())) return;
                   setActiveSectionId(section.id);
-                  setDraft(null);
-                  setActionError("");
                 }}
                 onKeyDown={handleTabKeyDown}
                 ref={(element) => {
@@ -852,22 +932,19 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-zinc-200">
-                {draft.id ? "Modifica sezione" : "Nuova sezione"}
+                {draft.mode === "block" ? "Modifica contenuto" : draft.id ? "Modifica sezione" : "Nuova sezione"}
               </h3>
               <button
                 aria-label="Annulla modifica"
                 className="rounded border border-zinc-800 p-1.5 text-zinc-400 hover:text-white"
-                onClick={() => {
-                  setDraft(null);
-                  setActionError("");
-                }}
+                onClick={discardDraft}
                 type="button"
               >
                 <X size={14} />
               </button>
             </div>
 
-            <div className="grid gap-3">
+            {draft.mode === "section" && <div className="grid gap-3">
               <label className="block">
                 <Label>Titolo</Label>
                 <input
@@ -896,16 +973,9 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
                   value={draft.subtitle}
                 />
               </label>
-            </div>
+            </div>}
 
-            <div className="space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <Label>Contenuti della sezione</Label>
-                <span className="text-[11px] text-zinc-500">
-                  Aggiungi tutti i blocchi che vuoi
-                </span>
-              </div>
-
+            {draft.mode === "block" && <div className="space-y-3">
               {draft.blocks.map((block, index) => (
                 <div
                   className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-950/40 p-3"
@@ -916,88 +986,58 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
                       {SECTION_TYPES.find((type) => type.value === block.type)
                         ?.label ?? "Contenuto"}
                     </span>
-                    <div className="flex items-center gap-1">
-                      <IconButton
-                        label="Sposta contenuto su"
-                        onClick={() => moveBlock(index, -1)}
-                      >
-                        <ArrowUp size={12} />
-                      </IconButton>
-                      <IconButton
-                        label="Sposta contenuto giù"
-                        onClick={() => moveBlock(index, 1)}
-                      >
-                        <ArrowDown size={12} />
-                      </IconButton>
-                      <IconButton
-                        danger
-                        label="Rimuovi contenuto"
-                        onClick={() =>
-                          setDraft((previous) => ({
-                            ...previous,
-                            blocks: previous.blocks.filter(
-                              (_, blockIndex) => blockIndex !== index,
-                            ),
-                          }))
-                        }
-                      >
-                        <Trash2 size={12} />
-                      </IconButton>
-                    </div>
                   </div>
                   <PayloadEditor
                     draft={block}
+                    onUploadingChange={setUploading}
+                    onUploaded={(path) => uploadedPaths.current.push(path)}
                     setDraft={(updater) => updateBlock(index, updater)}
                   />
                 </div>
               ))}
 
-              <div className="flex flex-wrap gap-2">
-                {SECTION_TYPES.map((type) => (
-                  <button
-                    className="inline-flex min-h-9 items-center gap-1 rounded-lg border border-zinc-800 px-2.5 py-1.5 text-[11px] text-zinc-300 transition-colors hover:border-zinc-600 hover:bg-zinc-800/50 hover:text-white"
-                    key={type.value}
-                    onClick={() => addBlock(type.value)}
-                    type="button"
-                  >
-                    <Plus size={12} /> {type.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            </div>}
 
             {actionError && (
-              <p
+              <div
                 className="rounded-md border border-rose-500/30 bg-rose-950/20 px-3 py-2 text-xs text-rose-300"
                 role="alert"
               >
-                {actionError}
-              </p>
+                <p>{actionError}</p>
+                {draft.section && (
+                  <button className="mt-2 underline" disabled={saving} onClick={refreshDraft} type="button">
+                    Aggiorna la sezione mantenendo la bozza
+                  </button>
+                )}
+              </div>
             )}
 
             <div className="flex justify-end gap-2 border-t border-zinc-900 pt-3">
               <button
                 className="min-h-10 rounded-lg border border-zinc-800 px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-800/50"
-                onClick={() => {
-                  setDraft(null);
-                  setActionError("");
-                }}
+                onClick={discardDraft}
                 type="button"
               >
                 Annulla
               </button>
               <button
                 className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-950 hover:bg-white disabled:opacity-50"
-                disabled={saving}
+                disabled={saving || uploading}
                 type="submit"
               >
                 <Save size={13} />
-                {saving ? "Salvataggio…" : "Salva sezione"}
+                {saving ? "Salvataggio…" : draft.mode === "block" ? "Salva contenuto" : "Salva sezione"}
               </button>
             </div>
           </form>
         )}
 
+        {draft && actionError && activeSection && (
+          <div>
+            <p className="mb-2 text-xs text-zinc-400">Versione caricata della sezione</p>
+            <SectionCard section={activeSection} />
+          </div>
+        )}
         {!loading && !error && sections.length === 0 && !draft && (
           <p className="rounded-xl border border-dashed border-zinc-800 bg-zinc-950/30 py-12 text-center text-sm italic text-zinc-500">
             Gli approfondimenti strutturati per questo nodo non sono ancora
@@ -1006,24 +1046,28 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
         )}
 
         {!loading && sections.length > 0 && activeSection && !draft && (
+          <>
           <SectionCard
             actions={
               canEdit ? (
                 <div className="flex items-center gap-1.5">
                   <IconButton
                     label="Sposta su"
+                    disabled={saving}
                     onClick={() => moveSection(activeIndex, -1)}
                   >
                     <ArrowUp size={13} />
                   </IconButton>
                   <IconButton
                     label="Sposta giù"
+                    disabled={saving}
                     onClick={() => moveSection(activeIndex, 1)}
                   >
                     <ArrowDown size={13} />
                   </IconButton>
                   <IconButton
                     label="Modifica sezione"
+                    disabled={saving}
                     onClick={() => startEdit(activeSection)}
                   >
                     <Pencil size={13} />
@@ -1031,6 +1075,7 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
                   <IconButton
                     danger
                     label="Elimina sezione"
+                    disabled={saving}
                     onClick={() => handleDelete(activeSection)}
                   >
                     <Trash2 size={13} />
@@ -1038,19 +1083,51 @@ export default function ContentSectionEditor({ nodeId, canEdit = false }) {
                 </div>
               ) : null
             }
+            blockActions={canEdit ? (block, index) => (
+              <div className="flex items-center justify-between gap-2 border-b border-zinc-800/50 pb-1">
+                <span className="font-mono text-[10px] uppercase text-zinc-500">
+                  {SECTION_TYPES.find((entry) => entry.value === block.type)?.label ?? "Contenuto sconosciuto"}
+                </span>
+                <div className="flex gap-1">
+                  <IconButton disabled={saving || index === 0} label="Sposta contenuto su" onClick={() => moveBlock(index, -1)}><ArrowUp size={12} /></IconButton>
+                  <IconButton disabled={saving || index === getSectionBlocks(activeSection).length - 1} label="Sposta contenuto giù" onClick={() => moveBlock(index, 1)}><ArrowDown size={12} /></IconButton>
+                  {SECTION_TYPES.some((entry) => entry.value === block.type) && (
+                    <IconButton disabled={saving} label="Modifica contenuto" onClick={() => startBlock(activeSection, index)}><Pencil size={12} /></IconButton>
+                  )}
+                  <IconButton disabled={saving} danger label="Elimina contenuto" onClick={() => removeBlock(index)}><Trash2 size={12} /></IconButton>
+                </div>
+              </div>
+            ) : undefined}
             key={activeSection.id}
             section={activeSection}
           />
+          {canEdit && (
+            <div className="flex flex-wrap gap-2">
+              {SECTION_TYPES.map((type) => (
+                <button
+                  className="inline-flex min-h-9 items-center gap-1 rounded-lg border border-zinc-800 px-2.5 py-1.5 text-[11px] text-zinc-300 hover:bg-zinc-800/50 disabled:opacity-50"
+                  disabled={saving}
+                  key={type.value}
+                  onClick={() => addBlock(type.value)}
+                  type="button"
+                >
+                  <Plus size={12} /> {type.label}
+                </button>
+              ))}
+            </div>
+          )}
+          </>
         )}
       </div>
 
       {actionError && !draft && (
-        <p
+        <div
           className="rounded-md border border-rose-500/30 bg-rose-950/20 px-3 py-2 text-xs text-rose-300"
           role="alert"
         >
-          {actionError}
-        </p>
+          <p>{actionError}</p>
+          <button className="mt-2 underline" onClick={retryLoad} type="button">Ricarica sezioni</button>
+        </div>
       )}
     </section>
   );

@@ -1,4 +1,5 @@
 import { ArrowLeft, GitFork, Lock, Presentation, X } from "lucide-react";
+import { useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { hasNotebook } from "../notebooks/registry";
 import ContentSectionEditor from "../components/ContentSectionEditor";
@@ -24,6 +25,9 @@ export default function NodeKnowledgePage({
   const primaryCategory = nodeData.primaryCategory ?? "frontend";
   const accent = CATEGORY_COLORS[primaryCategory] ?? "#94a3b8";
   const navigate = useNavigate();
+  const draftGuard = useRef(null);
+  const onDraftChange = useCallback((guard) => { draftGuard.current = guard; }, []);
+  const confirmNavigation = async () => !draftGuard.current || await draftGuard.current();
   const notebookSlug = hasNotebook(nodeData.slug) ? nodeData.slug : null;
 
   return (
@@ -45,7 +49,7 @@ export default function NodeKnowledgePage({
                 <button
                   aria-label={`Torna al nodo ${parentNode.label}`}
                   className="inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded border border-zinc-800 bg-zinc-900/60 text-zinc-400 transition-colors hover:border-zinc-700 hover:bg-zinc-800 hover:text-white"
-                  onClick={onBack}
+                  onClick={async () => { if (await confirmNavigation()) onBack?.(); }}
                   title={`Torna al nodo ${parentNode.label}`}
                   type="button"
                 >
@@ -81,7 +85,7 @@ export default function NodeKnowledgePage({
               aria-label="Chiudi e torna alla mappa"
               title="Chiudi e torna alla mappa"
               className="inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/60 p-2 text-zinc-400 shadow-sm transition-colors hover:border-zinc-700 hover:bg-zinc-800 hover:text-white"
-              onClick={onClose}
+              onClick={async () => { if (await confirmNavigation()) onClose?.(); }}
               type="button"
             >
               <X size={18} />
@@ -105,11 +109,11 @@ export default function NodeKnowledgePage({
           {notebookSlug && (
             <button
               className="mb-6 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-cyan-400/50 bg-linear-to-r from-fuchsia-500/10 to-cyan-400/10 px-4 py-2 font-mono text-xs font-bold uppercase tracking-widest text-cyan-200 shadow-[0_0_14px_rgba(34,211,238,0.15)] transition-colors hover:border-cyan-300 hover:text-white"
-              onClick={() =>
-                navigate(`/notebook/${notebookSlug}`, {
+              onClick={async () => {
+                if (await confirmNavigation()) navigate(`/notebook/${notebookSlug}`, {
                   state: { knowledgeNodeId: node.id },
-                })
-              }
+                });
+              }}
               type="button"
             >
               <Presentation size={14} />
@@ -144,7 +148,7 @@ export default function NodeKnowledgePage({
                   <li className="min-w-0" key={child.id}>
                     <button
                       className="cursor-pointer rounded border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-left text-xs font-mono text-zinc-300 wrap-break-word transition-all hover:text-white"
-                      onClick={() => onSelectChild?.(child.id)}
+                      onClick={async () => { if (await confirmNavigation()) onSelectChild?.(child.id); }}
                       style={{
                         borderColor: `${accent}55`,
                         boxShadow: `0 0 5px ${accent}20`,
@@ -164,7 +168,7 @@ export default function NodeKnowledgePage({
           className="min-w-0 border-t pt-6 2xl:col-start-2 2xl:row-start-2"
           style={{ borderTopColor: `${accent}22` }}
         >
-          <ContentSectionEditor canEdit={canEdit} nodeId={node?.id} />
+          <ContentSectionEditor canEdit={canEdit} nodeId={node?.id} onDraftChange={onDraftChange} />
         </div>
       </div>
     </section>

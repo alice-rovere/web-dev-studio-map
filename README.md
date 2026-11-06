@@ -9,6 +9,7 @@ Mappa interattiva delle competenze per lo sviluppo web full-stack. I nodi tecnol
 - Vista ad albero ottimizzata per dispositivi mobili.
 - Dettaglio del nodo: click su un nodo per zoomare e aprire in automatico il pannello (il resto della mappa si opacizza), con padri e figli in un elenco espandibile e consultabile e il pulsante **Apri nodo** per l'approfondimento; i figli si aprono anche con il pulsante **+** del nodo.
 - Approfondimenti per nodo organizzati in sezioni e blocchi di contenuto, con best practice e convenzioni di naming sempre visibili e modificabili dagli editor, collegamenti esterni richiudibili e un box dedicato ai nodi figli nella colonna sinistra, lasciando spazio a destra per i post-it.
+- Nella pagina del nodo e nella scheda Contenuti dell'admin ogni blocco si modifica, aggiunge, riordina o elimina separatamente; l'eliminazione richiede conferma. I blocchi di testo supportano grassetto, corsivo, sottolineatura, evidenziatore e dimensioni carattere. I contenuti già presenti restano leggibili.
 - Appunti Visivi a step, con un diagramma SVG animato per il flusso di Prisma ORM.
 - Glossario consultabile per iniziale o ricerca, con termini apribili in una modale, definizioni su più paragrafi e tooltip automatici con anteprima nei testi. Nella pagina knowledge è evidenziata solo la prima occorrenza di ogni termine: selezionandola si apre la definizione completa. Gli editor possono aggiungere termini anche dalla mappa e dalla pagina knowledge.
 - Percorso guidato che illustra il ciclo di vita di una richiesta web.
@@ -57,6 +58,8 @@ I ruoli sono gestiti nei profili Supabase: `viewer` può consultare i contenuti,
 
 La migrazione `0007_atomic_node_save.sql` è necessaria per creare o modificare nodi dal pannello: salva i campi del nodo, le categorie e i padri in un'unica transazione, così un errore non lascia dati parziali. La creazione di un nodo aggiunge una voce alla mappa, non una nuova route o pagina; le sezioni di approfondimento si creano separatamente dalla scheda **Contenuti**. **Quick Add** aggiunge solo link a un nodo o all'inbox.
 
+I blocchi rimangono nel JSON della rispettiva sezione; il salvataggio verifica `updated_at` per evitare di sovrascrivere cambiamenti avvenuti in un'altra scheda. In caso di conflitto la bozza rimane nell'editor: si possono aggiornare i dati senza perderla e, se il blocco interessato non è cambiato, riprovare il salvataggio. Se invece è cambiato, confrontare e copiare la bozza prima di annullare. Le immagini già salvate non vengono eliminate automaticamente dallo storage quando si rimuove o sostituisce un blocco, perché potrebbero essere ancora utilizzate altrove.
+
 ## Script
 
 | Comando        | Descrizione                                 |
@@ -65,6 +68,12 @@ La migrazione `0007_atomic_node_save.sql` è necessaria per creare o modificare 
 | `pnpm build`   | Genera la build di produzione in `dist/`.   |
 | `pnpm preview` | Anteprima locale della build di produzione. |
 | `pnpm lint`    | Esegue ESLint su tutto il progetto.         |
+
+Per eseguire le verifiche mirate sui blocchi, sul testo formattato e sui conflitti:
+
+```bash
+node --test src/components/sectionBlocks.test.js src/components/blocks/RichTextBlock.test.js src/services/mapService.test.js
+```
 
 ## Rotte
 
