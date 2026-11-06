@@ -74,7 +74,7 @@ function LinkList({ links }) {
             target="_blank"
           >
             <span className="min-w-0 wrap-break-word">
-              <GlossaryText>{link.label || link.url}</GlossaryText>
+              {link.label || link.url}
             </span>
             <ExternalLink className="shrink-0" size={12} />
           </a>

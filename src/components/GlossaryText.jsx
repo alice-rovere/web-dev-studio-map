@@ -1,8 +1,60 @@
 import * as Tooltip from "@radix-ui/react-tooltip";
+import { useContext, useLayoutEffect, useRef, useSyncExternalStore } from "react";
 import { useGlossary } from "../hooks/useGlossary";
+import { GlossaryPageContext } from "../context/GlossaryPageContext";
+
+function GlossaryOccurrence({ term, text, scope }) {
+  const ref = useRef(null);
+  const store = scope?.store;
+  const isFirst = useSyncExternalStore(
+    store?.subscribe ?? (() => () => {}),
+    () => store ? store.isFirst(ref.current, term.id) : true,
+    () => true,
+  );
+
+  useLayoutEffect(() => {
+    if (!store || !ref.current) return undefined;
+    return store.register(ref.current, term.id);
+  }, [store, term.id]);
+
+  return (
+    <span ref={ref}>
+      {isFirst ? (
+        <Tooltip.Provider delayDuration={200}>
+          <Tooltip.Root>
+            <Tooltip.Trigger asChild>
+              {scope ? (
+                <button
+                  className="cursor-pointer border-b border-dashed border-cyan-400 text-cyan-400 hover:text-cyan-300 font-medium transition-colors duration-200"
+                  onClick={(event) => scope.openTerm(term, event.currentTarget)}
+                  type="button"
+                >
+                  {text}
+                </button>
+              ) : (
+                <span tabIndex={0} className="cursor-help border-b border-dashed border-cyan-400 text-cyan-400 hover:text-cyan-300 font-medium transition-colors duration-200 select-none">
+                  {text}
+                </span>
+              )}
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content sideOffset={5} className="z-50 max-w-xs rounded border border-cyan-500/30 bg-slate-950/95 px-3 py-2 text-sm text-slate-200 shadow-[0_0_15px_rgba(34,211,238,0.2)] backdrop-blur-md">
+                <div className="font-semibold text-cyan-400 mb-0.5">{term.term}</div>
+                <p className="line-clamp-3 whitespace-pre-wrap break-words text-xs leading-relaxed text-slate-300">{term.definition}</p>
+                {scope && <p className="mt-2 text-[10px] text-cyan-300">Seleziona il termine per leggere la definizione completa.</p>}
+                <Tooltip.Arrow className="fill-slate-950 border-t border-cyan-500/30" />
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        </Tooltip.Provider>
+      ) : text}
+    </span>
+  );
+}
 
 export default function GlossaryText({ children }) {
   const { glossary } = useGlossary();
+  const scope = useContext(GlossaryPageContext);
 
   if (!glossary || glossary.length === 0) return String(children);
 
@@ -37,34 +89,8 @@ export default function GlossaryText({ children }) {
     // Aggiunge la parte di testo prima del match
     parts.push(text.slice(cursor, start));
 
-    // Inietta il trigger del Tooltip Radix sul termine individuato
     parts.push(
-      <Tooltip.Provider key={`${start}-${index}`} delayDuration={200}>
-        <Tooltip.Root>
-          <Tooltip.Trigger asChild>
-            <span
-              tabIndex={0}
-              className="cursor-help border-b border-dashed border-cyan-400 text-cyan-400 hover:text-cyan-300 font-medium transition-colors duration-200 select-none"
-            >
-              {match[0]}
-            </span>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content
-              sideOffset={5}
-              className="z-50 max-w-xs rounded border border-cyan-500/30 bg-slate-950/95 px-3 py-2 text-sm text-slate-200 shadow-[0_0_15px_rgba(34,211,238,0.2)] backdrop-blur-md animate-in fade-in zoom-in-95 duration-150 select-none"
-            >
-              <div className="font-semibold text-cyan-400 mb-0.5">
-                {term.term}
-              </div>
-              <p className="line-clamp-3 whitespace-pre-wrap break-words text-xs leading-relaxed text-slate-300">
-                {term.definition}
-              </p>
-              <Tooltip.Arrow className="fill-slate-950 border-t border-cyan-500/30" />
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
-      </Tooltip.Provider>,
+      <GlossaryOccurrence key={`${start}-${index}`} scope={scope} term={term} text={match[0]} />,
     );
     cursor = start + match[0].length;
   }

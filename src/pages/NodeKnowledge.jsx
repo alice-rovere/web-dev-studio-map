@@ -7,6 +7,7 @@ import GlossaryText from "../components/GlossaryText";
 import { CATEGORY_COLORS, CATEGORY_LABELS } from "../data/baseNodes";
 import { StickyNotesCanvas } from "../components/StickyNotesCanvas";
 import QuickGlossaryAdd from "../components/QuickGlossaryAdd";
+import { GlossaryPageScope } from "../components/GlossaryPageScope";
 
 export default function NodeKnowledgePage({
   node,
@@ -26,6 +27,7 @@ export default function NodeKnowledgePage({
   const notebookSlug = hasNotebook(nodeData.slug) ? nodeData.slug : null;
 
   return (
+    <GlossaryPageScope>
     <section className="relative h-full w-full overflow-y-auto border border-zinc-800 bg-[#0b1120] p-4 font-sans text-zinc-100 shadow-2xl before:absolute before:top-0 before:left-0 before:h-px before:w-full before:bg-linear-to-r before:from-transparent before:via-zinc-700 before:to-transparent sm:p-6 md:p-10">
       {node?.id && (
         <StickyNotesCanvas
@@ -149,7 +151,7 @@ export default function NodeKnowledgePage({
                       }}
                       type="button"
                     >
-                      <GlossaryText>{child.label}</GlossaryText>
+                      {child.label}
                     </button>
                   </li>
                 ))}
@@ -166,5 +168,6 @@ export default function NodeKnowledgePage({
         </div>
       </div>
     </section>
+    </GlossaryPageScope>
   );
 }

@@ -1,9 +1,9 @@
 import { useRef, useState } from "react";
-import * as Dialog from "@radix-ui/react-dialog";
-import { ChevronRight, Loader2, Pencil, Save, Search, Trash2, X } from "lucide-react";
+import { ChevronRight, Loader2, Pencil, Save, Search, Trash2 } from "lucide-react";
 import { useGlossary } from "../../hooks/useGlossary";
 import { useAuth } from "../../hooks/useAuth";
 import QuickGlossaryAdd from "../QuickGlossaryAdd";
+import GlossaryDialog from "../GlossaryDialog";
 
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const inputClass =
@@ -161,28 +161,16 @@ export default function GlossaryManager() {
         </div>
       </div>
 
-      <Dialog.Root open={Boolean(selected)} onOpenChange={(open) => { if (!open) closeDetails(); }}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-[100] bg-[#060b13]/75 backdrop-blur-sm" />
-          <Dialog.Content
-            aria-describedby={undefined}
-            className="fixed left-1/2 top-1/2 z-[101] flex max-h-[85dvh] w-[min(94vw,36rem)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-xl border border-slate-700 bg-[#0b1120] p-5 shadow-2xl focus:outline-none"
-            onCloseAutoFocus={(event) => {
-              event.preventDefault();
-              if (triggerRef.current?.isConnected) triggerRef.current.focus();
-            }}
-            onEscapeKeyDown={(event) => { if (saving) event.preventDefault(); }}
-            onPointerDownOutside={(event) => { if (saving) event.preventDefault(); }}
-          >
-            <div className="mb-4 flex items-start justify-between gap-3 border-b border-slate-800 pb-4">
-              <Dialog.Title className="min-w-0 wrap-break-word text-lg font-bold text-cyan-300">
-                {selected?.term}
-              </Dialog.Title>
-              <Dialog.Close asChild>
-                <button aria-label="Chiudi" className="rounded p-1 text-slate-400 hover:text-white" disabled={saving} type="button"><X size={18} /></button>
-              </Dialog.Close>
-            </div>
-            <div className="min-h-0 overflow-y-auto">
+      <GlossaryDialog
+        open={Boolean(selected)}
+        onOpenChange={(open) => { if (!open) closeDetails(); }}
+        term={selected}
+        saving={saving}
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          if (triggerRef.current?.isConnected) triggerRef.current.focus();
+        }}
+      >
               {editing ? (
                 <form className="space-y-4" onSubmit={handleUpdate}>
                   <label className="block space-y-1 text-xs text-slate-400">
@@ -210,10 +198,7 @@ export default function GlossaryManager() {
                 </>
               )}
               {message && <p className="mt-4 rounded-md border border-rose-500/30 bg-rose-950/20 px-3 py-2 text-xs text-rose-300" role="alert">{message}</p>}
-            </div>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      </GlossaryDialog>
     </div>
   );
 }
