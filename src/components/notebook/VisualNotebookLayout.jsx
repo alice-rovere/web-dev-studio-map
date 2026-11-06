@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useReducedMotion } from "framer-motion";
 import PrismaFlowDiagram from "./PrismaFlowDiagram.jsx";
+import InternetBrowserDiagram from "./InternetBrowserDiagram.jsx";
 
 const PHASE_ICONS = {
   server: Server,
@@ -23,6 +24,7 @@ const PHASE_ICONS = {
 
 const ILLUSTRATIONS = {
   "prisma-flow": PrismaFlowDiagram,
+  "internet-browser": InternetBrowserDiagram,
 };
 
 const AUTOPLAY_MS = 3200;

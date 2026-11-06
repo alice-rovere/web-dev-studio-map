@@ -10,7 +10,7 @@ Mappa interattiva delle competenze per lo sviluppo web full-stack. I nodi tecnol
 - Dettaglio del nodo: click su un nodo per zoomare e aprire in automatico il pannello (il resto della mappa si opacizza), con padri e figli in un elenco espandibile e consultabile e il pulsante **Apri nodo** per l'approfondimento; i figli si aprono anche con il pulsante **+** del nodo.
 - Approfondimenti per nodo organizzati in sezioni e blocchi di contenuto, con best practice e convenzioni di naming sempre visibili e modificabili dagli editor, collegamenti esterni richiudibili e un box dedicato ai nodi figli nella colonna sinistra, lasciando spazio a destra per i post-it.
 - Nella pagina del nodo e nella scheda Contenuti dell'admin ogni blocco supportato si modifica, aggiunge, riordina o elimina separatamente; l'eliminazione richiede conferma. I blocchi di testo supportano grassetto, corsivo, sottolineatura, evidenziatore e dimensioni carattere. I precedenti blocchi Mermaid non sono più visualizzabili o modificabili, ma i loro dati rimangono salvati.
-- Appunti Visivi a step, con un diagramma SVG animato per il flusso di Prisma ORM.
+- Appunti Visivi a step, con diagrammi SVG animati per il flusso di Prisma ORM e per il percorso dalla URL al rendering del browser. Il nodo Internet & Browser include anche teoria su Internet, Web, protocolli e browser.
 - Glossario consultabile per iniziale o ricerca, con termini apribili in una modale, definizioni su più paragrafi e tooltip automatici con anteprima nei testi. Nella pagina knowledge è evidenziata solo la prima occorrenza di ogni termine: selezionandola si apre la definizione completa. Gli editor possono aggiungere termini anche dalla mappa e dalla pagina knowledge.
 - Percorso guidato che illustra il ciclo di vita di una richiesta web.
 - Pagine dedicate a linee guida e sicurezza.
@@ -58,6 +58,10 @@ I ruoli sono gestiti nei profili Supabase: `viewer` può consultare i contenuti,
 
 La migrazione `0007_atomic_node_save.sql` è necessaria per creare o modificare nodi dal pannello: salva i campi del nodo, le categorie e i padri in un'unica transazione, così un errore non lascia dati parziali. La creazione di un nodo aggiunge una voce alla mappa, non una nuova route o pagina; le sezioni di approfondimento si creano separatamente dalla scheda **Contenuti**. **Quick Add** aggiunge solo link a un nodo o all'inbox.
 
+La migrazione `0008_internet_browser_notebook.sql` inserisce la teoria del nodo `internet-browser` se il nodo è già presente. Sostituisce solo le quattro sezioni originali riconosciute per titolo, salvandone una copia completa nella tabella protetta `internet_browser_section_backup`; le altre sezioni sono conservate. Se trova solo alcune sezioni originali o una teoria parziale, interrompe l'operazione: controlla i dati prima di riprovare. La copia è consultabile solo con privilegi amministrativi. Per un eventuale ripristino, confronta le righe salvate con i contenuti correnti e ripristina le sezioni desiderate da un backup del database con un amministratore, evitando di sovrascrivere modifiche successive.
+
+Su un'installazione nuova le migrazioni possono precedere la creazione di `internet-browser`: dopo aver applicato le migrazioni e il seed, lo script `supabase/roadmaps/01_frontend.sql` crea il nodo e richiama l'installazione della teoria. Lo script roadmap elimina e ricrea sezioni anche di altri nodi: non rieseguirlo su un database già popolato. Se il nodo viene creato successivamente con un'altra procedura, esegui `select public.install_internet_browser_theory();` come amministratore. La funzione non è esposta ai client.
+
 I blocchi rimangono nel JSON della rispettiva sezione; il salvataggio verifica `updated_at` per evitare di sovrascrivere cambiamenti avvenuti in un'altra scheda. In caso di conflitto la bozza rimane nell'editor: si possono aggiornare i dati senza perderla e, se il blocco interessato non è cambiato, riprovare il salvataggio. Se invece è cambiato, confrontare e copiare la bozza prima di annullare. Le immagini già salvate non vengono eliminate automaticamente dallo storage quando si rimuove o sostituisce un blocco, perché potrebbero essere ancora utilizzate altrove.
 
 ## Script
@@ -72,7 +76,7 @@ I blocchi rimangono nel JSON della rispettiva sezione; il salvataggio verifica `
 Per eseguire le verifiche mirate sui blocchi, sul testo formattato e sui conflitti:
 
 ```bash
-node --test src/components/content/sectionBlocks.test.js src/components/content/ContentSectionView.test.js src/components/content/blocks/RichTextBlock.test.js src/services/mapService.test.js
+node --test src/components/content/sectionBlocks.test.js src/components/content/ContentSectionView.test.js src/components/content/blocks/RichTextBlock.test.js src/services/mapService.test.js src/notebooks/internetBrowserConfig.test.js
 ```
 
 ## Rotte
@@ -93,6 +97,8 @@ node --test src/components/content/sectionBlocks.test.js src/components/content/
 ### Appunti Visivi (simulazioni a step)
 
 Dalla pagina di approfondimento di un nodo con un notebook associato compare il pulsante **Apri Appunti Visivi**, che apre `/notebook/:slug` a schermo intero (frecce ←/→ per gli step, Esc per chiudere). Per aggiungerne uno:
+
+Nel nodo **Internet & Browser** il pulsante è disponibile sia in cima alla pagina sia dopo le sezioni teoriche; il diagramma distingue il percorso di rete dalla pipeline di rendering.
 
 1. Crea `src/notebooks/configs/<nome>Config.js` con config JSON pura: `{ slug, title, subtitle, phases, steps }` (esempio: `prismaFlowConfig.js`). Ogni step ha `phase`, `title`, `description` e `panels` di tipo `code`, `table` o `text`; il campo facoltativo `illustration` seleziona una scena SVG registrata nel layout.
 2. Registra lo slug in `src/notebooks/registry.js`. Lo slug deve coincidere con lo `slug` del nodo.

@@ -660,6 +660,9 @@ where node_id in (
   )
 );
 
+-- La migrazione può essere stata applicata prima della creazione dei nodi roadmap.
+select public.install_internet_browser_theory();
+
 -- Accessibilità ARIA & Non Vedenti
 insert into public.node_content_sections (node_id, sort_order, title, type, payload)
 select id, 0, 'Linee Guida per Utenti Non Vedenti e Screen Reader', 'text',

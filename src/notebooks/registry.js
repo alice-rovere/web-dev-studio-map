@@ -2,6 +2,7 @@
 // In futuro: affiancare/sostituire con fetch da Supabase (stesso formato JSON).
 const loaders = {
   "prisma-orm": () => import("./configs/prismaFlowConfig.js"),
+  "internet-browser": () => import("./configs/internetBrowserConfig.js"),
 };
 
 export const hasNotebook = (slug) =>

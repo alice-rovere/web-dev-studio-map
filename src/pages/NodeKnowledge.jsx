@@ -10,6 +10,19 @@ import { StickyNotesCanvas } from "../components/notes/StickyNotesCanvas";
 import QuickGlossaryAdd from "../components/glossary/QuickGlossaryAdd";
 import { GlossaryPageScope } from "../components/glossary/GlossaryPageScope";
 
+function NotebookButton({ onClick }) {
+  return (
+    <button
+      className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-cyan-400/50 bg-linear-to-r from-fuchsia-500/10 to-cyan-400/10 px-4 py-2 font-mono text-xs font-bold uppercase tracking-widest text-cyan-200 shadow-[0_0_14px_rgba(34,211,238,0.15)] transition-colors hover:border-cyan-300 hover:text-white"
+      onClick={onClick}
+      type="button"
+    >
+      <Presentation size={14} />
+      Apri Appunti Visivi
+    </button>
+  );
+}
+
 export default function NodeKnowledgePage({
   node,
   childNodes = [],
@@ -31,6 +44,12 @@ export default function NodeKnowledgePage({
   const onDraftChange = useCallback((guard) => { draftGuard.current = guard; }, []);
   const confirmNavigation = async () => !draftGuard.current || await draftGuard.current();
   const notebookSlug = hasNotebook(nodeData.slug) ? nodeData.slug : null;
+
+  const openNotebook = async () => {
+    if (await confirmNavigation()) {
+      navigate(`/notebook/${notebookSlug}`, { state: { knowledgeNodeId: node.id } });
+    }
+  };
 
   const getDefaultNotePosition = () => {
     const scrollContainer = scrollContainerRef.current;
@@ -128,18 +147,9 @@ export default function NodeKnowledgePage({
           </p>
 
           {notebookSlug && (
-            <button
-              className="mb-6 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-cyan-400/50 bg-linear-to-r from-fuchsia-500/10 to-cyan-400/10 px-4 py-2 font-mono text-xs font-bold uppercase tracking-widest text-cyan-200 shadow-[0_0_14px_rgba(34,211,238,0.15)] transition-colors hover:border-cyan-300 hover:text-white"
-              onClick={async () => {
-                if (await confirmNavigation()) navigate(`/notebook/${notebookSlug}`, {
-                  state: { knowledgeNodeId: node.id },
-                });
-              }}
-              type="button"
-            >
-              <Presentation size={14} />
-              Apri Appunti Visivi
-            </button>
+            <div className="mb-6">
+              <NotebookButton onClick={openNotebook} />
+            </div>
           )}
 
           {!canEdit && (
@@ -191,6 +201,11 @@ export default function NodeKnowledgePage({
           style={{ borderTopColor: `${accent}22` }}
         >
           <ContentSectionEditor canEdit={canEdit} nodeId={node?.id} onDraftChange={onDraftChange} />
+          {notebookSlug === "internet-browser" && (
+            <div className="mt-6">
+              <NotebookButton onClick={openNotebook} />
+            </div>
+          )}
         </div>
       </div>
     </section>

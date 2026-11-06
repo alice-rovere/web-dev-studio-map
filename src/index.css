@@ -62,12 +62,14 @@
   }
 }
 
-.prisma-flow-dash {
+.prisma-flow-dash,
+.internet-flow-dash {
   animation: prisma-flow-dash 1.4s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .prisma-flow-dash {
+  .prisma-flow-dash,
+  .internet-flow-dash {
     animation: none;
   }
 }
