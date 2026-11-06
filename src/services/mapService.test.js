@@ -1,4 +1,7 @@
 import { strict as assert } from "node:assert";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import process from "node:process";
 import { after, test } from "node:test";
 import { createServer } from "vite";
@@ -18,10 +21,12 @@ globalThis.fetch = async (input, init) => {
   });
 };
 
-const vite = await createServer({ server: { middlewareMode: true, ws: false }, optimizeDeps: { noDiscovery: true }, appType: "custom" });
+const cacheDir = mkdtempSync(join(tmpdir(), "web-dev-studio-test-"));
+const vite = await createServer({ cacheDir, server: { middlewareMode: true, ws: false }, optimizeDeps: { noDiscovery: true }, appType: "custom" });
 after(async () => {
   globalThis.fetch = originalFetch;
   await vite.close();
+  rmSync(cacheDir, { recursive: true, force: true });
 });
 const { updateSection, deleteSection } = await vite.ssrLoadModule("/src/services/mapService.js");
 

@@ -1,11 +1,18 @@
 import { strict as assert } from "node:assert";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { after, test } from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createServer } from "vite";
 
-const vite = await createServer({ server: { middlewareMode: true, ws: false }, optimizeDeps: { noDiscovery: true }, appType: "custom" });
-after(() => vite.close());
+const cacheDir = mkdtempSync(join(tmpdir(), "web-dev-studio-test-"));
+const vite = await createServer({ cacheDir, server: { middlewareMode: true, ws: false }, optimizeDeps: { noDiscovery: true }, appType: "custom" });
+after(async () => {
+  await vite.close();
+  rmSync(cacheDir, { recursive: true, force: true });
+});
 const { RichTextView } = await vite.ssrLoadModule("/src/components/blocks/RichTextBlock.jsx");
 const { NativeGlossaryContext } = await vite.ssrLoadModule("/src/context/GlossaryContext.jsx");
 

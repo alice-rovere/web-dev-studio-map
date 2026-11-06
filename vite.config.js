@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
-    // Excalidraw, Mermaid ed ELK sono già caricati in modo differito.
+    // Excalidraw ed ELK sono già caricati in modo differito.
     chunkSizeWarningLimit: 2000,
   },
 })

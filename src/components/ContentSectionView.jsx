@@ -1,7 +1,6 @@
 import GlossaryText from "./GlossaryText";
 import { CalloutView } from "./blocks/CalloutBlock";
 import { ImageView } from "./blocks/ImageBlock";
-import { MermaidView } from "./blocks/MermaidBlock";
 import { WhiteboardView } from "./blocks/WhiteboardBlock";
 import { RichTextView } from "./blocks/RichTextBlock";
 
@@ -116,14 +115,13 @@ function ContentBlock({ section }) {
 
   if (section?.type === "callout") return <CalloutView payload={payload} />;
   if (section?.type === "image") return <ImageView payload={payload} />;
-  if (section?.type === "mermaid") return <MermaidView payload={payload} />;
   if (section?.type === "whiteboard") {
     return <WhiteboardView payload={payload} />;
   }
 
   return (
     <p className="text-zinc-500 italic text-sm">
-      Formato della sezione non riconosciuto.
+      Formato del contenuto non supportato. I dati salvati sono conservati.
     </p>
   );
 }

@@ -12,7 +12,6 @@ import {
 import { SectionCard } from "./ContentSectionView";
 import { CalloutEditor } from "./blocks/CalloutBlock";
 import { ImageEditor } from "./blocks/ImageBlock";
-import { MermaidEditor } from "./blocks/MermaidBlock";
 import { WhiteboardEditor } from "./blocks/WhiteboardBlock";
 import { RichTextEditor } from "./blocks/RichTextBlock";
 import { getSectionBlocks, payloadWithBlocks, rebaseDraft } from "./sectionBlocks";
@@ -33,7 +32,6 @@ const SECTION_TYPES = [
   { value: "timeline", label: "Timeline" },
   { value: "callout", label: "Callout" },
   { value: "image", label: "Immagine" },
-  { value: "mermaid", label: "Diagramma" },
   { value: "whiteboard", label: "Lavagna" },
 ];
 
@@ -64,8 +62,6 @@ function emptyPayload(type) {
       return { variant: "note", title: "", text: "" };
     case "image":
       return { url: "", path: "", caption: "", alt: "" };
-    case "mermaid":
-      return { code: "" };
     case "whiteboard":
       return { elements: [], files: {} };
     default:
@@ -133,8 +129,6 @@ function ensurePayload(type, payload) {
         caption: typeof source.caption === "string" ? source.caption : "",
         alt: typeof source.alt === "string" ? source.alt : "",
       };
-    case "mermaid":
-      return { code: typeof source.code === "string" ? source.code : "" };
     case "whiteboard":
       return {
         elements: Array.isArray(source.elements) ? source.elements : [],
@@ -421,7 +415,6 @@ function PayloadEditor({ draft, setDraft, onUploadingChange, onUploaded }) {
 
   if (type === "callout") return <CalloutEditor {...shared} />;
   if (type === "image") return <ImageEditor {...shared} />;
-  if (type === "mermaid") return <MermaidEditor {...shared} />;
   if (type === "whiteboard") return <WhiteboardEditor {...shared} />;
 
   return (
