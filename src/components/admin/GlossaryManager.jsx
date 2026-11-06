@@ -2,8 +2,8 @@ import { useRef, useState } from "react";
 import { ChevronRight, Loader2, Pencil, Save, Search, Trash2 } from "lucide-react";
 import { useGlossary } from "../../hooks/useGlossary";
 import { useAuth } from "../../hooks/useAuth";
-import QuickGlossaryAdd from "../QuickGlossaryAdd";
-import GlossaryDialog from "../GlossaryDialog";
+import QuickGlossaryAdd from "../glossary/QuickGlossaryAdd";
+import GlossaryDialog from "../glossary/GlossaryDialog";
 
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const inputClass =

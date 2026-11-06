@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import {
   ArrowDown,
   ArrowUp,
   Loader2,
+  MoreHorizontal,
   Pencil,
   Plus,
   Save,
@@ -22,7 +23,7 @@ import {
   fetchNodeSections,
   reorderSections,
   updateSection,
-} from "../services/mapService";
+} from "../../services/mapService";
 
 const SECTION_TYPES = [
   { value: "text", label: "Testo" },
@@ -166,6 +167,88 @@ function IconButton({ label, onClick, children, danger = false, disabled = false
     >
       {children}
     </button>
+  );
+}
+
+function BlockActionsMenu({
+  index,
+  total,
+  saving,
+  editable,
+  onMove,
+  onEdit,
+  onRemove,
+}) {
+  const [open, setOpen] = useState(false);
+  const menuId = useId();
+  const containerRef = useRef(null);
+  const triggerRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const handlePointerDown = (event) => {
+      if (!containerRef.current?.contains(event.target)) setOpen(false);
+    };
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
+  const runAction = (action) => {
+    setOpen(false);
+    action();
+  };
+
+  return (
+    <div className="absolute right-0 top-0 z-20" ref={containerRef}>
+      <button
+        aria-controls={menuId}
+        aria-expanded={open}
+        aria-label={open ? "Chiudi azioni contenuto" : "Apri azioni contenuto"}
+        className="inline-flex min-h-8 min-w-8 items-center justify-center rounded border border-zinc-800 bg-zinc-950/90 p-1.5 text-zinc-400 shadow-lg transition-colors hover:bg-zinc-800 hover:text-white focus-visible:outline-2 focus-visible:outline-cyan-400"
+        disabled={saving}
+        onClick={() => setOpen((current) => !current)}
+        ref={triggerRef}
+        title={open ? "Chiudi azioni contenuto" : "Azioni contenuto"}
+        type="button"
+      >
+        <MoreHorizontal aria-hidden="true" size={14} />
+      </button>
+      {open && (
+        <div
+          aria-label="Azioni contenuto"
+          className="absolute left-full top-0 ml-1 flex flex-col gap-1 rounded-lg border border-zinc-800 bg-zinc-950/95 p-1 shadow-xl backdrop-blur"
+          id={menuId}
+          role="group"
+        >
+          <IconButton disabled={saving || index === 0} label="Sposta contenuto su" onClick={() => runAction(() => onMove(-1))}>
+            <ArrowUp size={12} />
+          </IconButton>
+          <IconButton disabled={saving || index === total - 1} label="Sposta contenuto giù" onClick={() => runAction(() => onMove(1))}>
+            <ArrowDown size={12} />
+          </IconButton>
+          {editable && (
+            <IconButton disabled={saving} label="Modifica contenuto" onClick={() => runAction(onEdit)}>
+              <Pencil size={12} />
+            </IconButton>
+          )}
+          <IconButton disabled={saving} danger label="Elimina contenuto" onClick={() => runAction(onRemove)}>
+            <Trash2 size={12} />
+          </IconButton>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -1077,14 +1160,15 @@ export default function ContentSectionEditor({ nodeId, canEdit = false, onDraftC
               ) : null
             }
             blockActions={canEdit ? (block, index) => (
-              <div className="absolute right-0 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-1">
-                <IconButton disabled={saving || index === 0} label="Sposta contenuto su" onClick={() => moveBlock(index, -1)}><ArrowUp size={12} /></IconButton>
-                <IconButton disabled={saving || index === getSectionBlocks(activeSection).length - 1} label="Sposta contenuto giù" onClick={() => moveBlock(index, 1)}><ArrowDown size={12} /></IconButton>
-                {SECTION_TYPES.some((entry) => entry.value === block.type) && (
-                  <IconButton disabled={saving} label="Modifica contenuto" onClick={() => startBlock(activeSection, index)}><Pencil size={12} /></IconButton>
-                )}
-                <IconButton disabled={saving} danger label="Elimina contenuto" onClick={() => removeBlock(index)}><Trash2 size={12} /></IconButton>
-              </div>
+              <BlockActionsMenu
+                editable={SECTION_TYPES.some((entry) => entry.value === block.type)}
+                index={index}
+                onEdit={() => startBlock(activeSection, index)}
+                onMove={(direction) => moveBlock(index, direction)}
+                onRemove={() => removeBlock(index)}
+                saving={saving}
+                total={getSectionBlocks(activeSection).length}
+              />
             ) : undefined}
             key={activeSection.id}
             section={activeSection}

@@ -13,8 +13,8 @@ after(async () => {
   await vite.close();
   rmSync(cacheDir, { recursive: true, force: true });
 });
-const { SectionCard } = await vite.ssrLoadModule("/src/components/ContentSectionView.jsx");
-const { RichTextView } = await vite.ssrLoadModule("/src/components/blocks/RichTextBlock.jsx");
+const { SectionCard } = await vite.ssrLoadModule("/src/components/content/ContentSectionView.jsx");
+const { RichTextView } = await vite.ssrLoadModule("/src/components/content/blocks/RichTextBlock.jsx");
 const { NativeGlossaryContext } = await vite.ssrLoadModule("/src/context/GlossaryContext.jsx");
 const { getSectionBlocks, payloadWithBlocks } = await import("./sectionBlocks.js");
 

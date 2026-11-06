@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { ShieldAlert } from "lucide-react";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function RequireEditor({ children }) {
   const { loading, session, isEditor } = useAuth();

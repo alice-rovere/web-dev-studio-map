@@ -18,10 +18,10 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 
 import { nodeTypes } from "../flow/nodes/index.jsx";
-import NodeDetailsModal from "../components/NodeDetailsModal.jsx";
-import MobileSkillTree from "../components/MobileSkillTree.jsx";
-import SkillMapSearch from "../components/SkillMapSearch.jsx";
-import QuickGlossaryAdd from "../components/QuickGlossaryAdd.jsx";
+import NodeDetailsModal from "../components/skill-map/NodeDetailsModal.jsx";
+import MobileSkillTree from "../components/skill-map/MobileSkillTree.jsx";
+import SkillMapSearch from "../components/skill-map/SkillMapSearch.jsx";
+import QuickGlossaryAdd from "../components/glossary/QuickGlossaryAdd.jsx";
 import NodeKnowledgePage from "./NodeKnowledge.jsx";
 import { useMapGraph } from "../hooks/useMapGraph";
 import { useAuth } from "../hooks/useAuth";

@@ -1,8 +1,8 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MotionConfig } from "framer-motion";
-import Navbar from "./components/Navbar";
-import RequireEditor from "./components/RequireEditor";
+import Navbar from "./components/navigation/Navbar";
+import RequireEditor from "./components/auth/RequireEditor";
 import { AuthProvider } from "./context/AuthContext";
 import { GlossaryProvider } from "./context/GlossaryProvider";
 

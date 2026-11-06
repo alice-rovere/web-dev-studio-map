@@ -9,8 +9,8 @@ import {
   Sparkles,
   Terminal,
 } from "lucide-react";
-import { StickyNotesCanvas } from "../components/StickyNotesCanvas";
-import PageTabs from "../components/PageTabs";
+import { StickyNotesCanvas } from "../components/notes/StickyNotesCanvas";
+import PageTabs from "../components/navigation/PageTabs";
 import {
   agentFileExample,
   agentFileSections,

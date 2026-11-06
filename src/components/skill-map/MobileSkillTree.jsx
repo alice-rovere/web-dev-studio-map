@@ -1,5 +1,5 @@
 import { BookOpen, Info, Minus, Plus } from "lucide-react";
-import { CATEGORY_COLORS, CATEGORY_LABELS } from "../data/baseNodes";
+import { CATEGORY_COLORS, CATEGORY_LABELS } from "../../data/baseNodes";
 import NodeIcon from "./NodeIcon.jsx";
 
 function TreeNode({

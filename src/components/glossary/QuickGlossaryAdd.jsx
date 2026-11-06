@@ -2,7 +2,7 @@ import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Plus } from "lucide-react";
 import { GlossaryForm } from "./GlossaryForm";
-import { useGlossary } from "../hooks/useGlossary";
+import { useGlossary } from "../../hooks/useGlossary";
 
 export default function QuickGlossaryAdd({ className }) {
   const [open, setOpen] = useState(false);

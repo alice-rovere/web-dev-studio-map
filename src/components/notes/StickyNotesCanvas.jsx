@@ -1,7 +1,7 @@
-// src/components/StickyNotesCanvas.jsx
+// src/components/notes/StickyNotesCanvas.jsx
 import { useRef, useState } from "react";
 import { Plus, Trash2, GripHorizontal } from "lucide-react";
-import { useStickyNotes } from "../hooks/useStickyNotes";
+import { useStickyNotes } from "../../hooks/useStickyNotes";
 
 export function StickyNotesCanvas({ boardId, action, getDefaultPosition }) {
   // L'hook è integrato di nuovo direttamente nel canvas per la massima comodità d'uso

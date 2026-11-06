@@ -14,8 +14,8 @@ import {
   X,
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useAuth } from "../hooks/useAuth";
-import { countInboxLinks, INBOX_CHANGED_EVENT } from "../services/mapService";
+import { useAuth } from "../../hooks/useAuth";
+import { countInboxLinks, INBOX_CHANGED_EVENT } from "../../services/mapService";
 
 function InboxBadge({ count }) {
   if (!count) return null;

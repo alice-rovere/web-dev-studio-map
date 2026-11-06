@@ -1,5 +1,5 @@
-import PageTabs from "../components/PageTabs";
-import { StickyNotesCanvas } from "../components/StickyNotesCanvas";
+import PageTabs from "../components/navigation/PageTabs";
+import { StickyNotesCanvas } from "../components/notes/StickyNotesCanvas";
 
 const namingConventions = [
   {

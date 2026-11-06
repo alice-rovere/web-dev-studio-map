@@ -1,7 +1,7 @@
 import { Handle, Position } from "@xyflow/react";
 import { BookOpen, GitFork, Minus, Plus } from "lucide-react";
 import { CATEGORY_COLORS, CATEGORY_LABELS } from "../../data/baseNodes";
-import NodeIcon from "../../components/NodeIcon.jsx";
+import NodeIcon from "../../components/skill-map/NodeIcon.jsx";
 
 const TechNode = ({ data }) => {
   const {

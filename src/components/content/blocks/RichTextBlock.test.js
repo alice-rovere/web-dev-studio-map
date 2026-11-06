@@ -13,7 +13,7 @@ after(async () => {
   await vite.close();
   rmSync(cacheDir, { recursive: true, force: true });
 });
-const { RichTextView } = await vite.ssrLoadModule("/src/components/blocks/RichTextBlock.jsx");
+const { RichTextView } = await vite.ssrLoadModule("/src/components/content/blocks/RichTextBlock.jsx");
 const { NativeGlossaryContext } = await vite.ssrLoadModule("/src/context/GlossaryContext.jsx");
 
 test("rendering preserves formatting and recognizes glossary terms across styles", () => {

@@ -8,8 +8,8 @@ import {
 } from "react";
 import { BookOpen, Search, X } from "lucide-react";
 
-import { useGlossary } from "../hooks/useGlossary";
-import { CATEGORY_COLORS, CATEGORY_LABELS } from "../data/baseNodes";
+import { useGlossary } from "../../hooks/useGlossary";
+import { CATEGORY_COLORS, CATEGORY_LABELS } from "../../data/baseNodes";
 
 const MAX_RESULTS_PER_GROUP = 12;
 

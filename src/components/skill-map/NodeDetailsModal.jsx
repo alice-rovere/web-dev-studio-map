@@ -9,8 +9,8 @@ import {
   GitFork,
   X,
 } from "lucide-react";
-import GlossaryText from "./GlossaryText.jsx";
-import { CATEGORY_COLORS, CATEGORY_LABELS } from "../data/baseNodes";
+import GlossaryText from "../glossary/GlossaryText.jsx";
+import { CATEGORY_COLORS, CATEGORY_LABELS } from "../../data/baseNodes";
 
 function RelationTree({
   nodes,

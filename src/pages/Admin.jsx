@@ -12,7 +12,7 @@ import {
 import NodeTree from "../components/admin/NodeTree";
 import NodeForm from "../components/admin/NodeForm";
 import GlossaryManager from "../components/admin/GlossaryManager";
-import ContentSectionEditor from "../components/ContentSectionEditor";
+import ContentSectionEditor from "../components/content/ContentSectionEditor";
 import { useMapGraph } from "../hooks/useMapGraph";
 import { useAuth } from "../hooks/useAuth";
 import {

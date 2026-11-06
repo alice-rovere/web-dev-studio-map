@@ -1,4 +1,4 @@
-import GlossaryText from "./GlossaryText";
+import GlossaryText from "../glossary/GlossaryText";
 import { CalloutView } from "./blocks/CalloutBlock";
 import { ImageView } from "./blocks/ImageBlock";
 import { WhiteboardView } from "./blocks/WhiteboardBlock";

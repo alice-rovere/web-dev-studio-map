@@ -1,5 +1,5 @@
 import { ExternalLink } from "lucide-react";
-import PageTabs from "../components/PageTabs";
+import PageTabs from "../components/navigation/PageTabs";
 
 const learningResources = [
   {

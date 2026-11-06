@@ -1,6 +1,6 @@
 import { useState } from "react";
 import GlossaryDialog from "./GlossaryDialog";
-import { GlossaryPageContext } from "../context/GlossaryPageContext";
+import { GlossaryPageContext } from "../../context/GlossaryPageContext";
 
 function createOccurrenceStore() {
   const occurrences = new Map();

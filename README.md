@@ -72,7 +72,7 @@ I blocchi rimangono nel JSON della rispettiva sezione; il salvataggio verifica `
 Per eseguire le verifiche mirate sui blocchi, sul testo formattato e sui conflitti:
 
 ```bash
-node --test src/components/sectionBlocks.test.js src/components/ContentSectionView.test.js src/components/blocks/RichTextBlock.test.js src/services/mapService.test.js
+node --test src/components/content/sectionBlocks.test.js src/components/content/ContentSectionView.test.js src/components/content/blocks/RichTextBlock.test.js src/services/mapService.test.js
 ```
 
 ## Rotte
@@ -109,9 +109,15 @@ L'app è una PWA: da Chrome su Android scegli **Installa app**. Tenendo premuta 
 
 ```text
 src/
-├── components/          # UI condivisa, blocchi, glossario e post-it
+├── components/          # Componenti organizzati per area funzionale
 │   ├── admin/           # Gestione nodi, albero e glossario
-│   └── blocks/          # Blocchi per gli approfondimenti
+│   ├── auth/            # Controllo accesso editor
+│   ├── content/         # Sezioni di approfondimento e blocchi
+│   ├── glossary/        # Glossario e dialoghi di inserimento
+│   ├── navigation/      # Navbar e navigazione tra pagine
+│   ├── notes/           # Canvas dei post-it
+│   ├── notebook/        # Layout e diagrammi degli appunti visivi
+│   └── skill-map/       # Ricerca, albero mobile e dettagli dei nodi
 ├── context/             # Provider globali di autenticazione e glossario
 ├── data/                # Categorie, dati e percorso guidato
 ├── flow/                # Nodi React Flow e utilità per il grafo
@@ -167,7 +173,7 @@ Il progetto include un sistema centralizzato di post-it fluttuanti, trascinabili
 ### Architettura e Componenti
 
 - **`src/hooks/useStickyNotes.js`**: Gestisce lo stato ottimistico locale e sincronizza le operazioni CRUD su Supabase (`select`, `insert`, `update`, `delete`).
-- **`src/components/StickyNotesCanvas.jsx`**: Canvas invisibile che intercetta i movimenti del mouse, gestisce il riposizionamento in primo piano al click (`z-index`) e renderizza il pulsante fluttuante unificato in basso a destra.
+- **`src/components/notes/StickyNotesCanvas.jsx`**: Canvas invisibile che intercetta i movimenti del mouse, gestisce il riposizionamento in primo piano al click (`z-index`) e renderizza il pulsante fluttuante unificato in basso a destra.
 
 ### Sicurezza (Row Level Security)
 
@@ -184,7 +190,7 @@ Per abilitare i post-it fluttuanti in una rotta o in un componente, segui questi
 
 ```jsx
 import React from "react";
-import { StickyNotesCanvas } from "../components/StickyNotesCanvas";
+import { StickyNotesCanvas } from "../components/notes/StickyNotesCanvas";
 
 export default function NuovaPaginaStudio() {
   return (

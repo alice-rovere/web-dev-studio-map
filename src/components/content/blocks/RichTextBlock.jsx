@@ -2,7 +2,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
 import { FontSize, TextStyle } from "@tiptap/extension-text-style";
-import GlossaryText from "../GlossaryText";
+import GlossaryText from "../../glossary/GlossaryText";
 
 const sizes = ["12px", "14px", "16px", "18px", "24px"];
 const highlights = ["#fef08a", "#bbf7d0", "#bfdbfe", "#fbcfe8"];

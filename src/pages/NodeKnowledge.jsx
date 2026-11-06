@@ -2,13 +2,13 @@ import { ArrowLeft, GitFork, Lock, Presentation, X } from "lucide-react";
 import { useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { hasNotebook } from "../notebooks/registry";
-import ContentSectionEditor from "../components/ContentSectionEditor";
-import NodeGenericInfo from "../components/NodeGenericInfo";
-import GlossaryText from "../components/GlossaryText";
+import ContentSectionEditor from "../components/content/ContentSectionEditor";
+import NodeGenericInfo from "../components/skill-map/NodeGenericInfo";
+import GlossaryText from "../components/glossary/GlossaryText";
 import { CATEGORY_COLORS, CATEGORY_LABELS } from "../data/baseNodes";
-import { StickyNotesCanvas } from "../components/StickyNotesCanvas";
-import QuickGlossaryAdd from "../components/QuickGlossaryAdd";
-import { GlossaryPageScope } from "../components/GlossaryPageScope";
+import { StickyNotesCanvas } from "../components/notes/StickyNotesCanvas";
+import QuickGlossaryAdd from "../components/glossary/QuickGlossaryAdd";
+import { GlossaryPageScope } from "../components/glossary/GlossaryPageScope";
 
 export default function NodeKnowledgePage({
   node,

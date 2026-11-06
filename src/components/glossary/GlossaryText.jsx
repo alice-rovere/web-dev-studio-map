@@ -5,8 +5,8 @@ import {
   useRef,
   useSyncExternalStore,
 } from "react";
-import { useGlossary } from "../hooks/useGlossary";
-import { GlossaryPageContext } from "../context/GlossaryPageContext";
+import { useGlossary } from "../../hooks/useGlossary";
+import { GlossaryPageContext } from "../../context/GlossaryPageContext";
 
 function GlossaryOccurrence({ term, text, scope }) {
   const ref = useRef(null);

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Loader2, Upload } from "lucide-react";
-import GlossaryText from "../GlossaryText";
-import { uploadNoteImage } from "../../services/mapService";
+import GlossaryText from "../../glossary/GlossaryText";
+import { uploadNoteImage } from "../../../services/mapService";
 
 const MAX_DIMENSION = 1600;
 

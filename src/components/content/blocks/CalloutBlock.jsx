@@ -1,5 +1,5 @@
 import { AlertTriangle, Info, Lightbulb, OctagonAlert } from "lucide-react";
-import GlossaryText from "../GlossaryText";
+import GlossaryText from "../../glossary/GlossaryText";
 
 const CALLOUT_VARIANTS = {
   note: {

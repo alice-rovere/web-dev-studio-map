@@ -10,8 +10,8 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import GlossaryText from "./GlossaryText";
-import { updateNode } from "../services/mapService";
+import GlossaryText from "../glossary/GlossaryText";
+import { updateNode } from "../../services/mapService";
 
 const INFO_SECTIONS = {
   best_practices: {
