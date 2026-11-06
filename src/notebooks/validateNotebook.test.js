@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { getNotebookCatalog, loadNotebookConfig } from "./registry.js";
@@ -6,10 +7,11 @@ import { validateNotebook } from "./validateNotebook.js";
 
 test("la migrazione conserva tutte le configurazioni e le descrizioni originali", async () => {
   const sql = await readFile(new URL("../../supabase/migrations/0010_seed_guided_notebooks.sql", import.meta.url), "utf8");
-  const payloads = [...sql.matchAll(/'((?:''|[^'])*)'::jsonb/g)]
-    .map((match) => JSON.parse(match[1].replaceAll("''", "'")));
+  const payloads = [...sql.matchAll(/convert_from\(decode\('([A-Za-z0-9+/=]+)', 'base64'\), 'UTF8'\)::jsonb/g)]
+    .map((match) => JSON.parse(Buffer.from(match[1], "base64").toString("utf8")));
   const catalog = getNotebookCatalog();
   assert.equal(payloads.length, catalog.length);
+  assert.ok(!sql.includes("INSERT INTO orders"));
   for (const [index, item] of catalog.entries()) {
     const config = await loadNotebookConfig(item.slug);
     assert.deepEqual(payloads[index], config);

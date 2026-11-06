@@ -1,4 +1,5 @@
 import { writeFile } from "node:fs/promises";
+import { Buffer } from "node:buffer";
 import { getNotebookCatalog, loadNotebookConfig } from "../src/notebooks/registry.js";
 
 const quote = (value) => `'${value.replaceAll("'", "''")}'`;
@@ -8,7 +9,7 @@ for (const item of getNotebookCatalog()) {
   inserts.push(`insert into public.guided_notebooks (slug, description, node_id, pending_node_slug, config)
 select ${quote(item.slug)}, ${quote(item.description)}, n.id,
   case when n.id is null then ${quote(item.slug)} else null end,
-  ${quote(JSON.stringify(config))}::jsonb
+  convert_from(decode(${quote(Buffer.from(JSON.stringify(config), "utf8").toString("base64"))}, 'base64'), 'UTF8')::jsonb
 from (select 1) seed left join public.nodes n on n.slug = ${quote(item.slug)}
 on conflict (slug) do nothing;`);
 }
