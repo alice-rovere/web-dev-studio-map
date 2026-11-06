@@ -39,6 +39,7 @@ const SkillMapContent = () => {
     edges,
     expandedIds,
     toggleNode,
+    collapseAll,
     expandFocused,
     updateNodePosition,
     updateNodeData,
@@ -226,11 +227,22 @@ const SkillMapContent = () => {
     return set;
   }, [selectedNodeId, isModalOpen, expandedIds, graph]);
 
-  const handleNodeClick = useCallback((_, node) => {
-    setSelectedNodeId(node.id);
-    setIsModalOpen(true);
-    setPendingFocusId(node.id);
-  }, []);
+  const handleOpenNodeDetails = useCallback(
+    (nodeId) => {
+      expandFocused(nodeId);
+      setSelectedNodeId(nodeId);
+      setIsModalOpen(true);
+    },
+    [expandFocused],
+  );
+
+  const handleNodeClick = useCallback(
+    (_, node) => {
+      handleOpenNodeDetails(node.id);
+      setPendingFocusId(node.id);
+    },
+    [handleOpenNodeDetails],
+  );
 
   // Salvataggio posizione con debounce (solo root nodes se il drag è abilitato)
   const handleNodeDragStop = useCallback(
@@ -261,10 +273,9 @@ const SkillMapContent = () => {
 
   // Collassa tutto
   const handleCollapseAll = useCallback(() => {
-    const ids = [...expandedIds];
-    for (const id of ids) toggleNode(id);
+    collapseAll();
     setSelectedNodeId(null);
-  }, [expandedIds, toggleNode]);
+  }, [collapseAll]);
 
   // Chiudendo la modale si azzera la selezione e si collassano i nodi aperti
   const handleCloseModal = useCallback(() => {
@@ -342,6 +353,7 @@ const SkillMapContent = () => {
           onClose={() => {
             setActiveKnowledgeId(null);
             setSelectedNodeId(null);
+            collapseAll();
           }}
         />
       );
@@ -550,10 +562,7 @@ const SkillMapContent = () => {
       <MobileSkillTree
         expandedIds={expandedIds}
         graph={graph}
-        onOpenDetails={(nodeId) => {
-          setSelectedNodeId(nodeId);
-          setIsModalOpen(true);
-        }}
+        onOpenDetails={handleOpenNodeDetails}
         onOpenKnowledge={handleOpenKnowledge}
         onToggleNode={toggleNode}
       />
