@@ -79,10 +79,6 @@ const SkillMapContent = () => {
     setSelectedNodeId(null);
   }, []);
 
-  const toggleNodeFocus = useCallback((nodeId) => {
-    setSelectedNodeId((prev) => (prev === nodeId ? null : nodeId));
-  }, []);
-
   const toDisplayNode = useCallback(
     (nodeId) => {
       const node = graph.nodesById.get(nodeId);
@@ -111,22 +107,6 @@ const SkillMapContent = () => {
 
   const selectedNode = selectedNodeId ? toDisplayNode(selectedNodeId) : null;
 
-  const selectedParents = useMemo(() => {
-    if (!selectedNodeId) return [];
-    return graph.getParentIds(selectedNodeId).map((parentId) => ({
-      id: parentId,
-      label: graph.nodesById.get(parentId)?.label ?? parentId,
-    }));
-  }, [graph, selectedNodeId]);
-
-  const selectedChildren = useMemo(() => {
-    if (!selectedNodeId) return [];
-    return graph.getChildIds(selectedNodeId).map((childId) => ({
-      id: childId,
-      label: graph.nodesById.get(childId)?.label ?? childId,
-    }));
-  }, [graph, selectedNodeId]);
-
   const knowledgeChildren = useMemo(() => {
     if (!activeKnowledgeId) return [];
     return graph.getChildIds(activeKnowledgeId).map((childId) => ({
@@ -148,7 +128,8 @@ const SkillMapContent = () => {
 
   const handleToggleChildren = useCallback(
     (nodeId) => {
-      toggleNodeFocus(nodeId);
+      setSelectedNodeId(nodeId);
+      setIsModalOpen(true);
 
       if (expandedIds.has(nodeId)) {
         toggleNode(nodeId);
@@ -173,15 +154,21 @@ const SkillMapContent = () => {
         duration: 500,
       });
     },
-    [
-      expandedIds,
-      toggleNode,
-      expandFocused,
-      getNode,
-      setCenter,
-      nodes,
-      toggleNodeFocus,
-    ],
+    [expandedIds, toggleNode, expandFocused, getNode, setCenter, nodes],
+  );
+
+  const getRelatedNodes = useCallback(
+    (nodeId, direction) => {
+      const ids =
+        direction === "parents"
+          ? graph.getParentIds(nodeId)
+          : graph.getChildIds(nodeId);
+      return ids.map((id) => ({
+        id,
+        label: graph.nodesById.get(id)?.label ?? id,
+      }));
+    },
+    [graph],
   );
 
   const handleSearchSelectNode = useCallback(
@@ -229,20 +216,21 @@ const SkillMapContent = () => {
     return () => cancelAnimationFrame(frame);
   }, [pendingFocusId, nodes, getNode, setCenter]);
 
-  // Nodi rilevanti per focus opacity
+  // Con la modale aperta restano in evidenza il nodo selezionato e, se espansi, i suoi figli
   const highlightedIds = useMemo(() => {
-    if (!selectedNodeId) return null;
+    if (!selectedNodeId || !isModalOpen) return null;
     const set = new Set([selectedNodeId]);
-    for (const id of graph.getParentIds(selectedNodeId)) set.add(id);
-    for (const id of graph.getChildIds(selectedNodeId)) set.add(id);
+    if (expandedIds.has(selectedNodeId)) {
+      for (const id of graph.getChildIds(selectedNodeId)) set.add(id);
+    }
     return set;
-  }, [selectedNodeId, graph]);
+  }, [selectedNodeId, isModalOpen, expandedIds, graph]);
 
-  // Click su un nodo: attiva/disattiva focus e opacità
-  const handleNodeClick = useCallback(
-    (_, node) => toggleNodeFocus(node.id),
-    [toggleNodeFocus],
-  );
+  const handleNodeClick = useCallback((_, node) => {
+    setSelectedNodeId(node.id);
+    setIsModalOpen(true);
+    setPendingFocusId(node.id);
+  }, []);
 
   // Salvataggio posizione con debounce (solo root nodes se il drag è abilitato)
   const handleNodeDragStop = useCallback(
@@ -278,6 +266,12 @@ const SkillMapContent = () => {
     setSelectedNodeId(null);
   }, [expandedIds, toggleNode]);
 
+  // Chiudendo la modale si azzera la selezione e si collassano i nodi aperti
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false);
+    handleCollapseAll();
+  }, [handleCollapseAll]);
+
   const finalNodes = useMemo(
     () => [
       ...MACRO_GROUPS,
@@ -299,10 +293,6 @@ const SkillMapContent = () => {
           isSubNode: node.data.parentCount > 0,
           isSelected: selectedNodeId === node.id,
           onToggleChildren: () => handleToggleChildren(node.id),
-          onOpenModal: () => {
-            setSelectedNodeId(node.id);
-            setIsModalOpen(true);
-          },
           onOpenKnowledge: () => handleOpenKnowledge(node.id),
         },
       })),
@@ -370,7 +360,11 @@ const SkillMapContent = () => {
       />
 
       {/* HUD superiore */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-col gap-2 px-3 py-2 sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-3">
+      <div
+        className={`pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-col gap-2 px-3 py-2 transition-[padding] sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-3 ${
+          isModalOpen && selectedNode ? "sm:pr-[calc(28rem+1.25rem)]" : ""
+        }`}
+      >
         <div className="flex min-w-0 items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-xl border border-indigo-500/30 bg-indigo-950/60 backdrop-blur-md shadow-[0_0_12px_rgba(99,102,241,0.2)]">
             <Layers size={15} className="text-indigo-400" />
@@ -472,7 +466,13 @@ const SkillMapContent = () => {
       </div>
 
       {/* Legenda categorie */}
-      <div className="absolute bottom-[calc(1rem+env(safe-area-inset-bottom))] right-[calc(1rem+env(safe-area-inset-right))] z-20 hidden flex-col gap-1.5 rounded-xl border border-slate-800/60 bg-slate-950/75 p-3 backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.4)] md:flex">
+      <div
+        className={`absolute bottom-[calc(1rem+env(safe-area-inset-bottom))] z-20 hidden flex-col gap-1.5 rounded-xl border border-slate-800/60 bg-slate-950/75 p-3 backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.4)] md:flex ${
+          isModalOpen && selectedNode
+            ? "right-[calc(28rem+1rem)]"
+            : "right-[calc(1rem+env(safe-area-inset-right))]"
+        }`}
+      >
         {[
           { label: "Frontend", color: "#7ab8ff" },
           { label: "Backend", color: "#64d9bd" },
@@ -538,10 +538,7 @@ const SkillMapContent = () => {
           nodesDraggable={isDragEnabled}
           onNodeClick={handleNodeClick}
           onNodeDragStop={handleNodeDragStop}
-          onPaneClick={() => {
-            setSelectedNodeId(null);
-            setIsModalOpen(false);
-          }}
+          onPaneClick={handleCloseModal}
           panOnDrag
           zoomOnPinch
           zoomOnScroll
@@ -567,15 +564,11 @@ const SkillMapContent = () => {
 
       {/* Drawer dettagli nodo */}
       <NodeDetailsModal
-        childNodes={selectedChildren}
+        getRelated={getRelatedNodes}
         isOpen={isModalOpen && Boolean(selectedNode)}
         node={selectedNode}
-        onClose={() => setIsModalOpen(false)}
-        onOpenKnowledge={() => {
-          if (selectedNodeId) handleOpenKnowledge(selectedNodeId);
-        }}
-        onSelectRelated={(relatedId) => setSelectedNodeId(relatedId)}
-        parents={selectedParents}
+        onClose={handleCloseModal}
+        onSelectRelated={handleSearchSelectNode}
       />
     </div>
   );

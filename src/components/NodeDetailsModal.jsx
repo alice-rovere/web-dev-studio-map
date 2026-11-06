@@ -1,10 +1,9 @@
-import * as Dialog from "@radix-ui/react-dialog";
+﻿import * as Dialog from "@radix-ui/react-dialog";
+import { useState } from "react";
 import {
   ArrowDown,
-  ArrowRight,
   ArrowUp,
-  BookOpen,
-  Code2,
+  ChevronRight,
   ExternalLink,
   GitFork,
   X,
@@ -20,64 +19,133 @@ const emptyDetails = {
   study_urls: [],
 };
 
-function RelationGroup({ title, icon, nodes, empty, onSelect, accentColor }) {
-  if (!nodes || nodes.length === 0) {
-    return (
-      <div className="mb-4">
-        <h4 className="flex items-center gap-1.5 text-xs text-slate-400 font-semibold mb-2 uppercase tracking-wider">
-          {icon}
-          {title}
-        </h4>
-        <p className="text-xs text-slate-500 italic font-mono">{empty}</p>
-      </div>
-    );
-  }
+function RelationTree({ nodes, getRelated, direction, onSelect, accentColor, path }) {
+  return (
+    <ul className="space-y-1">
+      {nodes.map((relatedNode) => (
+        <RelationItem
+          accentColor={accentColor}
+          direction={direction}
+          getRelated={getRelated}
+          key={relatedNode.id}
+          node={relatedNode}
+          onSelect={onSelect}
+          path={path}
+        />
+      ))}
+    </ul>
+  );
+}
 
+function RelationItem({ node, getRelated, direction, onSelect, accentColor, path }) {
+  const [open, setOpen] = useState(false);
+  // path evita cicli infiniti in caso di relazioni circolari
+  const nextPath = [...path, node.id];
+  const nested = getRelated(node.id, direction).filter(
+    (entry) => !nextPath.includes(entry.id),
+  );
+  const expandable = nested.length > 0;
+
+  return (
+    <li>
+      <div
+        className="flex items-center gap-1 rounded border bg-slate-900/60 text-xs font-mono"
+        style={{ borderColor: `${accentColor}40` }}
+      >
+        {expandable ? (
+          <button
+            aria-expanded={open}
+            aria-label={`${open ? "Comprimi" : "Espandi"} ${node.label}`}
+            className="inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center text-slate-400 hover:text-white"
+            onClick={() => setOpen((prev) => !prev)}
+            type="button"
+          >
+            <ChevronRight
+              className={`transition-transform ${open ? "rotate-90" : ""}`}
+              size={14}
+            />
+          </button>
+        ) : (
+          <span className="inline-block h-7 w-7 shrink-0" />
+        )}
+        <button
+          className="min-w-0 flex-1 cursor-pointer truncate py-1 pr-2 text-left text-slate-300 transition-colors hover:text-white"
+          onClick={() => onSelect?.(node.id)}
+          type="button"
+        >
+          <GlossaryText>{node.label}</GlossaryText>
+        </button>
+        {expandable && (
+          <span className="pr-2 text-[10px] text-slate-500">
+            {nested.length}
+          </span>
+        )}
+      </div>
+      {expandable && open && (
+        <div className="mt-1 ml-3 border-l border-slate-800 pl-2">
+          <RelationTree
+            accentColor={accentColor}
+            direction={direction}
+            getRelated={getRelated}
+            nodes={nested}
+            onSelect={onSelect}
+            path={nextPath}
+          />
+        </div>
+      )}
+    </li>
+  );
+}
+
+function RelationGroup({
+  title,
+  icon,
+  nodes,
+  empty,
+  onSelect,
+  accentColor,
+  getRelated,
+  direction,
+  rootId,
+}) {
   return (
     <div className="mb-4">
       <h4 className="flex items-center gap-1.5 text-xs text-slate-400 font-semibold mb-2 uppercase tracking-wider">
         {icon}
         {title}
+        {nodes.length > 0 && (
+          <span className="font-mono text-[10px] text-slate-500">
+            ({nodes.length})
+          </span>
+        )}
       </h4>
-      <ul className="flex flex-wrap gap-2">
-        {nodes.map((relatedNode) => (
-          <li key={relatedNode.id}>
-            <button
-              className="px-2.5 py-1 text-xs font-mono rounded bg-slate-900/60 border border-slate-800 text-slate-300 hover:text-white transition-all cursor-pointer"
-              style={{
-                borderColor: `${accentColor}55`,
-                boxShadow: `0 0 5px ${accentColor}20`,
-              }}
-              onClick={() => onSelect?.(relatedNode.id)}
-              type="button"
-            >
-              <GlossaryText>{relatedNode.label}</GlossaryText>
-            </button>
-          </li>
-        ))}
-      </ul>
+      {nodes.length === 0 ? (
+        <p className="text-xs text-slate-500 italic font-mono">{empty}</p>
+      ) : (
+        <RelationTree
+          accentColor={accentColor}
+          direction={direction}
+          getRelated={getRelated}
+          nodes={nodes}
+          onSelect={onSelect}
+          path={[rootId]}
+        />
+      )}
     </div>
   );
-}
-
-function normalizeList(value) {
-  if (Array.isArray(value)) return value.filter(Boolean);
-  if (typeof value === "string") {
-    return value.split(/\r?\n/).filter((entry) => entry.trim().length > 0);
-  }
-  return [];
 }
 
 export default function NodeDetailsModal({
   isOpen,
   onClose,
   node,
-  parents = [],
-  childNodes = [],
+  getRelated,
   onSelectRelated,
-  onOpenKnowledge,
 }) {
   if (!node) return null;
+
+  const parents = getRelated(node.id, "parents");
+  const childNodes = getRelated(node.id, "children");
 
   const nodeInfo = node.data ?? emptyDetails;
   const categories = nodeInfo.categories ?? [];
@@ -87,16 +155,19 @@ export default function NodeDetailsModal({
   const studyUrls = Array.isArray(nodeInfo.study_urls)
     ? nodeInfo.study_urls
     : [];
-  const bestPractices = normalizeList(nodeInfo.best_practices);
-  const namingConventions = normalizeList(nodeInfo.naming_conventions);
 
   return (
-    <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog.Root
+      modal={false}
+      open={isOpen}
+      onOpenChange={(open) => !open && onClose()}
+    >
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-xs data-[state=open]:animate-fade-in" />
-
         <Dialog.Content
           className="fixed inset-y-0 right-0 z-50 flex h-dvh w-full flex-col border-l border-slate-900 bg-slate-950/85 shadow-[-10px_0_30px_rgba(0,0,0,0.8)] backdrop-blur-xl focus:outline-hidden sm:max-w-md"
+          // La mappa resta interattiva: si chiude solo da X, Esc o click sul fondo mappa
+          onInteractOutside={(event) => event.preventDefault()}
+          onOpenAutoFocus={(event) => event.preventDefault()}
           style={{ borderColor: `${accentColor}30` }}
         >
           <header className="flex items-start justify-between border-b border-slate-900 bg-slate-950/50 px-4 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-3 sm:p-4">
@@ -161,21 +232,6 @@ export default function NodeDetailsModal({
               </GlossaryText>
             </p>
 
-            <button
-              className="w-full flex items-center justify-between p-3 rounded font-mono text-xs border border-cyan-500/20 bg-cyan-950/10 text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-300 transition-all cursor-pointer group"
-              onClick={onOpenKnowledge}
-              type="button"
-            >
-              <div className="flex items-center gap-2">
-                <BookOpen size={14} />
-                <span>APRI APPROFONDIMENTO LOGICO</span>
-              </div>
-              <ArrowRight
-                size={14}
-                className="transform group-hover:translate-x-1 transition-transform"
-              />
-            </button>
-
             <section className="border-t border-slate-900 pt-4">
               <h3 className="flex items-center gap-2 font-mono text-xs text-white uppercase tracking-wider mb-4">
                 <GitFork size={14} style={{ color: accentColor }} />
@@ -183,60 +239,28 @@ export default function NodeDetailsModal({
               </h3>
               <RelationGroup
                 accentColor={accentColor}
+                direction="parents"
                 empty="Nessun padre: questo nodo è una radice della mappa."
+                getRelated={getRelated}
                 icon={<ArrowUp size={12} />}
+                key={`parents-${node.id}`}
                 nodes={parents}
                 onSelect={onSelectRelated}
+                rootId={node.id}
                 title="Padri tecnici"
               />
               <RelationGroup
                 accentColor={accentColor}
+                direction="children"
                 empty="Nessun figlio collegato."
+                getRelated={getRelated}
                 icon={<ArrowDown size={12} />}
+                key={`children-${node.id}`}
                 nodes={childNodes}
                 onSelect={onSelectRelated}
+                rootId={node.id}
                 title="Figli"
               />
-            </section>
-
-            <section className="border-t border-slate-900 pt-4">
-              <h3 className="flex items-center gap-2 font-mono text-xs text-white uppercase tracking-wider mb-2">
-                <BookOpen size={14} className="text-emerald-400" />
-                Best Practice Standard
-              </h3>
-              {bestPractices.length > 0 ? (
-                <ul className="list-inside list-disc space-y-1.5 text-xs text-slate-400 font-mono">
-                  {bestPractices.map((practice) => (
-                    <li key={practice}>
-                      <GlossaryText>{practice}</GlossaryText>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-xs text-slate-500 font-mono italic">
-                  Nessuna best practice registrata.
-                </p>
-              )}
-            </section>
-
-            <section className="border-t border-slate-900 pt-4">
-              <h3 className="flex items-center gap-2 font-mono text-xs text-white uppercase tracking-wider mb-2">
-                <Code2 size={14} className="text-purple-400" />
-                Naming Convention
-              </h3>
-              {namingConventions.length > 0 ? (
-                <ul className="list-inside list-disc space-y-1.5 text-xs text-slate-400 font-mono">
-                  {namingConventions.map((convention) => (
-                    <li key={convention}>
-                      <GlossaryText>{convention}</GlossaryText>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-xs text-slate-500 font-mono italic">
-                  Nessuna naming convention registrata.
-                </p>
-              )}
             </section>
 
             <section className="border-t border-slate-900 pt-4">

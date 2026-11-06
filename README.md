@@ -7,7 +7,7 @@ Mappa interattiva delle competenze per lo sviluppo web full-stack. I nodi tecnol
 - Mappa interattiva React Flow con nodi espandibili, relazioni padre-figlio e categorie `frontend`, `backend`, `database`, `devops` e `tools`.
 - Ricerca di nodi e termini del glossario, con selezione rapida e navigazione da tastiera.
 - Vista ad albero ottimizzata per dispositivi mobili.
-- Dettaglio del nodo con relazioni padre/figlio, best practice e risorse esterne.
+- Dettaglio del nodo: click su un nodo per zoomare e aprire in automatico il pannello (il resto della mappa si opacizza), con padri e figli in un elenco espandibile e consultabile; i figli si aprono anche con il pulsante **+** del nodo.
 - Approfondimenti per nodo organizzati in sezioni e blocchi di contenuto.
 - Appunti Visivi a step, con un diagramma SVG animato per il flusso di Prisma ORM.
 - Glossario con definizioni su più paragrafi e tooltip automatici con anteprima dei termini presenti nei testi.
