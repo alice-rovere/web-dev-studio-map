@@ -30,8 +30,8 @@ export default function NodeKnowledgePage({
         <StickyNotesCanvas key={node.id} boardId={`node-${node.id}`} />
       )}
 
-      <div className="mx-auto grid w-full gap-5 pb-16 2xl:grid-cols-[minmax(0,1fr)_minmax(0,56rem)_minmax(0,1fr)]">
-        <div className="order-1 min-w-0 2xl:col-start-2 2xl:row-start-1">
+      <div className="mx-auto grid w-full items-start gap-5 pb-16 2xl:grid-cols-[minmax(0,1fr)_minmax(0,56rem)_minmax(0,1fr)] 2xl:grid-rows-[auto_minmax(0,1fr)]">
+        <div className="min-w-0 2xl:col-start-2 2xl:row-start-1">
           <div className="mb-4 flex items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-2">
               {parentNode && (
@@ -110,32 +110,6 @@ export default function NodeKnowledgePage({
             </button>
           )}
 
-          {childNodes.length > 0 && (
-            <div className="mb-8">
-              <h3 className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-zinc-400">
-                <GitFork size={13} style={{ color: accent }} />
-                Nodi figli
-              </h3>
-              <ul className="flex flex-wrap gap-2">
-                {childNodes.map((child) => (
-                  <li key={child.id}>
-                    <button
-                      className="cursor-pointer rounded border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-xs font-mono text-zinc-300 transition-all hover:text-white"
-                      onClick={() => onSelectChild?.(child.id)}
-                      style={{
-                        borderColor: `${accent}55`,
-                        boxShadow: `0 0 5px ${accent}20`,
-                      }}
-                      type="button"
-                    >
-                      <GlossaryText>{child.label}</GlossaryText>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
           {!canEdit && (
             <p className="mb-6 flex items-center gap-2 rounded-lg border border-zinc-900 bg-zinc-950/80 px-4 py-3 text-xs font-mono text-zinc-500">
               <Lock size={13} />
@@ -145,7 +119,7 @@ export default function NodeKnowledgePage({
           )}
         </div>
 
-        <div className="order-2 min-w-0 2xl:col-start-1 2xl:row-start-1">
+        <div className="min-w-0 2xl:col-start-1 2xl:row-span-2 2xl:row-start-1">
           <NodeGenericInfo
             canEdit={canEdit}
             nodeData={nodeData}
@@ -155,11 +129,37 @@ export default function NodeKnowledgePage({
         </div>
 
         <div
-          className="order-3 min-w-0 border-t pt-6 2xl:col-start-2 2xl:row-start-2"
+          className="min-w-0 border-t pt-6 2xl:col-start-2 2xl:row-start-2"
           style={{ borderTopColor: `${accent}22` }}
         >
           <ContentSectionEditor canEdit={canEdit} nodeId={node?.id} />
         </div>
+
+        {childNodes.length > 0 && (
+          <aside className="min-w-0 rounded-lg border border-zinc-800 bg-zinc-950/90 p-4 shadow-xl 2xl:col-start-3 2xl:row-span-2 2xl:row-start-1">
+            <h3 className="mb-3 flex items-center gap-2 border-b border-zinc-800 pb-2 font-mono text-xs font-semibold uppercase tracking-wider text-zinc-400">
+              <GitFork size={13} style={{ color: accent }} />
+              Nodi figli
+            </h3>
+            <ul className="flex flex-wrap gap-2">
+              {childNodes.map((child) => (
+                <li className="min-w-0" key={child.id}>
+                  <button
+                    className="cursor-pointer rounded border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-left text-xs font-mono text-zinc-300 wrap-break-word transition-all hover:text-white"
+                    onClick={() => onSelectChild?.(child.id)}
+                    style={{
+                      borderColor: `${accent}55`,
+                      boxShadow: `0 0 5px ${accent}20`,
+                    }}
+                    type="button"
+                  >
+                    <GlossaryText>{child.label}</GlossaryText>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )}
       </div>
     </section>
   );

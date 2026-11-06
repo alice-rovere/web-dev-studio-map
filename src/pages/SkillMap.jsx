@@ -362,7 +362,7 @@ const SkillMapContent = () => {
       {/* HUD superiore */}
       <div
         className={`pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-col gap-2 px-3 py-2 transition-[padding] sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-3 ${
-          isModalOpen && selectedNode ? "sm:pr-[calc(28rem+1.25rem)]" : ""
+          isModalOpen && selectedNode ? "sm:pr-117" : ""
         }`}
       >
         <div className="flex min-w-0 items-center gap-2.5">
@@ -469,7 +469,7 @@ const SkillMapContent = () => {
       <div
         className={`absolute bottom-[calc(1rem+env(safe-area-inset-bottom))] z-20 hidden flex-col gap-1.5 rounded-xl border border-slate-800/60 bg-slate-950/75 p-3 backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.4)] md:flex ${
           isModalOpen && selectedNode
-            ? "right-[calc(28rem+1rem)]"
+            ? "right-116"
             : "right-[calc(1rem+env(safe-area-inset-right))]"
         }`}
       >

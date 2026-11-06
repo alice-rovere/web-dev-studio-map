@@ -8,7 +8,7 @@ Mappa interattiva delle competenze per lo sviluppo web full-stack. I nodi tecnol
 - Ricerca di nodi e termini del glossario, con selezione rapida e navigazione da tastiera.
 - Vista ad albero ottimizzata per dispositivi mobili.
 - Dettaglio del nodo: click su un nodo per zoomare e aprire in automatico il pannello (il resto della mappa si opacizza), con padri e figli in un elenco espandibile e consultabile; i figli si aprono anche con il pulsante **+** del nodo.
-- Approfondimenti per nodo organizzati in sezioni e blocchi di contenuto.
+- Approfondimenti per nodo organizzati in sezioni e blocchi di contenuto, con best practice e convenzioni di naming sempre visibili e modificabili dagli editor, collegamenti esterni richiudibili e un box dedicato ai nodi figli.
 - Appunti Visivi a step, con un diagramma SVG animato per il flusso di Prisma ORM.
 - Glossario con definizioni su più paragrafi e tooltip automatici con anteprima dei termini presenti nei testi.
 - Percorso guidato che illustra il ciclo di vita di una richiesta web.

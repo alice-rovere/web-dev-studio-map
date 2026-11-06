@@ -44,7 +44,7 @@ function normalizeList(value) {
 
 function InfoList({ values }) {
   return (
-    <ul className="list-inside list-disc space-y-1.5 text-xs font-mono text-zinc-400">
+    <ul className="list-inside list-disc space-y-1.5 text-xs font-mono text-zinc-400 wrap-break-word">
       {values.map((value) => (
         <li key={value}>
           <GlossaryText>{value}</GlossaryText>
@@ -90,7 +90,7 @@ export default function NodeGenericInfo({
   canEdit = false,
   onNodeUpdated,
 }) {
-  const [activeSection, setActiveSection] = useState(null);
+  const [linksOpen, setLinksOpen] = useState(false);
   const [editingSection, setEditingSection] = useState(null);
   const [draft, setDraft] = useState("");
   const [saving, setSaving] = useState(false);
@@ -288,7 +288,8 @@ export default function NodeGenericInfo({
             )}
             {canEdit && (
               <button
-                className="inline-flex items-center gap-1.5 rounded border border-zinc-800 px-2.5 py-1.5 text-xs text-zinc-400 hover:border-zinc-700 hover:text-white"
+                className="inline-flex items-center gap-1.5 rounded border border-zinc-800 px-2.5 py-1.5 text-xs text-zinc-400 hover:border-zinc-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={editingSection !== null}
                 onClick={() => startEditing(section)}
                 type="button"
               >
@@ -303,99 +304,49 @@ export default function NodeGenericInfo({
   }
 
   return (
-    <>
-      <aside
-        aria-label="Informazioni del nodo"
-        className="hidden min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3 2xl:grid"
-      >
-        {activeSection && (
+    <aside aria-label="Informazioni del nodo" className="min-w-0 space-y-3">
+      {["best_practices", "naming_conventions"].map((section) => {
+        const config = INFO_SECTIONS[section];
+        const Icon = config.icon;
+        return (
           <section
-            id={`node-info-${activeSection}`}
-            aria-label={INFO_SECTIONS[activeSection].title}
             className="min-w-0 rounded-lg border border-zinc-800 bg-zinc-950/90 p-4 shadow-xl"
+            key={section}
           >
             <h3 className="mb-3 flex items-center gap-2 border-b border-zinc-800 pb-2 text-xs font-semibold uppercase tracking-wider text-zinc-300">
-              {(() => {
-                const Icon = INFO_SECTIONS[activeSection].icon;
-                return <Icon className="text-cyan-400" size={14} />;
-              })()}
-              {INFO_SECTIONS[activeSection].title}
+              <Icon className="text-cyan-400" size={14} />
+              {config.title}
             </h3>
-            {renderSectionContent(activeSection)}
+            {renderSectionContent(section)}
           </section>
-        )}
-
-        <nav
-          aria-label="Informazioni generiche"
-          className="flex flex-col gap-2 lg:col-start-2"
+        );
+      })}
+      <section className="min-w-0 rounded-lg border border-zinc-800 bg-zinc-950/90 shadow-xl">
+        <h3>
+          <button
+            aria-controls="node-info-study-urls"
+            aria-expanded={linksOpen}
+            className="flex w-full items-center gap-2 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-300 disabled:cursor-not-allowed"
+            disabled={editingSection === "study_urls"}
+            onClick={() => setLinksOpen((current) => !current)}
+            type="button"
+          >
+            <ExternalLink className="text-cyan-400" size={14} />
+            Collegamenti esterni
+            <ChevronDown
+              className={`ml-auto text-zinc-500 transition-transform ${linksOpen ? "rotate-180" : ""}`}
+              size={14}
+            />
+          </button>
+        </h3>
+        <div
+          className="border-t border-zinc-800 p-4"
+          hidden={!linksOpen}
+          id="node-info-study-urls"
         >
-          {Object.entries(INFO_SECTIONS).map(([section, config]) => {
-            const Icon = config.icon;
-            const expanded = activeSection === section;
-            return (
-              <button
-                aria-controls={
-                  expanded ? `node-info-${section}` : undefined
-                }
-                aria-expanded={expanded}
-                aria-label={`${expanded ? "Chiudi" : "Apri"} ${config.title}`}
-                className={`inline-flex h-10 w-10 items-center justify-center gap-1 rounded-lg border transition-colors ${
-                  expanded
-                    ? "border-cyan-500/40 bg-cyan-950/30 text-cyan-300"
-                    : "border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:text-white"
-                }`}
-                key={section}
-                onClick={() =>
-                  setActiveSection((current) =>
-                    current === section ? null : section,
-                  )
-                }
-                title={config.title}
-                type="button"
-              >
-                <Icon size={15} />
-                <ChevronDown
-                  className={`transition-transform ${
-                    expanded ? "rotate-180" : ""
-                  }`}
-                  size={11}
-                />
-              </button>
-            );
-          })}
-        </nav>
-      </aside>
-
-      <div className="space-y-3 2xl:hidden">
-        {Object.entries(INFO_SECTIONS).map(([section, config]) => {
-          const Icon = config.icon;
-          return (
-            <details
-              className="group rounded-lg border border-zinc-800 bg-zinc-950/60"
-              key={section}
-            >
-              <summary
-                aria-label={config.title}
-                className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-zinc-300 marker:hidden"
-                title={config.title}
-              >
-                <Icon className="text-cyan-400" size={16} />
-                <span className="sr-only">{config.title}</span>
-                <ChevronDown
-                  className="ml-auto text-zinc-500 transition-transform group-open:rotate-180"
-                  size={14}
-                />
-              </summary>
-              <div
-                className="border-t border-zinc-800 px-4 py-4"
-                id={`mobile-node-info-${section}`}
-              >
-                {renderSectionContent(section)}
-              </div>
-            </details>
-          );
-        })}
-      </div>
-    </>
+          {linksOpen && renderSectionContent("study_urls")}
+        </div>
+      </section>
+    </aside>
   );
 }
