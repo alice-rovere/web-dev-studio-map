@@ -10,7 +10,7 @@ function serviceError(error, fallback) {
     return new Error("Il nodo selezionato non esiste più.");
   }
   if (error?.code === "42501" || error?.code === "PGRST301") {
-    return new Error("Permessi insufficienti: serve il ruolo admin.");
+    return new Error("Permessi insufficienti: serve un ruolo editor o admin e occorre applicare la migrazione 0011.");
   }
   return new Error(fallback);
 }

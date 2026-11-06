@@ -56,7 +56,7 @@ Vite legge le variabili con prefisso `VITE_` nel browser. Usa solo la chiave ano
 
 Applica in ordine numerico tutte le migrazioni in `supabase/migrations/`. Per un database vuoto, esegui poi `supabase/seed.sql` una sola volta. Il seed contiene i dati iniziali e non va rieseguito su un database già popolato.
 
-I ruoli sono gestiti nei profili Supabase: `viewer` può consultare i contenuti, `editor` può gestirli e `admin` può inoltre gestire i profili e i percorsi guidati secondo le policy RLS. L'accesso editor/admin a `/admin` richiede un utente autenticato con il ruolo corrispondente; la gestione dei percorsi è riservata agli admin.
+I ruoli sono gestiti nei profili Supabase: `viewer` può consultare i contenuti, `editor` e `admin` possono gestirli, inclusi i percorsi guidati. Il ruolo `admin` mantiene inoltre il permesso di gestire i profili secondo le policy RLS. L'accesso a `/admin` richiede un utente autenticato con ruolo editor o admin.
 
 La migrazione `0007_atomic_node_save.sql` è necessaria per creare o modificare nodi dal pannello: salva i campi del nodo, le categorie e i padri in un'unica transazione, così un errore non lascia dati parziali. La creazione di un nodo aggiunge una voce alla mappa, non una nuova route o pagina; le sezioni di approfondimento si creano separatamente dalla scheda **Contenuti**. **Quick Add** aggiunge solo link a un nodo o all'inbox.
 
@@ -64,7 +64,7 @@ La migrazione `0008_internet_browser_notebook.sql` inserisce la teoria del nodo 
 
 Su un'installazione nuova le migrazioni possono precedere la creazione di `internet-browser`: dopo aver applicato le migrazioni e il seed, lo script `supabase/roadmaps/01_frontend.sql` crea il nodo e richiama l'installazione della teoria. Lo script roadmap elimina e ricrea sezioni anche di altri nodi: non rieseguirlo su un database già popolato. Se il nodo viene creato successivamente con un'altra procedura, esegui `select public.install_internet_browser_theory();` come amministratore. La funzione non è esposta ai client.
 
-Le migrazioni `0009_guided_notebooks.sql` e `0010_seed_guided_notebooks.sql` sono necessarie per consultare e gestire i percorsi guidati e vanno applicate prima di distribuire la versione corrispondente dell'app. Il catalogo è pubblico, mentre inserimento, modifica ed eliminazione sono riservati agli admin anche tramite RLS. I tre percorsi originali sono copiati senza modificare gli URL; se i nodi corrispondenti non esistono ancora, vengono collegati alla loro successiva creazione, salvo scelta diversa dell'admin. Eliminare un nodo non elimina il percorso. `scripts/generate-notebook-migration.js` documenta come sono stati generati i dati originali: non rigenerare una migrazione già applicata per apportare modifiche successive.
+Le migrazioni `0009_guided_notebooks.sql` e `0010_seed_guided_notebooks.sql` sono necessarie per consultare e gestire i percorsi guidati. La migrazione `0011_guided_notebooks_editor_access.sql` estende la gestione ai ruoli editor e admin anche tramite RLS e va applicata prima di distribuire la relativa versione dell'app. Il catalogo resta pubblico. I tre percorsi originali sono copiati senza modificare gli URL; se i nodi corrispondenti non esistono ancora, vengono collegati alla loro successiva creazione, salvo scelta diversa dell'editor. Eliminare un nodo non elimina il percorso. `scripts/generate-notebook-migration.js` documenta come sono stati generati i dati originali: non rigenerare una migrazione già applicata per apportare modifiche successive.
 
 I blocchi rimangono nel JSON della rispettiva sezione; il salvataggio verifica `updated_at` per evitare di sovrascrivere cambiamenti avvenuti in un'altra scheda. In caso di conflitto la bozza rimane nell'editor: si possono aggiornare i dati senza perderla e, se il blocco interessato non è cambiato, riprovare il salvataggio. Se invece è cambiato, confrontare e copiare la bozza prima di annullare. Le immagini già salvate non vengono eliminate automaticamente dallo storage quando si rimuove o sostituisce un blocco, perché potrebbero essere ancora utilizzate altrove.
 
@@ -97,8 +97,8 @@ node --test src/components/content/sectionBlocks.test.js src/components/content/
 | `/admin`            | Pannello editor        | Editor/admin autenticati |
 | `/quick-add`        | Aggiunta rapida link   | Editor/admin autenticati |
 | `/notebook/:slug`   | Appunti Visivi         | Pubblico                 |
-| `/admin/percorsi/nuovo` | Nuovo percorso     | Solo admin               |
-| `/admin/percorsi/:slug/modifica` | Modifica percorso | Solo admin         |
+| `/admin/percorsi/nuovo` | Nuovo percorso     | Editor/admin autenticati |
+| `/admin/percorsi/:slug/modifica` | Modifica percorso | Editor/admin autenticati |
 
 ### Appunti Visivi (simulazioni a step)
 
@@ -108,7 +108,7 @@ Nel nodo **Internet & Browser** il pulsante è disponibile sia in cima alla pagi
 
 La voce **Percorso Guidato** mostra l'indice degli appunti visivi, con titolo, descrizione e posizione di ciascun percorso nella mappa. Selezionando una scheda si apre il relativo diagramma a schermo intero.
 
-Gli admin possono creare percorsi dalla pagina **Percorsi guidati** o dalla scheda omonima nel pannello admin; la scheda permette anche di modificarli ed eliminarli. Il form gestisce titolo, descrizione, nodo facoltativo, fasi, icone, passaggi e pannelli di testo, codice e tabella, con anteprima prima del salvataggio. Lo slug è scelto alla creazione e rimane stabile; ogni nodo può avere al massimo un percorso associato. Il salvataggio rende immediatamente pubblico il percorso e verifica che non sia stato modificato contemporaneamente altrove.
+Gli editor e gli admin possono creare percorsi dalla pagina **Percorsi guidati** o dalla scheda omonima nel pannello admin; la scheda permette anche di modificarli ed eliminarli. Il form gestisce titolo, descrizione, nodo facoltativo, fasi, icone, passaggi e pannelli di testo, codice e tabella, con anteprima prima del salvataggio. Lo slug è scelto alla creazione e rimane stabile; ogni nodo può avere al massimo un percorso associato. Il salvataggio rende immediatamente pubblico il percorso e verifica che non sia stato modificato contemporaneamente altrove.
 
 Per i nuovi passaggi si può scegliere uno schema generico delle fasi con icone predefinite o nessuna illustrazione. Le scene animate originali dei tre percorsi migrati restano disponibili sui rispettivi passaggi: sono componenti React legati ai loro identificativi, non disegni personalizzabili dal form. Nuove scene animate su misura richiedono ancora codice. Le configurazioni in `src/notebooks/configs/` e il registry conservano i dati sorgente della migrazione e i riferimenti alle scene originali, non sono il catalogo usato dall'app.
 

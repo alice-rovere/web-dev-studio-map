@@ -3,7 +3,6 @@ import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import { MotionConfig } from "framer-motion";
 import Navbar from "./components/navigation/Navbar";
 import RequireEditor from "./components/auth/RequireEditor";
-import RequireAdmin from "./components/auth/RequireAdmin";
 import { AuthProvider } from "./context/AuthContext";
 import { GlossaryProvider } from "./context/GlossaryProvider";
 
@@ -50,8 +49,8 @@ const router = createBrowserRouter([{
     { path: "/percorso-guidato", element: <GuidedPath /> },
     { path: "/glossario", element: <Glossary /> },
     { path: "/notebook/:slug", element: <VisualNotebook /> },
-    { path: "/admin/percorsi/nuovo", element: <RequireAdmin><NotebookEditor /></RequireAdmin> },
-    { path: "/admin/percorsi/:slug/modifica", element: <RequireAdmin><NotebookEditor /></RequireAdmin> },
+    { path: "/admin/percorsi/nuovo", element: <RequireEditor><NotebookEditor /></RequireEditor> },
+    { path: "/admin/percorsi/:slug/modifica", element: <RequireEditor><NotebookEditor /></RequireEditor> },
     { path: "/login", element: <Login /> },
     { path: "/quick-add", element: <RequireEditor><QuickAdd /></RequireEditor> },
     { path: "/admin", element: <RequireEditor><Admin /></RequireEditor> },

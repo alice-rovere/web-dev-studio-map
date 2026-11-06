@@ -6,7 +6,7 @@ import { useMapGraph } from "../hooks/useMapGraph";
 import { fetchNotebooks } from "../services/notebookService";
 
 export default function GuidedPathPage() {
-  const { isAdmin } = useAuth();
+  const { isEditor } = useAuth();
   const { graph, loading: graphLoading, error: graphError, reload } = useMapGraph();
   const [state, setState] = useState({ notebooks: [], loading: true, error: null });
   const [attempt, setAttempt] = useState(0);
@@ -32,7 +32,7 @@ export default function GuidedPathPage() {
             Scegli un percorso per esplorare un concetto passo dopo passo. Ogni
             appunto può essere collegato a un nodo nella mappa delle competenze.
           </p>
-          {isAdmin && (
+          {isEditor && (
             <Link className="mt-4 inline-flex items-center gap-2 rounded-lg bg-cyan-400 px-3 py-2 text-sm font-semibold text-slate-950" to="/admin/percorsi/nuovo">
               <Plus size={16} /> Nuovo percorso
             </Link>
@@ -95,7 +95,7 @@ export default function GuidedPathPage() {
                   </p>
                 </div>
               </Link>
-              {isAdmin && <Link className="mt-2 inline-flex items-center gap-1 text-xs text-cyan-300 underline" to={`/admin/percorsi/${notebook.slug}/modifica`}><Pencil size={13} /> Modifica</Link>}
+              {isEditor && <Link className="mt-2 inline-flex items-center gap-1 text-xs text-cyan-300 underline" to={`/admin/percorsi/${notebook.slug}/modifica`}><Pencil size={13} /> Modifica</Link>}
               </div>
             );})}
           </div>

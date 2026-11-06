@@ -29,7 +29,7 @@ const TABS = [
 ];
 
 export default function Admin() {
-  const { profile, isAdmin } = useAuth();
+  const { profile } = useAuth();
   const { data, loading, error, reload } = useMapGraph();
 
   const [tab, setTab] = useState("nodes");
@@ -143,7 +143,7 @@ export default function Admin() {
         </header>
 
         <nav className="mb-6 flex flex-wrap gap-2 border-b border-slate-800 pb-3">
-          {[...TABS, ...(isAdmin ? [{ id: "notebooks", label: "Percorsi guidati", icon: Presentation }] : [])].map((entry) => {
+          {[...TABS, { id: "notebooks", label: "Percorsi guidati", icon: Presentation }].map((entry) => {
             const Icon = entry.icon;
             return (
               <button
@@ -387,7 +387,7 @@ export default function Admin() {
         )}
 
         {tab === "glossary" && <GlossaryManager />}
-        {tab === "notebooks" && isAdmin && <NotebookManager />}
+        {tab === "notebooks" && <NotebookManager />}
       </div>
     </div>
   );
