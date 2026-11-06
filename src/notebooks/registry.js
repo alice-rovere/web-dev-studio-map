@@ -3,7 +3,37 @@
 const loaders = {
   "prisma-orm": () => import("./configs/prismaFlowConfig.js"),
   "internet-browser": () => import("./configs/internetBrowserConfig.js"),
+  "http-protocol": () => import("./configs/httpProtocolConfig.js"),
 };
+
+const notebookCatalog = [
+  {
+    slug: "internet-browser",
+    title: "Internet & Browser",
+    description:
+      "Segui il percorso dall'indirizzo e dalla risoluzione DNS fino a HTTP, HTML, CSS, JavaScript e ai pixel mostrati dal browser.",
+    nodeLabel: "Internet & Browser",
+    parentLabel: null,
+  },
+  {
+    slug: "http-protocol",
+    title: "Il ciclo di una richiesta Web",
+    description:
+      "Segui una chiamata dal frontend all'API e al database, poi osserva la risposta tornare al browser per aggiornare l'interfaccia.",
+    nodeLabel: "HTTP & Protocolli Web",
+    parentLabel: "Internet & Browser",
+  },
+  {
+    slug: "prisma-orm",
+    title: "Prisma ORM",
+    description:
+      "Segui una richiesta Express attraverso Prisma Client e SQL parametrizzato fino alla riga creata nel database e alla risposta al client.",
+    nodeLabel: "Prisma ORM",
+    parentLabel: "Librerie ORM & ODM (Prisma, Mongoose)",
+  },
+];
+
+export const getNotebookCatalog = () => notebookCatalog;
 
 export const hasNotebook = (slug) =>
   Boolean(slug) && Object.hasOwn(loaders, slug);

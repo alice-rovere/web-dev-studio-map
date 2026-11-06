@@ -100,6 +100,8 @@ Dalla pagina di approfondimento di un nodo con un notebook associato compare il 
 
 Nel nodo **Internet & Browser** il pulsante è disponibile sia in cima alla pagina sia dopo le sezioni teoriche; il diagramma distingue il percorso di rete dalla pipeline di rendering.
 
+La voce **Percorso Guidato** mostra l'indice degli appunti visivi, con titolo, descrizione e posizione di ciascun percorso nella mappa. Selezionando una scheda si apre il relativo diagramma a schermo intero.
+
 1. Crea `src/notebooks/configs/<nome>Config.js` con config JSON pura: `{ slug, title, subtitle, phases, steps }` (esempio: `prismaFlowConfig.js`). Ogni step ha `phase`, `title`, `description` e `panels` di tipo `code`, `table` o `text`; il campo facoltativo `illustration` seleziona una scena SVG registrata nel layout.
 2. Registra lo slug in `src/notebooks/registry.js`. Lo slug deve coincidere con lo `slug` del nodo.
 
