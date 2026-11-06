@@ -31,6 +31,7 @@ const NAV_ITEMS = [
   { to: "/sicurezza", label: "Sicurezza", icon: ShieldAlert },
   { to: "/ai-web-dev", label: "AI nel Web Dev", icon: Sparkles },
   { to: "/percorso-guidato", label: "Percorso Guidato", icon: Route },
+  { to: "/glossario", label: "Glossario", icon: BookOpen },
 ];
 
 const ACTIVE_CLASSES = "border-[#33445d] text-[#e8edf5] bg-[#192536]";
@@ -101,7 +102,7 @@ const Navbar = () => {
         </NavLink>
 
         {/* DESKTOP: Menu di navigazione principale */}
-        <nav className="mr-auto hidden items-center gap-2 lg:flex xl:gap-4">
+        <nav className="mr-auto hidden items-center gap-2 xl:flex xl:gap-4">
           {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
             <NavLink className={linkClass} key={to} to={to}>
               <Icon size={18} />
@@ -110,22 +111,8 @@ const Navbar = () => {
           ))}
         </nav>
 
-        {/* DESKTOP: Glossario, Separatore e Area Utente */}
-        <div className="hidden items-center gap-2 lg:flex lg:gap-4">
-          <NavLink
-            aria-label="Glossario"
-            className={({ isActive }) =>
-              `inline-flex h-8.5 w-8.5 items-center justify-center rounded-lg border shadow-[0_0_10px_rgba(34,211,238,0.05)] transition-all duration-150 ${
-                isActive
-                  ? "border-cyan-400/50 bg-[#192536] text-cyan-300"
-                  : "border-[#33445d]/40 bg-[#192536]/30 text-cyan-400 hover:border-[#33445d] hover:bg-[#192536] hover:text-cyan-300 hover:shadow-[0_0_15px_rgba(34,211,238,0.2)]"
-              }`
-            }
-            title="Glossario"
-            to="/glossario"
-          >
-            <BookOpen size={16} />
-          </NavLink>
+        {/* DESKTOP: Area Utente */}
+        <div className="hidden items-center gap-2 xl:flex xl:gap-4">
           <div className="h-4 w-px bg-[#33445d]" />
 
           {authLoading ? (
@@ -176,15 +163,15 @@ const Navbar = () => {
           <Dialog.Trigger asChild>
             <button
               aria-label="Apri menu"
-              className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#33445d]/60 text-[#b9c5d6] transition-colors hover:bg-[#192536] hover:text-[#e8edf5] lg:hidden"
+              className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#33445d]/60 text-[#b9c5d6] transition-colors hover:bg-[#192536] hover:text-[#e8edf5] xl:hidden"
               type="button"
             >
               <Menu size={20} />
             </button>
           </Dialog.Trigger>
           <Dialog.Portal>
-            <Dialog.Overlay className="fixed inset-0 z-50 bg-[#060b13]/70 backdrop-blur-sm lg:hidden" />
-            <Dialog.Content className="fixed inset-y-0 right-0 z-50 flex h-dvh w-[min(88vw,340px)] flex-col border-l border-[#33445d] bg-[#0e1624] px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-[-20px_0_50px_rgba(0,0,0,0.5)] focus:outline-none lg:hidden">
+            <Dialog.Overlay className="fixed inset-0 z-50 bg-[#060b13]/70 backdrop-blur-sm xl:hidden" />
+            <Dialog.Content className="fixed inset-y-0 right-0 z-50 flex h-dvh w-[min(88vw,340px)] flex-col border-l border-[#33445d] bg-[#0e1624] px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-[-20px_0_50px_rgba(0,0,0,0.5)] focus:outline-none xl:hidden">
               <div className="flex items-center justify-between border-b border-[#33445d]/70 pb-3">
                 <Dialog.Title className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-cyan-400">
                   Menu
@@ -212,14 +199,6 @@ const Navbar = () => {
                     <span>{label}</span>
                   </NavLink>
                 ))}
-                <NavLink
-                  className={mobileLinkClass}
-                  onClick={() => setIsMenuOpen(false)}
-                  to="/glossario"
-                >
-                  <BookOpen size={18} />
-                  <span>Glossario</span>
-                </NavLink>
                 {session && isEditor && (
                   <NavLink
                     className={mobileLinkClass}

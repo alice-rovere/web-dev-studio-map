@@ -9,7 +9,6 @@ import {
 import {
   AlertTriangle,
   ChevronDown,
-  LayoutGrid,
   Layers,
   Lock,
   RefreshCw,
@@ -22,6 +21,7 @@ import { nodeTypes } from "../flow/nodes/index.jsx";
 import NodeDetailsModal from "../components/NodeDetailsModal.jsx";
 import MobileSkillTree from "../components/MobileSkillTree.jsx";
 import SkillMapSearch from "../components/SkillMapSearch.jsx";
+import QuickGlossaryAdd from "../components/QuickGlossaryAdd.jsx";
 import NodeKnowledgePage from "./NodeKnowledge.jsx";
 import { useMapGraph } from "../hooks/useMapGraph";
 import { useAuth } from "../hooks/useAuth";
@@ -349,7 +349,7 @@ const SkillMapContent = () => {
   }
 
   return (
-    <div className="absolute inset-0 w-full h-full bg-[#0b1220]">
+    <div className="absolute inset-0 w-full h-full bg-[#0b1120]">
       {/* Glow ambientale */}
       <div
         className="pointer-events-none absolute inset-0 z-0"
@@ -453,15 +453,9 @@ const SkillMapContent = () => {
             <span className="hidden sm:inline">Collassa tutto</span>
           </button>
 
-          <button
-            className="flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-slate-700/60 bg-slate-900/70 px-2.5 py-1.5 text-[11px] font-mono text-slate-400 backdrop-blur-md transition-all hover:border-rose-500/40 hover:text-rose-300 sm:min-h-0 sm:px-3"
-            onClick={() => reload()}
-            title="Ricarica la mappa"
-            type="button"
-          >
-            <LayoutGrid size={12} />
-            <span className="hidden sm:inline">Reset layout</span>
-          </button>
+          {isEditor && (
+            <QuickGlossaryAdd className="flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-slate-700/60 bg-slate-900/70 px-2.5 py-1.5 text-[11px] font-mono text-slate-400 backdrop-blur-md transition-all hover:border-cyan-500/40 hover:text-cyan-300 sm:min-h-0 sm:px-3" />
+          )}
         </div>
       </div>
 

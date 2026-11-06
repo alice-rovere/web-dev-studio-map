@@ -6,6 +6,7 @@ import NodeGenericInfo from "../components/NodeGenericInfo";
 import GlossaryText from "../components/GlossaryText";
 import { CATEGORY_COLORS, CATEGORY_LABELS } from "../data/baseNodes";
 import { StickyNotesCanvas } from "../components/StickyNotesCanvas";
+import QuickGlossaryAdd from "../components/QuickGlossaryAdd";
 
 export default function NodeKnowledgePage({
   node,
@@ -25,9 +26,13 @@ export default function NodeKnowledgePage({
   const notebookSlug = hasNotebook(nodeData.slug) ? nodeData.slug : null;
 
   return (
-    <section className="relative h-full w-full overflow-y-auto border border-zinc-800 bg-zinc-900 p-4 font-sans text-zinc-100 shadow-2xl before:absolute before:top-0 before:left-0 before:h-px before:w-full before:bg-linear-to-r before:from-transparent before:via-zinc-700 before:to-transparent sm:p-6 md:p-10">
+    <section className="relative h-full w-full overflow-y-auto border border-zinc-800 bg-[#0b1120] p-4 font-sans text-zinc-100 shadow-2xl before:absolute before:top-0 before:left-0 before:h-px before:w-full before:bg-linear-to-r before:from-transparent before:via-zinc-700 before:to-transparent sm:p-6 md:p-10">
       {node?.id && (
-        <StickyNotesCanvas key={node.id} boardId={`node-${node.id}`} />
+        <StickyNotesCanvas
+          key={node.id}
+          boardId={`node-${node.id}`}
+          action={canEdit && <QuickGlossaryAdd className="flex cursor-pointer items-center gap-2 rounded-full border border-cyan-500/20 bg-slate-900 px-4 py-2.5 text-xs font-bold text-cyan-400 shadow-2xl transition-all hover:border-cyan-500/40 hover:bg-slate-800 hover:text-cyan-300 active:scale-95" />}
+        />
       )}
 
       <div className="mx-auto grid w-full items-start gap-5 pb-16 2xl:grid-cols-[minmax(0,1fr)_minmax(0,56rem)_minmax(0,1fr)] 2xl:grid-rows-[auto_minmax(0,1fr)]">

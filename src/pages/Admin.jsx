@@ -103,7 +103,7 @@ export default function Admin() {
   }
 
   async function handleSaved(nodeId) {
-    await reload({ clearPositions: true });
+    await reload();
     setSelectedNodeId(nodeId);
     setDefaultParentId(null);
     setMode(nodeId ? "edit" : null);
@@ -129,7 +129,7 @@ export default function Admin() {
           </div>
           <button
             className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2 text-xs text-slate-300 hover:bg-slate-900"
-            onClick={() => reload({ clearPositions: true })}
+            onClick={() => reload()}
             type="button"
           >
             <RefreshCw size={13} />
@@ -170,7 +170,7 @@ export default function Admin() {
             <span>{error}</span>
             <button
               className="font-semibold hover:underline"
-              onClick={() => reload({ clearPositions: true })}
+              onClick={() => reload()}
               type="button"
             >
               Riprova

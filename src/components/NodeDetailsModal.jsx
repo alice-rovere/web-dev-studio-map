@@ -12,7 +12,14 @@ import {
 import GlossaryText from "./GlossaryText.jsx";
 import { CATEGORY_COLORS, CATEGORY_LABELS } from "../data/baseNodes";
 
-function RelationTree({ nodes, getRelated, direction, onSelect, accentColor, path }) {
+function RelationTree({
+  nodes,
+  getRelated,
+  direction,
+  onSelect,
+  accentColor,
+  path,
+}) {
   return (
     <ul className="space-y-1">
       {nodes.map((relatedNode) => (
@@ -30,7 +37,14 @@ function RelationTree({ nodes, getRelated, direction, onSelect, accentColor, pat
   );
 }
 
-function RelationItem({ node, getRelated, direction, onSelect, accentColor, path }) {
+function RelationItem({
+  node,
+  getRelated,
+  direction,
+  onSelect,
+  accentColor,
+  path,
+}) {
   const [open, setOpen] = useState(false);
   // path evita cicli infiniti in caso di relazioni circolari
   const nextPath = [...path, node.id];
@@ -227,7 +241,7 @@ export default function NodeDetailsModal({
               type="button"
             >
               <BookOpen size={15} />
-              Apri nodo
+              Apri approfondimento
             </button>
 
             <section className="border-t border-slate-900 pt-4">

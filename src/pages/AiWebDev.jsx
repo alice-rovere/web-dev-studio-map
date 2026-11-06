@@ -413,7 +413,7 @@ export default function AiWebDev() {
   return (
     <section
       aria-labelledby="ai-web-dev-title"
-      className="relative h-full w-full overflow-y-auto bg-slate-950 p-4 font-sans text-slate-100 sm:p-6 md:p-12"
+      className="relative h-full w-full overflow-y-auto bg-[#0b1120] p-4 font-sans text-slate-100 sm:p-6 md:p-12"
     >
       <StickyNotesCanvas boardId="page-ai-web-dev" />
 

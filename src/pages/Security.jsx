@@ -162,7 +162,7 @@ export default function Security() {
   return (
     <section
       aria-labelledby="security-learning-title"
-      className="h-full w-full overflow-y-auto bg-slate-950 p-4 font-sans text-slate-100 sm:p-6 md:p-12"
+      className="h-full w-full overflow-y-auto bg-[#0b1120] p-4 font-sans text-slate-100 sm:p-6 md:p-12"
     >
       <div className="mx-auto max-w-4xl space-y-8 pb-5 sm:space-y-12">
         <header className="space-y-3">

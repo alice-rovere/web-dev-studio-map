@@ -31,7 +31,7 @@ export default function App() {
       <MotionConfig reducedMotion="user">
         <AuthProvider>
           <GlossaryProvider>
-            <div className="flex h-dvh w-full flex-col overflow-hidden bg-[#0b1220] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-[env(safe-area-inset-top)] text-[#e8edf5]">
+            <div className="flex h-dvh w-full flex-col overflow-hidden bg-[#0b1120] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-[env(safe-area-inset-top)] text-[#e8edf5]">
               <Navbar />
               <div className="relative min-h-0 w-full grow overflow-hidden">
                 <Suspense fallback={<PageLoader />}>

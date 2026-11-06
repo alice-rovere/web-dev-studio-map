@@ -165,7 +165,7 @@ export default function FullStackPathPage() {
     setActiveStep((prev) => Math.min(GUIDED_LESSONS.length - 1, prev + 1));
 
   return (
-    <main className="flex h-full w-full flex-col gap-4 overflow-y-auto bg-slate-900 p-4 font-sans text-slate-100 sm:gap-6 sm:p-6">
+    <main className="flex h-full w-full flex-col gap-4 overflow-y-auto bg-[#0b1120] p-4 font-sans text-slate-100 sm:gap-6 sm:p-6">
       {/* Header statico */}
       <header className="border-b border-slate-800 pb-4">
         <h1 className="mt-1 text-xl font-bold tracking-tight text-white sm:text-2xl">

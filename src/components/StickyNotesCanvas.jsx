@@ -3,39 +3,42 @@ import { useRef, useState } from "react";
 import { Plus, Trash2, GripHorizontal } from "lucide-react";
 import { useStickyNotes } from "../hooks/useStickyNotes";
 
-export function StickyNotesCanvas({ boardId }) {
+export function StickyNotesCanvas({ boardId, action }) {
   // L'hook è integrato di nuovo direttamente nel canvas per la massima comodità d'uso
   const { notes, loading, addNote, updateNoteFields, focusNote, deleteNote } =
     useStickyNotes(boardId);
 
-  if (loading) return null;
-
   return (
-    <div className="hidden md:block">
+    <>
       {/* 
         BOTTONE FISSO IN BASSO A DESTRA: 
         Ridisegnato in linea con la UI di DevSkillMap (Sfondo scuro ardesia, bordo e testo indaco)
       */}
-      <div className="fixed bottom-[calc(1.5rem_+_env(safe-area-inset-bottom))] right-[calc(1.5rem_+_env(safe-area-inset-right))] z-50">
-        <button
-          onClick={addNote}
-          className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-indigo-400 hover:text-indigo-300 px-4 py-2.5 rounded-full text-xs font-bold shadow-2xl border border-indigo-500/20 hover:border-indigo-500/40 transition-all active:scale-95 cursor-pointer"
-        >
-          <Plus size={14} /> Nota Fluttuante
-        </button>
+      <div className="fixed bottom-[calc(1.5rem_+_env(safe-area-inset-bottom))] right-[calc(1.5rem_+_env(safe-area-inset-right))] z-50 flex flex-wrap justify-end gap-2">
+        {action}
+        {!loading && (
+          <button
+            onClick={addNote}
+            className="hidden items-center gap-2 bg-slate-900 hover:bg-slate-800 text-indigo-400 hover:text-indigo-300 px-4 py-2.5 rounded-full text-xs font-bold shadow-2xl border border-indigo-500/20 hover:border-indigo-500/40 transition-all active:scale-95 cursor-pointer md:flex"
+            type="button"
+          >
+            <Plus size={14} /> Nota Fluttuante
+          </button>
+        )}
       </div>
 
       {/* Render dei Post-it fluttuanti */}
-      {notes.map((note) => (
-        <StickyNoteItem
-          key={note.id}
-          note={note}
-          onFocus={() => focusNote(note.id)}
-          onDelete={() => deleteNote(note.id)}
-          onUpdate={(fields) => updateNoteFields(note.id, fields)}
-        />
+      {!loading && notes.map((note) => (
+        <div className="hidden md:block" key={note.id}>
+          <StickyNoteItem
+            note={note}
+            onFocus={() => focusNote(note.id)}
+            onDelete={() => deleteNote(note.id)}
+            onUpdate={(fields) => updateNoteFields(note.id, fields)}
+          />
+        </div>
       ))}
-    </div>
+    </>
   );
 }
 

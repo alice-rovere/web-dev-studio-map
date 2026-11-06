@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 
-export function GlossaryForm({ error, onAddTerm, onClose }) {
+export function GlossaryForm({ error, onAddTerm, onClose, onSubmittingChange }) {
   const [term, setTerm] = useState("");
   const [definition, setDefinition] = useState("");
   const [validationError, setValidationError] = useState("");
@@ -18,6 +18,7 @@ export function GlossaryForm({ error, onAddTerm, onClose }) {
     }
 
     setIsSubmitting(true);
+    onSubmittingChange?.(true);
     try {
       const addError = await onAddTerm({
         term: normalizedTerm,
@@ -30,6 +31,7 @@ export function GlossaryForm({ error, onAddTerm, onClose }) {
       onClose();
     } finally {
       setIsSubmitting(false);
+      onSubmittingChange?.(false);
     }
   }
 
@@ -88,9 +90,9 @@ export function GlossaryForm({ error, onAddTerm, onClose }) {
             id="glossary-definition"
             disabled={isSubmitting}
             onChange={(event) => setDefinition(event.target.value)}
-            placeholder="Descrivi brevemente il termine"
-            rows={3}
-            className="w-full px-3 py-2 text-[13px] text-[#e8edf5] bg-[#0e1624] border border-[#33445d] rounded-lg focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30 transition-all resize-none placeholder:text-[#53657d]"
+            placeholder="Descrivi il termine (puoi usare più paragrafi)"
+            rows={8}
+            className="w-full px-3 py-2 text-[13px] text-[#e8edf5] bg-[#0e1624] border border-[#33445d] rounded-lg focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30 transition-all resize-y placeholder:text-[#53657d]"
             value={definition}
           />
         </div>

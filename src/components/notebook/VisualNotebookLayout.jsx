@@ -172,7 +172,7 @@ export default function VisualNotebookLayout({ config, onClose }) {
 
   if (!currentStep) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#05030d] font-mono text-sm text-zinc-400">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0b1120] font-mono text-sm text-zinc-400">
         Nessuno step disponibile.
       </div>
     );
@@ -185,7 +185,7 @@ export default function VisualNotebookLayout({ config, onClose }) {
     <div
       aria-label={config.title}
       aria-modal="true"
-      className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-[#05030d] text-zinc-200"
+      className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-[#0b1120] text-zinc-200"
       role="dialog"
     >
       <div
