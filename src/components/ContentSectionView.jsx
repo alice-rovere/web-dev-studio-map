@@ -152,7 +152,7 @@ export function SectionCard({ section, actions, blockActions }) {
       </div>
       <div className="space-y-4">
         {blocks.map((block, index) => (
-          <div className="min-w-0" key={block.id ?? `${block.type}-${index}`}>
+          <div className="relative min-w-0" key={block.id ?? `${block.type}-${index}`}>
             {blockActions?.(block, index)}
             <ContentBlock
               section={Array.isArray(section.payload?.blocks) ? block : section}

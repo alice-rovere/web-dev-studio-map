@@ -25,18 +25,39 @@ export default function NodeKnowledgePage({
   const primaryCategory = nodeData.primaryCategory ?? "frontend";
   const accent = CATEGORY_COLORS[primaryCategory] ?? "#94a3b8";
   const navigate = useNavigate();
+  const scrollContainerRef = useRef(null);
+  const mainContentRef = useRef(null);
   const draftGuard = useRef(null);
   const onDraftChange = useCallback((guard) => { draftGuard.current = guard; }, []);
   const confirmNavigation = async () => !draftGuard.current || await draftGuard.current();
   const notebookSlug = hasNotebook(nodeData.slug) ? nodeData.slug : null;
 
+  const getDefaultNotePosition = () => {
+    const scrollContainer = scrollContainerRef.current;
+    const mainContent = mainContentRef.current;
+    if (!scrollContainer || !mainContent) return { x_pos: 60, y_pos: 60 };
+
+    const containerRect = scrollContainer.getBoundingClientRect();
+    const contentRect = mainContent.getBoundingClientRect();
+    const contentOriginX = containerRect.left + scrollContainer.clientLeft;
+    const contentOriginY = containerRect.top + scrollContainer.clientTop;
+    const preferredX = contentRect.right - contentOriginX + scrollContainer.scrollLeft + 16;
+    const rightEdge = scrollContainer.scrollLeft + scrollContainer.clientWidth - 256;
+
+    return {
+      x_pos: Math.max(16, Math.min(preferredX, rightEdge)),
+      y_pos: scrollContainer.scrollTop + Math.max(24, contentRect.top - contentOriginY + 16),
+    };
+  };
+
   return (
     <GlossaryPageScope>
-    <section className="relative h-full w-full overflow-y-auto border border-zinc-800 bg-[#0b1120] p-4 font-sans text-zinc-100 shadow-2xl before:absolute before:top-0 before:left-0 before:h-px before:w-full before:bg-linear-to-r before:from-transparent before:via-zinc-700 before:to-transparent sm:p-6 md:p-10">
+    <section ref={scrollContainerRef} className="relative h-full w-full overflow-y-auto border border-zinc-800 bg-[#0b1120] p-4 font-sans text-zinc-100 shadow-2xl before:absolute before:top-0 before:left-0 before:h-px before:w-full before:bg-linear-to-r before:from-transparent before:via-zinc-700 before:to-transparent sm:p-6 md:p-10">
       {node?.id && (
         <StickyNotesCanvas
           key={node.id}
           boardId={`node-${node.id}`}
+          getDefaultPosition={getDefaultNotePosition}
           action={canEdit && <QuickGlossaryAdd className="flex cursor-pointer items-center gap-2 rounded-full border border-cyan-500/20 bg-slate-900 px-4 py-2.5 text-xs font-bold text-cyan-400 shadow-2xl transition-all hover:border-cyan-500/40 hover:bg-slate-800 hover:text-cyan-300 active:scale-95" />}
         />
       )}
@@ -130,7 +151,7 @@ export default function NodeKnowledgePage({
           )}
         </div>
 
-        <div className="min-w-0 space-y-3 2xl:col-start-1 2xl:row-span-2 2xl:row-start-1">
+        <div className="min-w-0 space-y-3 2xl:sticky 2xl:top-4 2xl:z-10 2xl:col-start-1 2xl:row-span-2 2xl:row-start-1 2xl:self-start">
           <NodeGenericInfo
             canEdit={canEdit}
             nodeData={nodeData}
@@ -165,6 +186,7 @@ export default function NodeKnowledgePage({
         </div>
 
         <div
+          ref={mainContentRef}
           className="min-w-0 border-t pt-6 2xl:col-start-2 2xl:row-start-2"
           style={{ borderTopColor: `${accent}22` }}
         >

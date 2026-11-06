@@ -1077,18 +1077,13 @@ export default function ContentSectionEditor({ nodeId, canEdit = false, onDraftC
               ) : null
             }
             blockActions={canEdit ? (block, index) => (
-              <div className="flex items-center justify-between gap-2 border-b border-zinc-800/50 pb-1">
-                <span className="font-mono text-[10px] uppercase text-zinc-500">
-                  {SECTION_TYPES.find((entry) => entry.value === block.type)?.label ?? "Contenuto sconosciuto"}
-                </span>
-                <div className="flex gap-1">
-                  <IconButton disabled={saving || index === 0} label="Sposta contenuto su" onClick={() => moveBlock(index, -1)}><ArrowUp size={12} /></IconButton>
-                  <IconButton disabled={saving || index === getSectionBlocks(activeSection).length - 1} label="Sposta contenuto giù" onClick={() => moveBlock(index, 1)}><ArrowDown size={12} /></IconButton>
-                  {SECTION_TYPES.some((entry) => entry.value === block.type) && (
-                    <IconButton disabled={saving} label="Modifica contenuto" onClick={() => startBlock(activeSection, index)}><Pencil size={12} /></IconButton>
-                  )}
-                  <IconButton disabled={saving} danger label="Elimina contenuto" onClick={() => removeBlock(index)}><Trash2 size={12} /></IconButton>
-                </div>
+              <div className="absolute right-0 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-1">
+                <IconButton disabled={saving || index === 0} label="Sposta contenuto su" onClick={() => moveBlock(index, -1)}><ArrowUp size={12} /></IconButton>
+                <IconButton disabled={saving || index === getSectionBlocks(activeSection).length - 1} label="Sposta contenuto giù" onClick={() => moveBlock(index, 1)}><ArrowDown size={12} /></IconButton>
+                {SECTION_TYPES.some((entry) => entry.value === block.type) && (
+                  <IconButton disabled={saving} label="Modifica contenuto" onClick={() => startBlock(activeSection, index)}><Pencil size={12} /></IconButton>
+                )}
+                <IconButton disabled={saving} danger label="Elimina contenuto" onClick={() => removeBlock(index)}><Trash2 size={12} /></IconButton>
               </div>
             ) : undefined}
             key={activeSection.id}

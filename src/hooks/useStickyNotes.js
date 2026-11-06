@@ -4,6 +4,7 @@ import { supabase } from '../services/supabase'; // Adegua il path al tuo client
 export function useStickyNotes(boardId) {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [operationError, setOperationError] = useState('');
 
   // Carica i post-it associati a questa board/nodo
   useEffect(() => {
@@ -32,13 +33,14 @@ export function useStickyNotes(boardId) {
   }, [boardId]);
 
   // Crea un nuovo post-it
-  const addNote = async () => {
+  const addNote = async (position = {}) => {
     const maxZ = notes.length > 0 ? Math.max(...notes.map(n => n.z_index)) : 0;
+    setOperationError('');
     const newNote = {
       board_id: boardId,
       content: '',
-      x_pos: 60,
-      y_pos: 60,
+      x_pos: Math.round(position.x_pos ?? 60),
+      y_pos: Math.round(position.y_pos ?? 60),
       z_index: maxZ + 1
     };
 
@@ -48,18 +50,24 @@ export function useStickyNotes(boardId) {
       .select()
       .single();
 
-    if (!error && data) {
+    if (error) {
+      setOperationError(`Impossibile creare la nota: ${error.message}`);
+    } else if (data) {
       setNotes(prev => [...prev, data]);
     }
   };
 
   // Aggiorna le proprietà (es: testo, posizione, dimensione)
   const updateNoteFields = async (id, fields) => {
+    const normalizedFields = { ...fields };
+    if (typeof normalizedFields.x_pos === 'number') normalizedFields.x_pos = Math.round(normalizedFields.x_pos);
+    if (typeof normalizedFields.y_pos === 'number') normalizedFields.y_pos = Math.round(normalizedFields.y_pos);
+
     // Aggiornamento ottimistico locale per fluidità UI
-    setNotes(prev => prev.map(n => n.id === id ? { ...n, ...fields } : n));
+    setNotes(prev => prev.map(n => n.id === id ? { ...n, ...normalizedFields } : n));
     
     // Aggiorna Supabase in background
-    await supabase.from('sticky_notes').update(fields).eq('id', id);
+    await supabase.from('sticky_notes').update(normalizedFields).eq('id', id);
   };
 
   // Sposta in primo piano al click
@@ -77,5 +85,5 @@ export function useStickyNotes(boardId) {
     await supabase.from('sticky_notes').delete().eq('id', id);
   };
 
-  return { notes, loading, addNote, updateNoteFields, focusNote, deleteNote };
+  return { notes, loading, operationError, addNote, updateNoteFields, focusNote, deleteNote };
 }

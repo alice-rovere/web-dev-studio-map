@@ -3,10 +3,17 @@ import { useRef, useState } from "react";
 import { Plus, Trash2, GripHorizontal } from "lucide-react";
 import { useStickyNotes } from "../hooks/useStickyNotes";
 
-export function StickyNotesCanvas({ boardId, action }) {
+export function StickyNotesCanvas({ boardId, action, getDefaultPosition }) {
   // L'hook è integrato di nuovo direttamente nel canvas per la massima comodità d'uso
-  const { notes, loading, addNote, updateNoteFields, focusNote, deleteNote } =
-    useStickyNotes(boardId);
+  const {
+    notes,
+    loading,
+    operationError,
+    addNote,
+    updateNoteFields,
+    focusNote,
+    deleteNote,
+  } = useStickyNotes(boardId);
 
   return (
     <>
@@ -14,11 +21,11 @@ export function StickyNotesCanvas({ boardId, action }) {
         BOTTONE FISSO IN BASSO A DESTRA: 
         Ridisegnato in linea con la UI di DevSkillMap (Sfondo scuro ardesia, bordo e testo indaco)
       */}
-      <div className="fixed bottom-[calc(1.5rem_+_env(safe-area-inset-bottom))] right-[calc(1.5rem_+_env(safe-area-inset-right))] z-50 flex flex-wrap justify-end gap-2">
+      <div className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] right-[calc(1.5rem+env(safe-area-inset-right))] z-50 flex flex-wrap justify-end gap-2">
         {action}
         {!loading && (
           <button
-            onClick={addNote}
+            onClick={() => addNote(getDefaultPosition?.())}
             className="hidden items-center gap-2 bg-slate-900 hover:bg-slate-800 text-indigo-400 hover:text-indigo-300 px-4 py-2.5 rounded-full text-xs font-bold shadow-2xl border border-indigo-500/20 hover:border-indigo-500/40 transition-all active:scale-95 cursor-pointer md:flex"
             type="button"
           >
@@ -26,18 +33,30 @@ export function StickyNotesCanvas({ boardId, action }) {
           </button>
         )}
       </div>
+      {operationError && (
+        <p
+          className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-6 z-50 max-w-sm rounded-lg border border-rose-500/30 bg-slate-950 px-3 py-2 text-xs text-rose-300 shadow-xl"
+          role="alert"
+        >
+          {operationError}
+        </p>
+      )}
 
       {/* Render dei Post-it fluttuanti */}
-      {!loading && notes.map((note) => (
-        <div className="hidden md:block" key={note.id}>
-          <StickyNoteItem
-            note={note}
-            onFocus={() => focusNote(note.id)}
-            onDelete={() => deleteNote(note.id)}
-            onUpdate={(fields) => updateNoteFields(note.id, fields)}
-          />
-        </div>
-      ))}
+      {!loading &&
+        notes.map((note) => (
+          <div
+            className="pointer-events-none absolute inset-0 z-30 hidden md:block"
+            key={note.id}
+          >
+            <StickyNoteItem
+              note={note}
+              onFocus={() => focusNote(note.id)}
+              onDelete={() => deleteNote(note.id)}
+              onUpdate={(fields) => updateNoteFields(note.id, fields)}
+            />
+          </div>
+        ))}
     </>
   );
 }
@@ -98,6 +117,7 @@ function StickyNoteItem({ note, onFocus, onDelete, onUpdate }) {
   return (
     <div
       ref={noteRef}
+      className="pointer-events-auto flex flex-col bg-amber-500/10 text-amber-200 border border-amber-500/30 backdrop-blur-md p-3 rounded-xl shadow-2xl resize overflow-auto min-w-30 min-h-25 group select-none transition-shadow duration-200 focus-within:border-amber-400/60 focus-within:shadow-amber-500/5"
       onMouseDown={onFocus}
       style={{
         position: "absolute",
@@ -107,7 +127,6 @@ function StickyNoteItem({ note, onFocus, onDelete, onUpdate }) {
         height: `${note.height}px`,
         zIndex: note.z_index,
       }}
-      className="flex flex-col bg-amber-500/10 text-amber-200 border border-amber-500/30 backdrop-blur-md p-3 rounded-xl shadow-2xl resize overflow-auto min-w-30 min-h-25 group select-none transition-shadow duration-200 focus-within:border-amber-400/60 focus-within:shadow-amber-500/5"
     >
       <div
         onMouseDown={handleMouseDownDrag}

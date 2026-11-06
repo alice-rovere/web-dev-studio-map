@@ -110,7 +110,7 @@ export function RichTextEditor({ payload, update }) {
 function renderRun(text, marks, key) {
   let result = text;
   for (const mark of marks ?? []) {
-    if (mark.type === "bold") result = <strong>{result}</strong>;
+    if (mark.type === "bold") result = <strong className="font-semibold">{result}</strong>;
     if (mark.type === "italic") result = <em>{result}</em>;
     if (mark.type === "underline") result = <u>{result}</u>;
     if (mark.type === "highlight" && highlights.includes(mark.attrs?.color)) {

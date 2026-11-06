@@ -14,6 +14,7 @@ after(async () => {
   rmSync(cacheDir, { recursive: true, force: true });
 });
 const { SectionCard } = await vite.ssrLoadModule("/src/components/ContentSectionView.jsx");
+const { RichTextView } = await vite.ssrLoadModule("/src/components/blocks/RichTextBlock.jsx");
 const { NativeGlossaryContext } = await vite.ssrLoadModule("/src/context/GlossaryContext.jsx");
 const { getSectionBlocks, payloadWithBlocks } = await import("./sectionBlocks.js");
 
@@ -35,4 +36,21 @@ test("legacy unsupported blocks are reported and preserved when other blocks cha
     block.id === "text" ? { ...block, payload: { text: "dopo" } } : block,
   );
   assert.deepEqual(payloadWithBlocks(section, blocks).blocks[0], legacy);
+});
+
+test("bold rich text uses a visible font weight", () => {
+  const html = renderToStaticMarkup(createElement(
+    NativeGlossaryContext.Provider,
+    { value: { glossary: [] } },
+    createElement(RichTextView, {
+      document: {
+        type: "doc",
+        content: [{
+          type: "paragraph",
+          content: [{ type: "text", text: "grassetto", marks: [{ type: "bold" }] }],
+        }],
+      },
+    }),
+  ));
+  assert.match(html, /<strong class="font-semibold">grassetto<\/strong>/);
 });
