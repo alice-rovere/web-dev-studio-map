@@ -6,14 +6,11 @@ import {
 } from "../../data/baseNodes";
 import { buildNodeGraph } from "../../flow/utils/nodeGraph";
 import {
-  createNode,
   deleteNode,
-  setNodeCategories,
-  setNodeParents,
-  updateNode,
+  saveNodeWithRelations,
 } from "../../services/mapService";
 
-const CATEGORIES = ["frontend", "backend", "database", "devops", "tools"];
+const CATEGORIES = Object.keys(CATEGORY_LABELS);
 
 function slugify(value) {
   return value
@@ -68,6 +65,7 @@ export default function NodeForm({
 
   const [label, setLabel] = useState(node?.label ?? "");
   const [slug, setSlug] = useState(node?.slug ?? "");
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(Boolean(node));
   const [description, setDescription] = useState(node?.description ?? "");
   const [bestPractices, setBestPractices] = useState(
     (node?.best_practices ?? []).join("\n"),
@@ -319,14 +317,14 @@ export default function NodeForm({
 
     setSaving(true);
     try {
-      const savedNode = node
-        ? await updateNode(node.id, payload)
-        : await createNode(payload);
+      const savedNodeId = await saveNodeWithRelations({
+        nodeId: node?.id ?? null,
+        payload,
+        categoryLinks,
+        parentLinks,
+      });
 
-      await setNodeCategories(savedNode.id, categoryLinks);
-      await setNodeParents(savedNode.id, parentLinks);
-
-      await onSaved?.(savedNode.id);
+      await onSaved?.(savedNodeId);
     } catch (saveError) {
       setError(
         saveError instanceof Error
@@ -372,7 +370,8 @@ export default function NodeForm({
             {node ? `Modifica "${node.label}"` : "Nuovo nodo"}
           </h2>
           <p className="mt-1 text-xs text-slate-500">
-            Slug, categorie, padri e contenuti strutturati.
+            Salva il nodo nella mappa con categorie e relazioni. Le sezioni di
+            approfondimento si aggiungono separatamente.
           </p>
         </div>
         <button
@@ -392,24 +391,34 @@ export default function NodeForm({
             className={inputClass}
             onChange={(event) => {
               setLabel(event.target.value);
-              if (!node && !slug) {
+              if (!slugManuallyEdited) {
                 setSlug(slugify(event.target.value));
               }
             }}
-            placeholder="Es. Fetch API"
+            placeholder="Es. Fetch API: specifica il nome della tecnologia o del concetto"
             required
             value={label}
           />
+          <span className="mt-1 block text-[10px] text-slate-500">
+            Nome chiaro e riconoscibile: evita abbreviazioni non spiegate.
+          </span>
         </label>
         <label className="block">
           <FieldLabel>Slug</FieldLabel>
           <input
             className={inputClass}
-            onChange={(event) => setSlug(event.target.value)}
-            placeholder="fetch-api"
-            required
+            onChange={(event) => {
+              setSlugManuallyEdited(true);
+              setSlug(event.target.value);
+            }}
+            placeholder="fetch-api (minuscolo, parole separate da trattini)"
             value={slug}
           />
+          <span className="mt-1 block text-[10px] text-slate-500">
+            {node
+              ? "È un identificatore stabile: cambialo solo se necessario."
+              : "Generato dal nome finché non lo modifichi. È un identificatore stabile: cambialo solo se necessario."}
+          </span>
         </label>
       </div>
 
@@ -418,12 +427,20 @@ export default function NodeForm({
         <textarea
           className={`${inputClass} min-h-24 resize-y`}
           onChange={(event) => setDescription(event.target.value)}
+          placeholder="Spiega che cos'è, a cosa serve, quando usarlo e in che modo si collega agli altri concetti della mappa."
           value={description}
         />
+        <span className="mt-1 block text-[10px] text-slate-500">
+          Preferisci una definizione specifica e autonoma, non una frase
+          promozionale o generica.
+        </span>
       </label>
 
       <section>
         <FieldLabel>Categorie</FieldLabel>
+        <p className="mb-2 text-[10px] text-slate-500">
+          Seleziona tutte le aree pertinenti e indica quella principale.
+        </p>
         <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
           {CATEGORIES.map((category) => {
             const state = categoryState[category];
@@ -557,8 +574,13 @@ export default function NodeForm({
         <textarea
           className={`${inputClass} min-h-24 resize-y`}
           onChange={(event) => setBestPractices(event.target.value)}
+          placeholder="Scrivi raccomandazioni concrete e applicabili, una per riga. Es.: valida i dati in ingresso prima di usarli."
           value={bestPractices}
         />
+        <p className="mt-1 text-[10px] text-slate-500">
+          Spiega cosa fare e, quando utile, perché: evita consigli vaghi come
+          “usa le best practice”.
+        </p>
       </section>
 
       <section>
@@ -569,8 +591,13 @@ export default function NodeForm({
         <textarea
           className={`${inputClass} min-h-20 resize-y`}
           onChange={(event) => setNamingConventions(event.target.value)}
+          placeholder="Indica la regola e un esempio, una per riga. Es.: variabili in camelCase (userName); componenti React in PascalCase (UserCard)."
           value={namingConventions}
         />
+        <p className="mt-1 text-[10px] text-slate-500">
+          Specifica il contesto della convenzione e includi esempi coerenti con
+          la tecnologia descritta.
+        </p>
       </section>
 
       <section>

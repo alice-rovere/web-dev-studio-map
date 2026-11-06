@@ -16,6 +16,7 @@ Mappa interattiva delle competenze per lo sviluppo web full-stack. I nodi tecnol
 - Pagina "AI nel Web Dev" con best practice per i prompt, gestione dei token, OpenCode/OpenRouter, `AGENTS.md`, OpenSpec, sicurezza e link utili (contenuti statici nel codice).
 - Post-it personali associati alle pagine e ai nodi, salvati su Supabase.
 - Pannello di amministrazione per editor/admin: ricerca gerarchica dei nodi con antenati, scorrimento automatico ai dettagli del nodo selezionato, relazioni, categorie, sezioni di contenuto e glossario.
+- Creazione e modifica dei nodi con slug generato dal nome, categorie obbligatorie e salvataggio atomico di nodo, categorie e relazioni.
 - Autenticazione Supabase con ruoli `viewer`, `editor`, `admin` e Row Level Security.
 
 ## Stack
@@ -53,6 +54,8 @@ Vite legge le variabili con prefisso `VITE_` nel browser. Usa solo la chiave ano
 Applica in ordine numerico tutte le migrazioni in `supabase/migrations/`. Per un database vuoto, esegui poi `supabase/seed.sql` una sola volta. Il seed contiene i dati iniziali e non va rieseguito su un database già popolato.
 
 I ruoli sono gestiti nei profili Supabase: `viewer` può consultare i contenuti, `editor` può gestirli e `admin` può inoltre gestire i profili secondo le policy RLS. L'accesso editor/admin a `/admin` richiede un utente autenticato con il ruolo corrispondente.
+
+La migrazione `0007_atomic_node_save.sql` è necessaria per creare o modificare nodi dal pannello: salva i campi del nodo, le categorie e i padri in un'unica transazione, così un errore non lascia dati parziali. La creazione di un nodo aggiunge una voce alla mappa, non una nuova route o pagina; le sezioni di approfondimento si creano separatamente dalla scheda **Contenuti**. **Quick Add** aggiunge solo link a un nodo o all'inbox.
 
 ## Script
 

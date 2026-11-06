@@ -28,6 +28,20 @@ function toServiceError(error, fallback) {
     );
   }
 
+  if (code === "22023") {
+    return new Error(error?.message ?? fallback);
+  }
+
+  if (code === "P0002") {
+    return new Error("Il nodo da aggiornare non esiste più.");
+  }
+
+  if (code === "PGRST202") {
+    return new Error(
+      "Funzione di salvataggio non disponibile: applica la migrazione 0007 e aggiorna la cache API di Supabase.",
+    );
+  }
+
   if (code === "42501" || code === "PGRST301") {
     return new Error("Permessi insufficienti: serve un ruolo editor o admin.");
   }
@@ -75,18 +89,34 @@ export async function fetchNodeSections(nodeId) {
   return data ?? [];
 }
 
-export async function createNode(payload) {
+export async function saveNodeWithRelations({
+  nodeId,
+  payload,
+  categoryLinks,
+  parentLinks,
+}) {
   const client = requireSupabase();
-  const { data, error } = await client
-    .from("nodes")
-    .insert(payload)
-    .select(NODE_COLUMNS)
-    .single();
+  const { data, error } = await client.rpc("save_node_with_relations", {
+    p_node_id: nodeId,
+    p_slug: payload.slug,
+    p_label: payload.label,
+    p_description: payload.description,
+    p_best_practices: payload.best_practices,
+    p_naming_conventions: payload.naming_conventions,
+    p_study_urls: payload.study_urls,
+    p_position_x: payload.position_x,
+    p_position_y: payload.position_y,
+    p_categories: categoryLinks,
+    p_parents: parentLinks,
+  });
 
   if (error) {
-    throw toServiceError(error, "Impossibile creare il nodo.");
+    throw toServiceError(error, "Impossibile salvare il nodo.");
   }
 
+  if (!data) {
+    throw new Error("Il salvataggio non ha restituito l'identificativo del nodo.");
+  }
   return data;
 }
 
@@ -124,66 +154,6 @@ export async function deleteNode(nodeId) {
 
   if (error) {
     throw toServiceError(error, "Impossibile eliminare il nodo.");
-  }
-}
-
-export async function setNodeParents(nodeId, parentLinks) {
-  const client = requireSupabase();
-
-  const { error: deleteError } = await client
-    .from("node_parents")
-    .delete()
-    .eq("child_id", nodeId);
-
-  if (deleteError) {
-    throw toServiceError(deleteError, "Impossibile aggiornare i padri del nodo.");
-  }
-
-  if (parentLinks.length === 0) return;
-
-  const rows = parentLinks.map((link, index) => ({
-    parent_id: link.parent_id,
-    child_id: nodeId,
-    sort_order: Number.isFinite(Number(link.sort_order))
-      ? Number(link.sort_order)
-      : index,
-    is_primary: Boolean(link.is_primary),
-  }));
-
-  const { error } = await client.from("node_parents").insert(rows);
-
-  if (error) {
-    throw toServiceError(error, "Impossibile aggiornare i padri del nodo.");
-  }
-}
-
-export async function setNodeCategories(nodeId, categoryLinks) {
-  const client = requireSupabase();
-
-  const { error: deleteError } = await client
-    .from("node_categories")
-    .delete()
-    .eq("node_id", nodeId);
-
-  if (deleteError) {
-    throw toServiceError(
-      deleteError,
-      "Impossibile aggiornare le categorie del nodo.",
-    );
-  }
-
-  if (categoryLinks.length === 0) return;
-
-  const rows = categoryLinks.map((link) => ({
-    node_id: nodeId,
-    category: link.category,
-    is_primary: Boolean(link.is_primary),
-  }));
-
-  const { error } = await client.from("node_categories").insert(rows);
-
-  if (error) {
-    throw toServiceError(error, "Impossibile aggiornare le categorie del nodo.");
   }
 }
 

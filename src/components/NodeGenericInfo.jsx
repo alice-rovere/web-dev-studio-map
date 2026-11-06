@@ -241,7 +241,11 @@ export default function NodeGenericInfo({
                 aria-label={config.title}
                 className={`${inputClass} min-h-28 resize-y`}
                 onChange={(event) => setDraft(event.target.value)}
-                placeholder="Un elemento per riga"
+                placeholder={
+                  section === "best_practices"
+                    ? "Una raccomandazione concreta per riga. Spiega cosa fare e, se serve, perché."
+                    : "Una regola di naming per riga, con contesto ed esempio (es. variabili camelCase: userName)."
+                }
                 value={draft}
               />
             )}
