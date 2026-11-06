@@ -471,6 +471,8 @@ const SkillMapContent = () => {
           { label: "Frontend", color: "#7ab8ff" },
           { label: "Backend", color: "#64d9bd" },
           { label: "Database", color: "#c49aff" },
+          { label: "DevOps", color: "#fb923c" },
+          { label: "Tools", color: "#38bdf8" },
         ].map(({ label, color }) => (
           <div key={label} className="flex items-center gap-2">
             <span

@@ -214,10 +214,7 @@ export default function SkillMapSearch({ graph, onSelectNode }) {
 
   useEffect(() => {
     function handleShortcut(event) {
-      if (
-        (event.metaKey || event.ctrlKey) &&
-        event.key.toLowerCase() === "k"
-      ) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
         if (isOpen) close();
         else setIsOpen(true);
@@ -264,7 +261,7 @@ export default function SkillMapSearch({ graph, onSelectNode }) {
       {isOpen && (
         <div
           aria-label="Ricerca nodi e glossario"
-          className="fixed left-3 right-3 top-[calc(env(safe-area-inset-top)_+_4.25rem)] z-50 overflow-hidden rounded-xl border border-slate-700/70 bg-slate-950/95 shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-xl sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%_+_8px)] sm:w-[min(380px,calc(100vw-2rem))]"
+          className="fixed left-3 right-3 top-[calc(env(safe-area-inset-top)+4.25rem)] z-50 overflow-hidden rounded-xl border border-slate-700/70 bg-slate-950/95 shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-xl sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+8px)] sm:w-[min(380px,calc(100vw-2rem))]"
           role="dialog"
         >
           <div className="flex items-center gap-2 border-b border-slate-800/80 px-3 py-2.5">
@@ -330,7 +327,9 @@ export default function SkillMapSearch({ graph, onSelectNode }) {
                               ? "bg-slate-800/80"
                               : "hover:bg-slate-900/70"
                           }`}
-                          onClick={() => handleSelectResult(results[index], index)}
+                          onClick={() =>
+                            handleSelectResult(results[index], index)
+                          }
                           onMouseEnter={() => setActiveIndex(index)}
                           ref={(element) => {
                             itemRefs.current[index] = element;
@@ -347,7 +346,10 @@ export default function SkillMapSearch({ graph, onSelectNode }) {
                           />
                           <span className="min-w-0">
                             <span className="block truncate text-xs font-mono text-slate-200">
-                              <Highlight text={node.label} terms={queryTokens} />
+                              <Highlight
+                                text={node.label}
+                                terms={queryTokens}
+                              />
                             </span>
                             <span className="mt-0.5 block truncate text-[10px] text-slate-500">
                               {CATEGORY_LABELS[node.primaryCategory] ??
@@ -389,7 +391,10 @@ export default function SkillMapSearch({ graph, onSelectNode }) {
                               : "hover:bg-slate-900/70"
                           }`}
                           onClick={() =>
-                            handleSelectResult(results[globalIndex], globalIndex)
+                            handleSelectResult(
+                              results[globalIndex],
+                              globalIndex,
+                            )
                           }
                           onMouseEnter={() => setActiveIndex(globalIndex)}
                           ref={(element) => {

@@ -15,7 +15,10 @@ import {
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useAuth } from "../../hooks/useAuth";
-import { countInboxLinks, INBOX_CHANGED_EVENT } from "../../services/mapService";
+import {
+  countInboxLinks,
+  INBOX_CHANGED_EVENT,
+} from "../../services/mapService";
 
 function InboxBadge({ count }) {
   if (!count) return null;
@@ -30,7 +33,7 @@ const NAV_ITEMS = [
   { to: "/linee-guida", label: "Linee Guida", icon: BookOpen },
   { to: "/sicurezza", label: "Sicurezza", icon: ShieldAlert },
   { to: "/ai-web-dev", label: "AI nel Web Dev", icon: Sparkles },
-  { to: "/percorso-guidato", label: "Percorso Guidato", icon: Route },
+  { to: "/percorso-guidato", label: "Percorsi Guidati", icon: Route },
   { to: "/glossario", label: "Glossario", icon: BookOpen },
 ];
 
