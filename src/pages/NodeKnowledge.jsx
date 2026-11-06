@@ -25,7 +25,7 @@ export default function NodeKnowledgePage({
   const notebookSlug = hasNotebook(nodeData.slug) ? nodeData.slug : null;
 
   return (
-    <section className="relative h-full w-full overflow-y-auto border border-zinc-900 bg-zinc-950 p-4 font-sans text-zinc-100 shadow-2xl before:absolute before:top-0 before:left-0 before:h-px before:w-full before:bg-linear-to-r before:from-transparent before:via-zinc-700 before:to-transparent sm:p-6 md:p-10">
+    <section className="relative h-full w-full overflow-y-auto border border-zinc-800 bg-zinc-900 p-4 font-sans text-zinc-100 shadow-2xl before:absolute before:top-0 before:left-0 before:h-px before:w-full before:bg-linear-to-r before:from-transparent before:via-zinc-700 before:to-transparent sm:p-6 md:p-10">
       {node?.id && (
         <StickyNotesCanvas key={node.id} boardId={`node-${node.id}`} />
       )}
@@ -119,13 +119,38 @@ export default function NodeKnowledgePage({
           )}
         </div>
 
-        <div className="min-w-0 2xl:col-start-1 2xl:row-span-2 2xl:row-start-1">
+        <div className="min-w-0 space-y-3 2xl:col-start-1 2xl:row-span-2 2xl:row-start-1">
           <NodeGenericInfo
             canEdit={canEdit}
             nodeData={nodeData}
             nodeId={node?.id}
             onNodeUpdated={onNodeUpdated}
           />
+          {childNodes.length > 0 && (
+            <aside className="min-w-0 rounded-lg border border-zinc-800 bg-zinc-950/90 p-4 shadow-xl">
+              <h3 className="mb-3 flex items-center gap-2 border-b border-zinc-800 pb-2 font-mono text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                <GitFork size={13} style={{ color: accent }} />
+                Nodi figli
+              </h3>
+              <ul className="flex flex-wrap gap-2">
+                {childNodes.map((child) => (
+                  <li className="min-w-0" key={child.id}>
+                    <button
+                      className="cursor-pointer rounded border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-left text-xs font-mono text-zinc-300 wrap-break-word transition-all hover:text-white"
+                      onClick={() => onSelectChild?.(child.id)}
+                      style={{
+                        borderColor: `${accent}55`,
+                        boxShadow: `0 0 5px ${accent}20`,
+                      }}
+                      type="button"
+                    >
+                      <GlossaryText>{child.label}</GlossaryText>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )}
         </div>
 
         <div
@@ -134,32 +159,6 @@ export default function NodeKnowledgePage({
         >
           <ContentSectionEditor canEdit={canEdit} nodeId={node?.id} />
         </div>
-
-        {childNodes.length > 0 && (
-          <aside className="min-w-0 rounded-lg border border-zinc-800 bg-zinc-950/90 p-4 shadow-xl 2xl:col-start-3 2xl:row-span-2 2xl:row-start-1">
-            <h3 className="mb-3 flex items-center gap-2 border-b border-zinc-800 pb-2 font-mono text-xs font-semibold uppercase tracking-wider text-zinc-400">
-              <GitFork size={13} style={{ color: accent }} />
-              Nodi figli
-            </h3>
-            <ul className="flex flex-wrap gap-2">
-              {childNodes.map((child) => (
-                <li className="min-w-0" key={child.id}>
-                  <button
-                    className="cursor-pointer rounded border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-left text-xs font-mono text-zinc-300 wrap-break-word transition-all hover:text-white"
-                    onClick={() => onSelectChild?.(child.id)}
-                    style={{
-                      borderColor: `${accent}55`,
-                      boxShadow: `0 0 5px ${accent}20`,
-                    }}
-                    type="button"
-                  >
-                    <GlossaryText>{child.label}</GlossaryText>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </aside>
-        )}
       </div>
     </section>
   );

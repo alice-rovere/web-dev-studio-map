@@ -568,6 +568,7 @@ const SkillMapContent = () => {
         isOpen={isModalOpen && Boolean(selectedNode)}
         node={selectedNode}
         onClose={handleCloseModal}
+        onOpenKnowledge={handleOpenKnowledge}
         onSelectRelated={handleSearchSelectNode}
       />
     </div>

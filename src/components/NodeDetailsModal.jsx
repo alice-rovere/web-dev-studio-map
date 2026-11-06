@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
   ArrowDown,
   ArrowUp,
+  BookOpen,
   ChevronRight,
   ExternalLink,
   GitFork,
@@ -10,14 +11,6 @@ import {
 } from "lucide-react";
 import GlossaryText from "./GlossaryText.jsx";
 import { CATEGORY_COLORS, CATEGORY_LABELS } from "../data/baseNodes";
-
-const emptyDetails = {
-  description:
-    "Esplora questa tecnologia e il suo ruolo nell'ecosistema dello studio.",
-  best_practices: [],
-  naming_conventions: [],
-  study_urls: [],
-};
 
 function RelationTree({ nodes, getRelated, direction, onSelect, accentColor, path }) {
   return (
@@ -141,13 +134,14 @@ export default function NodeDetailsModal({
   node,
   getRelated,
   onSelectRelated,
+  onOpenKnowledge,
 }) {
   if (!node) return null;
 
   const parents = getRelated(node.id, "parents");
   const childNodes = getRelated(node.id, "children");
 
-  const nodeInfo = node.data ?? emptyDetails;
+  const nodeInfo = node.data ?? {};
   const categories = nodeInfo.categories ?? [];
   const primaryCategory = nodeInfo.primaryCategory ?? "frontend";
   const accentColor = CATEGORY_COLORS[primaryCategory] ?? "#94a3b8";
@@ -164,6 +158,7 @@ export default function NodeDetailsModal({
     >
       <Dialog.Portal>
         <Dialog.Content
+          aria-describedby={undefined}
           className="fixed inset-y-0 right-0 z-50 flex h-dvh w-full flex-col border-l border-slate-900 bg-slate-950/85 shadow-[-10px_0_30px_rgba(0,0,0,0.8)] backdrop-blur-xl focus:outline-hidden sm:max-w-md"
           // La mappa resta interattiva: si chiude solo da X, Esc o click sul fondo mappa
           onInteractOutside={(event) => event.preventDefault()}
@@ -226,11 +221,14 @@ export default function NodeDetailsModal({
               </Dialog.Title>
             </div>
 
-            <p className="text-slate-400 leading-relaxed font-mono text-xs p-3 bg-slate-900/30 rounded border border-slate-900">
-              <GlossaryText>
-                {nodeInfo.description || emptyDetails.description}
-              </GlossaryText>
-            </p>
+            <button
+              className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-lg border border-cyan-500/40 bg-cyan-950/30 px-4 py-2 text-xs font-mono font-semibold uppercase tracking-wider text-cyan-300 transition-colors hover:border-cyan-400 hover:bg-cyan-950/60 hover:text-white"
+              onClick={() => onOpenKnowledge(node.id)}
+              type="button"
+            >
+              <BookOpen size={15} />
+              Apri nodo
+            </button>
 
             <section className="border-t border-slate-900 pt-4">
               <h3 className="flex items-center gap-2 font-mono text-xs text-white uppercase tracking-wider mb-4">
