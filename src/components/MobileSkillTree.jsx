@@ -1,5 +1,6 @@
 import { BookOpen, Info, Minus, Plus } from "lucide-react";
 import { CATEGORY_COLORS, CATEGORY_LABELS } from "../data/baseNodes";
+import NodeIcon from "./NodeIcon.jsx";
 
 function TreeNode({
   graph,
@@ -22,6 +23,7 @@ function TreeNode({
   return (
     <li className="min-w-0">
       <div className="flex min-h-12 items-center gap-2 rounded-lg border border-slate-800/80 bg-slate-900/55 px-2">
+        <NodeIcon color={accent} size={20} slug={node.slug} />
         <button
           className="min-h-11 min-w-0 flex-1 truncate py-2 text-left text-sm font-medium text-slate-200"
           onClick={() => onOpenDetails(nodeId)}

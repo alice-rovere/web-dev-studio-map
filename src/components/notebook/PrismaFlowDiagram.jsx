@@ -2,8 +2,18 @@ const NODES = [
   { id: "browser", label: ["Browser"], completedAt: 0, icon: "browser" },
   { id: "express", label: ["Express", "API"], completedAt: 0, icon: "server" },
   { id: "prisma", label: ["Prisma", "Client"], completedAt: 1, icon: "prisma" },
-  { id: "query", label: ["Query engine", "SQL"], completedAt: 2, icon: "terminal" },
-  { id: "database", label: ["Postgres", "User"], completedAt: 3, icon: "database" },
+  {
+    id: "query",
+    label: ["Query engine", "SQL"],
+    completedAt: 2,
+    icon: "terminal",
+  },
+  {
+    id: "database",
+    label: ["MySQL", "User"],
+    completedAt: 3,
+    icon: "database",
+  },
 ];
 
 const CONNECTIONS = [
@@ -68,8 +78,12 @@ function NodeIcon({ icon, x, stroke }) {
   if (icon === "prisma") {
     return (
       <g fill="none" stroke={stroke} strokeWidth="3" strokeLinejoin="round">
-        <path d={`M ${x - 23} 200 L ${x - 4} 164 L ${x + 24} 207 L ${x - 11} 215 Z`} />
-        <path d={`M ${x - 4} 164 L ${x - 11} 215 M ${x - 23} 200 L ${x + 24} 207`} />
+        <path
+          d={`M ${x - 23} 200 L ${x - 4} 164 L ${x + 24} 207 L ${x - 11} 215 Z`}
+        />
+        <path
+          d={`M ${x - 4} 164 L ${x - 11} 215 M ${x - 23} 200 L ${x + 24} 207`}
+        />
       </g>
     );
   }
@@ -78,14 +92,18 @@ function NodeIcon({ icon, x, stroke }) {
     return (
       <g fill="none" stroke={stroke} strokeWidth="3" strokeLinejoin="round">
         <rect x={x - 26} y="166" width="52" height="45" rx="5" />
-        <path d={`M ${x - 16} 179 L ${x - 8} 186 L ${x - 16} 193 M ${x - 3} 194 H ${x + 13}`} />
+        <path
+          d={`M ${x - 16} 179 L ${x - 8} 186 L ${x - 16} 193 M ${x - 3} 194 H ${x + 13}`}
+        />
       </g>
     );
   }
 
   return (
     <g fill="none" stroke={stroke} strokeWidth="3" strokeLinejoin="round">
-      <path d={`M ${x - 25} 174 C ${x - 25} 164 ${x + 25} 164 ${x + 25} 174 V 204 C ${x + 25} 214 ${x - 25} 214 ${x - 25} 204 Z`} />
+      <path
+        d={`M ${x - 25} 174 C ${x - 25} 164 ${x + 25} 164 ${x + 25} 174 V 204 C ${x + 25} 214 ${x - 25} 214 ${x - 25} 204 Z`}
+      />
       <ellipse cx={x} cy="174" rx="25" ry="9" />
       <path d={`M ${x - 25} 188 C ${x - 25} 198 ${x + 25} 198 ${x + 25} 188`} />
     </g>
@@ -93,7 +111,9 @@ function NodeIcon({ icon, x, stroke }) {
 }
 
 export default function PrismaFlowDiagram({ stepId, isPlaying }) {
-  const stepIndex = CONNECTIONS.findIndex((connection) => connection.id === stepId);
+  const stepIndex = CONNECTIONS.findIndex(
+    (connection) => connection.id === stepId,
+  );
   const activeNodes = new Set(ACTIVE_NODES_BY_STEP[stepId] ?? []);
   const isKnownStep = stepIndex >= 0;
 
@@ -101,7 +121,7 @@ export default function PrismaFlowDiagram({ stepId, isPlaying }) {
     <div className="overflow-x-auto rounded-xl border border-cyan-500/20 bg-[#080b14]/80 p-2 sm:p-3">
       <svg
         aria-label="Flusso illustrato da browser ed Express a Prisma, SQL e Postgres"
-        className="block h-auto max-h-[230px] w-full"
+        className="block h-auto max-h-57.5 w-full"
         role="img"
         viewBox="0 0 1000 360"
       >
@@ -113,7 +133,12 @@ export default function PrismaFlowDiagram({ stepId, isPlaying }) {
             patternUnits="userSpaceOnUse"
             width="28"
           >
-            <path d="M 28 0 H 0 V 28" fill="none" stroke="#1e293b" strokeOpacity=".35" />
+            <path
+              d="M 28 0 H 0 V 28"
+              fill="none"
+              stroke="#1e293b"
+              strokeOpacity=".35"
+            />
           </pattern>
           <marker
             id="prisma-flow-arrow-active"
@@ -162,7 +187,11 @@ export default function PrismaFlowDiagram({ stepId, isPlaying }) {
         {CONNECTIONS.map((connection, index) => {
           const isActive = connection.id === stepId;
           const isComplete = isKnownStep && index < stepIndex;
-          const stroke = isActive ? "#67e8f9" : isComplete ? "#22d3ee" : "#475569";
+          const stroke = isActive
+            ? "#67e8f9"
+            : isComplete
+              ? "#22d3ee"
+              : "#475569";
           const arrow = isActive
             ? "url(#prisma-flow-arrow-active)"
             : isComplete

@@ -85,6 +85,8 @@ Dalla pagina di approfondimento di un nodo con un notebook associato compare il 
 1. Crea `src/notebooks/configs/<nome>Config.js` con config JSON pura: `{ slug, title, subtitle, phases, steps }` (esempio: `prismaFlowConfig.js`). Ogni step ha `phase`, `title`, `description` e `panels` di tipo `code`, `table` o `text`; il campo facoltativo `illustration` seleziona una scena SVG registrata nel layout.
 2. Registra lo slug in `src/notebooks/registry.js`. Lo slug deve coincidere con lo `slug` del nodo.
 
+Le icone dei nodi vivono in `src/notebooks/icons/` (un file `.jsx` per nodo, registrato per slug in `index.js`) e sono usate sia dalla mappa (desktop e mobile) sia dai visualizer. I nodi senza icona registrata non ne mostrano alcuna.
+
 Il nodo `prisma-orm` richiede la migrazione `0006_prisma_orm_node.sql`.
 
 ### App installabile e Quick Add (Android)

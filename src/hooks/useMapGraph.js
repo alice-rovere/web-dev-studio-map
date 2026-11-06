@@ -153,6 +153,7 @@ export function useMapGraph() {
         draggable: !graph.parentsByChild.has(nodeId), // solo root nodes
         data: {
           label: node.label,
+          slug: node.slug,
           categories: node.categories,
           primaryCategory: node.primaryCategory,
           description: node.description,

@@ -1,0 +1,31 @@
+Certo. In questo progetto “creare un nuovo Visual Notebook” può voler dire due cose diverse: aggiungere una nuova simulazione al layout condiviso oppure costruire anche un layout React personalizzato. Il flusso è questo.
+
+1. Riutilizzare il layout esistente
+È la strada più semplice: scrivi i contenuti e gli step, mentre il layout si occupa già di navigazione, avanzamento, Play/Pausa/Reset e chiusura.
+
+Definisci il percorso: dividilo in fasi — per esempio “Client”, “API”, “Database” — e in step. Ogni step dovrebbe spiegare un cambiamento o passaggio significativo.
+
+Crea una configurazione in src/notebooks/configs/, prendendo come esempio prismaFlowConfig.js. La configurazione è dato JavaScript, non JSX: descrive i contenuti, non disegna l’interfaccia.
+
+
+phase deve corrispondere all’id di una fase. I pannelli supportati dal layout condiviso sono code, table e text. Nel layout attuale, le fasi restano visibili e mostrano il contenuto dell’ultimo step raggiunto che le riguarda.
+
+Registra la configurazione in src/notebooks/registry.js, aggiungendo un loader dinamico per il nuovo slug, sul modello di prisma-orm.
+
+Collega lo slug al nodo da cui vuoi aprire gli Appunti Visivi: deve coincidere con lo slug del notebook.
+
+Provalo: navigazione tra step, Play/Pausa/Reset, frecce, chiusura, visualizzazione su mobile; poi esegui pnpm lint e pnpm build.
+
+Il componente che rende questi dati e gestisce i controlli è VisualNotebookLayout.jsx. La pagina VisualNotebook.jsx carica la configurazione e la passa al layout.
+
+2. Aggiungere scene SVG al layout condiviso
+Se vuoi disegnare tu le scene senza ricreare tutta l’esperienza, crea componenti React .jsx per le illustrazioni e registrali nel layout. Ogni step seleziona la scena con un identificatore, per esempio illustration: "mio-flusso". Il layout passa al componente lo step corrente e lo stato di riproduzione, così la scena può evidenziare il passaggio giusto o animarsi durante Play.
+
+Nel prototipo Prisma, il componente è PrismaFlowDiagram.jsx: riceve stepId e isPlaying; la mappa in VisualNotebookLayout.jsx associa l’identificatore della configurazione al componente React.
+
+3. Creare un layout React completamente personalizzato
+Se la simulazione ha un’interazione o una composizione molto diversa — per esempio una scena a schermo intero con controlli e pannelli propri — crea un nuovo componente in src/components/notebook/. Puoi scomporlo in componenti figli per le parti indipendenti: scena, timeline, pannello dei dettagli, controlli.
+
+Poi serve un punto di selezione: oggi VisualNotebook.jsx usa sempre VisualNotebookLayout. Per supportare layout diversi, può scegliere quale componente renderizzare in base a un identificatore dichiarato nella configurazione o nel registro. Mantieni comunque la configurazione dei contenuti separata dal JSX; anche il layout personalizzato può ricevere config e onClose tramite props.
+
+In breve: config nuova se vuoi cambiare soprattutto contenuti e step; scene SVG nel layout condiviso se vuoi illustrazioni interattive ma conservare i controlli esistenti; layout React nuovo se vuoi ripensare anche struttura e comportamento.

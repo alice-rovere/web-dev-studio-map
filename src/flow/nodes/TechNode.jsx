@@ -1,10 +1,12 @@
 import { Handle, Position } from "@xyflow/react";
 import { BookOpen, GitFork, Info, Minus, Plus } from "lucide-react";
 import { CATEGORY_COLORS, CATEGORY_LABELS } from "../../data/baseNodes";
+import NodeIcon from "../../components/NodeIcon.jsx";
 
 const TechNode = ({ data }) => {
   const {
     label,
+    slug,
     isSubNode,
     isRoot,
     isDragEnabled = false,
@@ -53,7 +55,8 @@ const TechNode = ({ data }) => {
       />
 
       <div className="flex items-center justify-between w-full gap-3">
-        <div className="flex min-w-0 flex-col gap-0.5">
+        <NodeIcon color={accent} size={isSubNode ? 18 : 28} slug={slug} />
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="truncate">{label}</span>
           {(secondaryCategories.length > 0 || parentCount > 1) && (
             <span className="flex items-center gap-1.5">
