@@ -1,38 +1,39 @@
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import VisualNotebookLayout from "../components/notebook/VisualNotebookLayout.jsx";
-import { loadNotebookConfig } from "../notebooks/registry.js";
+import { fetchNotebook } from "../services/notebookService";
 
 export default function VisualNotebook() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const [state, setState] = useState({ slug: null, config: null, error: null });
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
-    loadNotebookConfig(slug)
-      .then((config) => {
+    fetchNotebook(slug)
+      .then((notebook) => {
         if (cancelled) return;
         setState({
           slug,
-          config,
-          error: config ? null : "Appunti visivi non trovati.",
+          config: notebook?.config ?? null,
+          error: notebook ? null : "Appunti visivi non trovati.",
         });
       })
-      .catch(() => {
+      .catch((error) => {
         if (!cancelled) {
           setState({
             slug,
             config: null,
-            error: "Impossibile caricare gli appunti visivi.",
+            error: error.message,
           });
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+  }, [slug, attempt]);
 
   const handleClose = useCallback(() => {
     const knowledgeNodeId = location.state?.knowledgeNodeId;
@@ -57,6 +58,9 @@ export default function VisualNotebook() {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-sm text-slate-300">
         <p role="alert">{state.error}</p>
+        <button className="cursor-pointer rounded border border-slate-700 px-3 py-1.5 hover:bg-slate-800" onClick={() => setAttempt((value) => value + 1)} type="button">
+          Riprova
+        </button>
         <button
           className="cursor-pointer rounded border border-slate-700 px-3 py-1.5 hover:bg-slate-800"
           onClick={handleClose}

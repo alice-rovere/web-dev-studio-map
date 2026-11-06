@@ -56,13 +56,15 @@ Vite legge le variabili con prefisso `VITE_` nel browser. Usa solo la chiave ano
 
 Applica in ordine numerico tutte le migrazioni in `supabase/migrations/`. Per un database vuoto, esegui poi `supabase/seed.sql` una sola volta. Il seed contiene i dati iniziali e non va rieseguito su un database già popolato.
 
-I ruoli sono gestiti nei profili Supabase: `viewer` può consultare i contenuti, `editor` può gestirli e `admin` può inoltre gestire i profili secondo le policy RLS. L'accesso editor/admin a `/admin` richiede un utente autenticato con il ruolo corrispondente.
+I ruoli sono gestiti nei profili Supabase: `viewer` può consultare i contenuti, `editor` può gestirli e `admin` può inoltre gestire i profili e i percorsi guidati secondo le policy RLS. L'accesso editor/admin a `/admin` richiede un utente autenticato con il ruolo corrispondente; la gestione dei percorsi è riservata agli admin.
 
 La migrazione `0007_atomic_node_save.sql` è necessaria per creare o modificare nodi dal pannello: salva i campi del nodo, le categorie e i padri in un'unica transazione, così un errore non lascia dati parziali. La creazione di un nodo aggiunge una voce alla mappa, non una nuova route o pagina; le sezioni di approfondimento si creano separatamente dalla scheda **Contenuti**. **Quick Add** aggiunge solo link a un nodo o all'inbox.
 
 La migrazione `0008_internet_browser_notebook.sql` inserisce la teoria del nodo `internet-browser` se il nodo è già presente. Sostituisce solo le quattro sezioni originali riconosciute per titolo, salvandone una copia completa nella tabella protetta `internet_browser_section_backup`; le altre sezioni sono conservate. Se trova solo alcune sezioni originali o una teoria parziale, interrompe l'operazione: controlla i dati prima di riprovare. La copia è consultabile solo con privilegi amministrativi. Per un eventuale ripristino, confronta le righe salvate con i contenuti correnti e ripristina le sezioni desiderate da un backup del database con un amministratore, evitando di sovrascrivere modifiche successive.
 
 Su un'installazione nuova le migrazioni possono precedere la creazione di `internet-browser`: dopo aver applicato le migrazioni e il seed, lo script `supabase/roadmaps/01_frontend.sql` crea il nodo e richiama l'installazione della teoria. Lo script roadmap elimina e ricrea sezioni anche di altri nodi: non rieseguirlo su un database già popolato. Se il nodo viene creato successivamente con un'altra procedura, esegui `select public.install_internet_browser_theory();` come amministratore. La funzione non è esposta ai client.
+
+Le migrazioni `0009_guided_notebooks.sql` e `0010_seed_guided_notebooks.sql` sono necessarie per consultare e gestire i percorsi guidati e vanno applicate prima di distribuire la versione corrispondente dell'app. Il catalogo è pubblico, mentre inserimento, modifica ed eliminazione sono riservati agli admin anche tramite RLS. I tre percorsi originali sono copiati senza modificare gli URL; se i nodi corrispondenti non esistono ancora, vengono collegati alla loro successiva creazione, salvo scelta diversa dell'admin. Eliminare un nodo non elimina il percorso. `scripts/generate-notebook-migration.js` documenta come sono stati generati i dati originali: non rigenerare una migrazione già applicata per apportare modifiche successive.
 
 I blocchi rimangono nel JSON della rispettiva sezione; il salvataggio verifica `updated_at` per evitare di sovrascrivere cambiamenti avvenuti in un'altra scheda. In caso di conflitto la bozza rimane nell'editor: si possono aggiornare i dati senza perderla e, se il blocco interessato non è cambiato, riprovare il salvataggio. Se invece è cambiato, confrontare e copiare la bozza prima di annullare. Le immagini già salvate non vengono eliminate automaticamente dallo storage quando si rimuove o sostituisce un blocco, perché potrebbero essere ancora utilizzate altrove.
 
@@ -78,7 +80,7 @@ I blocchi rimangono nel JSON della rispettiva sezione; il salvataggio verifica `
 Per eseguire le verifiche mirate sui blocchi, sul testo formattato e sui conflitti:
 
 ```bash
-node --test src/components/content/sectionBlocks.test.js src/components/content/ContentSectionView.test.js src/components/content/blocks/RichTextBlock.test.js src/services/mapService.test.js src/notebooks/internetBrowserConfig.test.js
+node --test src/components/content/sectionBlocks.test.js src/components/content/ContentSectionView.test.js src/components/content/blocks/RichTextBlock.test.js src/services/mapService.test.js src/notebooks/internetBrowserConfig.test.js src/notebooks/httpProtocolConfig.test.js src/notebooks/validateNotebook.test.js
 ```
 
 ## Rotte
@@ -95,17 +97,20 @@ node --test src/components/content/sectionBlocks.test.js src/components/content/
 | `/admin`            | Pannello editor        | Editor/admin autenticati |
 | `/quick-add`        | Aggiunta rapida link   | Editor/admin autenticati |
 | `/notebook/:slug`   | Appunti Visivi         | Pubblico                 |
+| `/admin/percorsi/nuovo` | Nuovo percorso     | Solo admin               |
+| `/admin/percorsi/:slug/modifica` | Modifica percorso | Solo admin         |
 
 ### Appunti Visivi (simulazioni a step)
 
-Dalla pagina di approfondimento di un nodo con un notebook associato compare il pulsante **Apri Appunti Visivi**, che apre `/notebook/:slug` a schermo intero (frecce ←/→ per gli step, Esc per chiudere). Per aggiungerne uno:
+Dalla pagina di approfondimento di un nodo con un notebook associato compare il pulsante **Apri Appunti Visivi**, che apre `/notebook/:slug` a schermo intero (frecce ←/→ per gli step, Esc per chiudere).
 
 Nel nodo **Internet & Browser** il pulsante è disponibile sia in cima alla pagina sia dopo le sezioni teoriche; il diagramma distingue il percorso di rete dalla pipeline di rendering.
 
 La voce **Percorso Guidato** mostra l'indice degli appunti visivi, con titolo, descrizione e posizione di ciascun percorso nella mappa. Selezionando una scheda si apre il relativo diagramma a schermo intero.
 
-1. Crea `src/notebooks/configs/<nome>Config.js` con config JSON pura: `{ slug, title, subtitle, phases, steps }` (esempio: `prismaFlowConfig.js`). Ogni step ha `phase`, `title`, `description` e `panels` di tipo `code`, `table` o `text`; il campo facoltativo `illustration` seleziona una scena SVG registrata nel layout.
-2. Registra lo slug in `src/notebooks/registry.js`. Lo slug deve coincidere con lo `slug` del nodo.
+Gli admin possono creare percorsi dalla pagina **Percorsi guidati** o dalla scheda omonima nel pannello admin; la scheda permette anche di modificarli ed eliminarli. Il form gestisce titolo, descrizione, nodo facoltativo, fasi, icone, passaggi e pannelli di testo, codice e tabella, con anteprima prima del salvataggio. Lo slug è scelto alla creazione e rimane stabile; ogni nodo può avere al massimo un percorso associato. Il salvataggio rende immediatamente pubblico il percorso e verifica che non sia stato modificato contemporaneamente altrove.
+
+Per i nuovi passaggi si può scegliere uno schema generico delle fasi con icone predefinite o nessuna illustrazione. Le scene animate originali dei tre percorsi migrati restano disponibili sui rispettivi passaggi: sono componenti React legati ai loro identificativi, non disegni personalizzabili dal form. Nuove scene animate su misura richiedono ancora codice. Le configurazioni in `src/notebooks/configs/` e il registry conservano i dati sorgente della migrazione e i riferimenti alle scene originali, non sono il catalogo usato dall'app.
 
 Le icone dei nodi vivono in `src/notebooks/icons/` (un file `.jsx` per nodo, registrato per slug in `index.js`) e sono usate sia dalla mappa (desktop e mobile) sia dai visualizer. I nodi senza icona registrata non ne mostrano alcuna.
 
@@ -173,7 +178,7 @@ pnpm build
 ## Note
 
 - Il file `.env` è escluso dal repository: non committare chiavi o segreti.
-- Attualmente non è presente una suite di test automatici.
+- Non è presente uno script `pnpm test`; i test mirati si eseguono con `node --test` come indicato sopra.
 - Prima di modificare schema o policy Supabase, crea una nuova migrazione e verifica che sia compatibile con i dati già presenti.
 
 ## Sistema Sticky Notes (Memo Fluttuanti)

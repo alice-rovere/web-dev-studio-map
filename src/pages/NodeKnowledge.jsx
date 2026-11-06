@@ -1,7 +1,7 @@
 import { ArrowLeft, GitFork, Lock, Presentation, X } from "lucide-react";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { hasNotebook } from "../notebooks/registry";
+import { fetchNotebookForNode } from "../services/notebookService";
 import ContentSectionEditor from "../components/content/ContentSectionEditor";
 import NodeGenericInfo from "../components/skill-map/NodeGenericInfo";
 import GlossaryText from "../components/glossary/GlossaryText";
@@ -43,7 +43,21 @@ export default function NodeKnowledgePage({
   const draftGuard = useRef(null);
   const onDraftChange = useCallback((guard) => { draftGuard.current = guard; }, []);
   const confirmNavigation = async () => !draftGuard.current || await draftGuard.current();
-  const notebookSlug = hasNotebook(nodeData.slug) ? nodeData.slug : null;
+  const [notebook, setNotebook] = useState({ nodeId: null, slug: null, error: null });
+  const [notebookAttempt, setNotebookAttempt] = useState(0);
+  useEffect(() => {
+    if (!node?.id) return undefined;
+    let active = true;
+    fetchNotebookForNode(node.id)
+      .then((result) => {
+        if (active) setNotebook({ nodeId: node.id, slug: result?.slug ?? null, error: null });
+      })
+      .catch((error) => {
+        if (active) setNotebook({ nodeId: node.id, slug: null, error: error.message });
+      });
+    return () => { active = false; };
+  }, [node?.id, notebookAttempt]);
+  const notebookSlug = notebook.nodeId === node?.id ? notebook.slug : null;
 
   const openNotebook = async () => {
     if (await confirmNavigation()) {
@@ -150,6 +164,12 @@ export default function NodeKnowledgePage({
             <div className="mb-6">
               <NotebookButton onClick={openNotebook} />
             </div>
+          )}
+          {notebook.nodeId === node?.id && notebook.error && (
+            <p className="mb-6 text-xs text-rose-300" role="alert">
+              {notebook.error}{" "}
+              <button className="underline" onClick={() => setNotebookAttempt((value) => value + 1)} type="button">Riprova</button>
+            </p>
           )}
 
           {!canEdit && (

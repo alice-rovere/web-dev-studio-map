@@ -1,8 +1,9 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import { MotionConfig } from "framer-motion";
 import Navbar from "./components/navigation/Navbar";
 import RequireEditor from "./components/auth/RequireEditor";
+import RequireAdmin from "./components/auth/RequireAdmin";
 import { AuthProvider } from "./context/AuthContext";
 import { GlossaryProvider } from "./context/GlossaryProvider";
 
@@ -16,6 +17,7 @@ const Admin = lazy(() => import("./pages/Admin"));
 const Glossary = lazy(() => import("./pages/Glossary"));
 const QuickAdd = lazy(() => import("./pages/QuickAdd"));
 const VisualNotebook = lazy(() => import("./pages/VisualNotebook"));
+const NotebookEditor = lazy(() => import("./pages/NotebookEditor"));
 
 function PageLoader() {
   return (
@@ -25,48 +27,45 @@ function PageLoader() {
   );
 }
 
-export default function App() {
+function AppLayout() {
   return (
-    <BrowserRouter>
-      <MotionConfig reducedMotion="user">
-        <AuthProvider>
-          <GlossaryProvider>
             <div className="flex h-dvh w-full flex-col overflow-hidden bg-[#0b1120] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-[env(safe-area-inset-top)] text-[#e8edf5]">
               <Navbar />
               <div className="relative min-h-0 w-full grow overflow-hidden">
                 <Suspense fallback={<PageLoader />}>
-                <Routes>
-                  <Route path="/" element={<SkillMap />} />
-                  <Route path="/linee-guida" element={<Guidelines />} />
-                  <Route path="/sicurezza" element={<Security />} />
-                  <Route path="/ai-web-dev" element={<AiWebDev />} />
-                  <Route path="/percorso-guidato" element={<GuidedPath />} />
-                  <Route path="/glossario" element={<Glossary />} />
-                  <Route path="/notebook/:slug" element={<VisualNotebook />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route
-                    path="/quick-add"
-                    element={
-                      <RequireEditor>
-                        <QuickAdd />
-                      </RequireEditor>
-                    }
-                  />
-                  <Route
-                    path="/admin"
-                    element={
-                      <RequireEditor>
-                        <Admin />
-                      </RequireEditor>
-                    }
-                  />
-                </Routes>
+                  <Outlet />
                 </Suspense>
               </div>
             </div>
+  );
+}
+
+const router = createBrowserRouter([{
+  element: <AppLayout />,
+  children: [
+    { path: "/", element: <SkillMap /> },
+    { path: "/linee-guida", element: <Guidelines /> },
+    { path: "/sicurezza", element: <Security /> },
+    { path: "/ai-web-dev", element: <AiWebDev /> },
+    { path: "/percorso-guidato", element: <GuidedPath /> },
+    { path: "/glossario", element: <Glossary /> },
+    { path: "/notebook/:slug", element: <VisualNotebook /> },
+    { path: "/admin/percorsi/nuovo", element: <RequireAdmin><NotebookEditor /></RequireAdmin> },
+    { path: "/admin/percorsi/:slug/modifica", element: <RequireAdmin><NotebookEditor /></RequireAdmin> },
+    { path: "/login", element: <Login /> },
+    { path: "/quick-add", element: <RequireEditor><QuickAdd /></RequireEditor> },
+    { path: "/admin", element: <RequireEditor><Admin /></RequireEditor> },
+  ],
+}]);
+
+export default function App() {
+  return (
+      <MotionConfig reducedMotion="user">
+        <AuthProvider>
+          <GlossaryProvider>
+            <RouterProvider router={router} />
           </GlossaryProvider>
         </AuthProvider>
       </MotionConfig>
-    </BrowserRouter>
   );
 }

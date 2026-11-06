@@ -7,11 +7,13 @@ import {
   Loader2,
   Pencil,
   Plus,
+  Presentation,
   RefreshCw,
 } from "lucide-react";
 import NodeTree from "../components/admin/NodeTree";
 import NodeForm from "../components/admin/NodeForm";
 import GlossaryManager from "../components/admin/GlossaryManager";
+import NotebookManager from "../components/admin/NotebookManager";
 import ContentSectionEditor from "../components/content/ContentSectionEditor";
 import { useMapGraph } from "../hooks/useMapGraph";
 import { useAuth } from "../hooks/useAuth";
@@ -27,7 +29,7 @@ const TABS = [
 ];
 
 export default function Admin() {
-  const { profile } = useAuth();
+  const { profile, isAdmin } = useAuth();
   const { data, loading, error, reload } = useMapGraph();
 
   const [tab, setTab] = useState("nodes");
@@ -141,7 +143,7 @@ export default function Admin() {
         </header>
 
         <nav className="mb-6 flex flex-wrap gap-2 border-b border-slate-800 pb-3">
-          {TABS.map((entry) => {
+          {[...TABS, ...(isAdmin ? [{ id: "notebooks", label: "Percorsi guidati", icon: Presentation }] : [])].map((entry) => {
             const Icon = entry.icon;
             return (
               <button
@@ -385,6 +387,7 @@ export default function Admin() {
         )}
 
         {tab === "glossary" && <GlossaryManager />}
+        {tab === "notebooks" && isAdmin && <NotebookManager />}
       </div>
     </div>
   );

@@ -3,25 +3,16 @@ import {
   ChevronLeft,
   ChevronRight,
   Code2,
-  Database,
   Pause,
   Play,
   RotateCcw,
-  Server,
-  Terminal,
   X,
 } from "lucide-react";
 import { useReducedMotion } from "framer-motion";
 import PrismaFlowDiagram from "./PrismaFlowDiagram.jsx";
 import InternetBrowserDiagram from "./InternetBrowserDiagram.jsx";
 import WebRequestCycleDiagram from "./WebRequestCycleDiagram.jsx";
-
-const PHASE_ICONS = {
-  server: Server,
-  code: Code2,
-  terminal: Terminal,
-  database: Database,
-};
+import { PHASE_ICONS } from "../../notebooks/phaseIcons.js";
 
 const ILLUSTRATIONS = {
   "prisma-flow": PrismaFlowDiagram,
@@ -288,6 +279,24 @@ export default function VisualNotebookLayout({ config, onClose }) {
                 isPlaying={isPlaying && !shouldReduceMotion}
                 stepId={currentStep.id}
               />
+            </div>
+          )}
+
+          {!Illustration && currentStep.illustration === "generic" && (
+            <div aria-label="Schema delle fasi" className="flex shrink-0 items-center gap-2 overflow-x-auto px-4 pt-3">
+              {phases.map((phase, index) => {
+                const Icon = PHASE_ICONS[phase.icon] ?? Code2;
+                const active = phase.id === currentStep.phase;
+                return (
+                  <div className="flex shrink-0 items-center gap-2" key={phase.id}>
+                    {index > 0 && <span aria-hidden="true" className="text-cyan-700">→</span>}
+                    <div className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs ${active ? "border-cyan-400 text-cyan-200" : "border-slate-700 text-slate-400"}`}>
+                      <Icon aria-hidden="true" size={18} />
+                      {phase.label}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
 
