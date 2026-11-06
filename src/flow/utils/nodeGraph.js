@@ -219,7 +219,13 @@ export function getNodePosition(node, parent, index = 0, total = 1, depth = 0) {
   }
 
   if (parent) {
-    const radius = 150 + Math.max(0, depth - 1) * 40;
+    const minSiblingSpacing = 220;
+    const siblingRadius =
+      total > 4
+        ? minSiblingSpacing / (2 * Math.sin(Math.PI / total))
+        : 150;
+    const radius =
+      Math.max(150, siblingRadius) + Math.max(0, depth - 1) * 40;
     const positions = calculateCircularPositions(
       parent.x,
       parent.y,

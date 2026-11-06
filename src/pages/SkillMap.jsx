@@ -64,7 +64,7 @@ const SkillMapContent = () => {
     });
   }, []);
 
-  const { getNode, setCenter } = useReactFlow();
+  const { fitView, getNode, setCenter } = useReactFlow();
   const location = useLocation();
 
   const [selectedNodeId, setSelectedNodeId] = useState(null);
@@ -73,6 +73,7 @@ const SkillMapContent = () => {
     () => location.state?.knowledgeNodeId ?? null,
   );
   const [pendingFocusId, setPendingFocusId] = useState(null);
+  const resetViewOnCloseRef = useRef(false);
 
   const handleOpenKnowledge = useCallback((nodeId) => {
     setActiveKnowledgeId(nodeId);
@@ -279,9 +280,21 @@ const SkillMapContent = () => {
 
   // Chiudendo la modale si azzera la selezione e si collassano i nodi aperti
   const handleCloseModal = useCallback(() => {
+    resetViewOnCloseRef.current = true;
     setIsModalOpen(false);
     handleCollapseAll();
   }, [handleCollapseAll]);
+
+  useEffect(() => {
+    if (!resetViewOnCloseRef.current || expandedIds.size > 0) return undefined;
+
+    resetViewOnCloseRef.current = false;
+    const frame = requestAnimationFrame(() => {
+      fitView({ padding: 0.2, duration: 500 });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [expandedIds, fitView]);
 
   const finalNodes = useMemo(
     () => [
