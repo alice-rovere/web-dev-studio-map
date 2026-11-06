@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useBlocker, useNavigate, useParams } from "react-router-dom";
+import NotebookEditorPreview from "../components/notebook/NotebookEditorPreview";
 import VisualNotebookLayout from "../components/notebook/VisualNotebookLayout";
 import { useMapGraph } from "../hooks/useMapGraph";
 import { PHASE_ICONS, PHASE_ICON_LABELS } from "../notebooks/phaseIcons";
@@ -109,6 +110,7 @@ export default function NotebookEditor() {
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState(false);
+  const [previewStepIndex, setPreviewStepIndex] = useState(0);
   const [search, setSearch] = useState("");
   const [attempt, setAttempt] = useState(0);
   const snapshot = JSON.stringify({ slug, description, nodeId, pendingNodeSlug, autoLink, config });
@@ -173,12 +175,20 @@ export default function NotebookEditor() {
   if (preview) return <VisualNotebookLayout config={{ ...config, slug }} onClose={() => setPreview(false)} />;
 
   return <main className="h-full overflow-y-auto p-4 sm:p-6">
-    <form className="mx-auto max-w-4xl space-y-6" onSubmit={save}>
-      <header><h1 className="text-xl font-bold">{editSlug ? "Modifica percorso" : "Nuovo percorso"}</h1><p className="mt-1 text-sm text-slate-400">Il percorso è pubblico appena salvato. Lo slug non può essere modificato dopo la creazione.</p></header>
+    <header className="mx-auto mb-6 max-w-7xl">
+      <h1 className="text-xl font-bold">{editSlug ? "Modifica percorso" : "Nuovo percorso"}</h1>
+      <p className="mt-1 text-sm text-slate-400">Il percorso è pubblico appena salvato. Lo slug non può essere modificato dopo la creazione.</p>
+    </header>
+    <form className="mx-auto grid max-w-7xl grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(400px,0.95fr)]" onSubmit={save}>
+      <div className="order-last min-w-0 space-y-6 lg:order-first">
       {error && <p className="rounded border border-rose-500 p-3 text-sm text-rose-300" role="alert">{error}</p>}
       {!dirty && updatedAt && <p className="text-sm text-emerald-300" role="status">Percorso salvato e pubblico.</p>}
       <section className="space-y-3 rounded-xl border border-slate-800 p-4">
-        <h2 className="font-semibold">Informazioni generali</h2>
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-widest text-cyan-400">1 · In alto nel diagramma</p>
+          <h2 className="font-semibold">Informazioni generali</h2>
+          <p className="mt-1 text-xs text-slate-400">Titolo e sottotitolo compongono l’intestazione; descrizione e nodo si vedono nel catalogo e nella mappa.</p>
+        </div>
         <Field label="Slug"><input className={fieldClass} disabled={Boolean(editSlug)} value={slug} onChange={(event) => setSlug(event.target.value)} /></Field>
         <Field label="Titolo"><input className={fieldClass} value={config.title} onChange={(event) => updateConfig({ title: event.target.value })} /></Field>
         <Field label="Sottotitolo"><input className={fieldClass} value={config.subtitle ?? ""} onChange={(event) => updateConfig({ subtitle: event.target.value })} /></Field>
@@ -187,7 +197,11 @@ export default function NotebookEditor() {
         {pendingNodeSlug && !nodeId && <label className="flex items-start gap-2 text-xs text-slate-300"><input checked={autoLink} onChange={(event) => setAutoLink(event.target.checked)} type="checkbox" /> Collega automaticamente al nodo «{pendingNodeSlug}» se viene creato.</label>}
       </section>
       <section className="space-y-3 rounded-xl border border-slate-800 p-4">
-        <h2 className="font-semibold">Fasi e icone</h2>
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-widest text-cyan-400">4 · Colonne del diagramma</p>
+          <h2 className="font-semibold">Fasi e icone</h2>
+          <p className="mt-1 text-xs text-slate-400">Ogni fase crea una colonna con la sua icona, il titolo e la descrizione breve.</p>
+        </div>
         <Field label="Cerca icona per nome"><input className={fieldClass} value={search} onChange={(event) => setSearch(event.target.value)} /></Field>
         {config.phases.map((phase, index) => {
           const Icon = PHASE_ICONS[phase.icon];
@@ -206,7 +220,11 @@ export default function NotebookEditor() {
         <button className={buttonClass} onClick={() => updateConfig({ phases: [...config.phases, emptyPhase()] })} type="button">Aggiungi fase</button>
       </section>
       <section className="space-y-3 rounded-xl border border-slate-800 p-4">
-        <h2 className="font-semibold">Passaggi</h2>
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-widest text-cyan-400">2–3 · Menu e contenuto</p>
+          <h2 className="font-semibold">Passaggi</h2>
+          <p className="mt-1 text-xs text-slate-400">Titolo e ordine formano il menu laterale; descrizione e illustrazione appaiono nell’area centrale. I pannelli finiscono nella colonna della fase selezionata.</p>
+        </div>
         <p className="text-xs text-slate-400">Le scene originali sono legate ai passaggi esistenti: modifiche a testi, ordine o rimozioni possono renderle meno coerenti.</p>
         {config.steps.map((step, index) => <div className="space-y-3 rounded-lg border border-slate-700 p-3" key={step.id}>
           <h3 className="text-sm font-semibold">Passaggio {index + 1}</h3>
@@ -218,6 +236,7 @@ export default function NotebookEditor() {
             {originalScenes[step.id] && <option value={originalScenes[step.id]}>Scena originale ({originalScenes[step.id]})</option>}
           </select></Field>
           <OrderButtons index={index} length={config.steps.length} onMove={(direction) => updateConfig({ steps: move(config.steps, index, direction) })} onRemove={() => { if (window.confirm("Eliminare il passaggio e i suoi pannelli?")) updateConfig({ steps: config.steps.filter((_, i) => i !== index) }); }} />
+          <p className="pt-2 font-mono text-[10px] uppercase tracking-widest text-fuchsia-300">Pannelli · contenuti della colonna «{config.phases.find((phase) => phase.id === step.phase)?.label || "fase selezionata"}»</p>
           {step.panels.map((panel, panelIndex) => <div className="space-y-2" key={panelIndex}>
             <PanelEditor panel={panel} onChange={(next) => updateStep(index, { panels: step.panels.map((item, i) => i === panelIndex ? next : item) })} />
             <OrderButtons index={panelIndex} length={step.panels.length} onMove={(direction) => updateStep(index, { panels: move(step.panels, panelIndex, direction) })} onRemove={() => { if (window.confirm("Eliminare il pannello?")) updateStep(index, { panels: step.panels.filter((_, i) => i !== panelIndex) }); }} />
@@ -231,6 +250,8 @@ export default function NotebookEditor() {
         <button className={buttonClass} onClick={() => { const problem = validate(); if (problem) setError(problem); else { setError(null); setPreview(true); } }} type="button">Anteprima</button>
         <button className={buttonClass} onClick={close} type="button">Annulla</button>
       </div>
+      </div>
+      <NotebookEditorPreview config={config} stepIndex={previewStepIndex} onStepSelect={setPreviewStepIndex} />
     </form>
   </main>;
 }

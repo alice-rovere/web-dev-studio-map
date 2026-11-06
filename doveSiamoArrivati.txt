@@ -213,3 +213,8 @@ Ricerca e filtri nodi         | Da fare     | Miglioramento UX opzionale.
 3. Documentare e automatizzare il deploy SPA con fallback su index.html.
 4. Valutare una UI admin per la gestione dei profili e dei ruoli.
 5. Valutare ricerca, filtri e legenda per migliorare la navigazione della mappa.
+6. Razionalizzare i percorsi guidati: rendere Supabase l'unica fonte dei contenuti, rimuovere le config statiche/registry solo dopo aver mantenuto nell'editor il supporto alle scene originali e aggiornato i test.
+
+Quando crei un nuovo percorso, l’app salva su Supabase: NotebookEditor chiama saveNotebook() e inserisce slug, descrizione, nodo collegato e tutta la configurazione (config) nella tabella guided_notebooks. La config, che comprende fasi, passaggi e pannelli, viene salvata come JSON nella colonna config.
+
+Non crea un nuovo file config JavaScript. I file in src/notebooks/configs/ non vengono modificati quando usi l’editor. Le illustrazioni animate, invece, restano componenti del codice associati a ID: l’editor salva l’ID selezionato e il layout visualizza la scena corrispondente.
