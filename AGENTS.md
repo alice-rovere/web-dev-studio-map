@@ -10,6 +10,7 @@
 ## Conventions
 
 - Use the existing JavaScript/JSX, React hooks, and Tailwind CSS patterns. Keep user-facing copy in Italian.
+- Use canonical Tailwind CSS v4 syntax: prefer named utilities over equivalent arbitrary values (for example, `z-100` instead of `z-[100]`), and place the important modifier after the utility (for example, `hover:text-cyan-400!`).
 - Reuse existing components and helpers before adding new abstractions. Keep the responsive mobile tree and desktop React Flow experience consistent when changing the map.
 - Surface loading and operation errors through the existing UI patterns; do not silently ignore failed data operations.
 - Never expose secrets in client code. Only the Supabase URL and anon/publishable key belong in `VITE_*` variables.

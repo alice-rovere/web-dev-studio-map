@@ -18,10 +18,10 @@ export default function QuickGlossaryAdd({ className }) {
         </button>
       </Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-[100] bg-[#060b13]/75 backdrop-blur-sm" />
+        <Dialog.Overlay className="fixed inset-0 z-100 bg-[#060b13]/75 backdrop-blur-sm" />
         <Dialog.Content
           aria-describedby={undefined}
-          className="fixed left-1/2 top-1/2 z-[101] max-h-[90dvh] w-[min(94vw,36rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-[#33445d] bg-[#0b1120] p-5 shadow-2xl focus:outline-none"
+          className="fixed left-1/2 top-1/2 z-101 max-h-[90dvh] w-[min(94vw,36rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-[#33445d] bg-[#0b1120] p-5 shadow-2xl focus:outline-none"
           onEscapeKeyDown={(event) => { if (saving) event.preventDefault(); }}
           onPointerDownOutside={(event) => { if (saving) event.preventDefault(); }}
         >

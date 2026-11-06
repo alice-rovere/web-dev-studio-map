@@ -108,8 +108,8 @@ const TABS = [
           </h3>
           <p className="text-slate-300 text-sm">
             Scegli la forma in base al contesto e mantienila coerente nel
-            progetto. Non cambiare la convenzione richiesta da un framework o
-            da uno schema esistente.
+            progetto. Non cambiare la convenzione richiesta da un framework o da
+            uno schema esistente.
           </p>
           <p className="pt-2">
             <a
@@ -124,7 +124,7 @@ const TABS = [
         </div>
 
         <div className="overflow-x-auto rounded-lg border border-slate-800 bg-slate-950">
-          <table className="w-full min-w-[620px] border-collapse text-left text-sm">
+          <table className="w-full min-w-155 border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-slate-800 bg-slate-900/50 text-slate-400 font-semibold">
                 <th className="p-3 sm:p-4">Stile</th>

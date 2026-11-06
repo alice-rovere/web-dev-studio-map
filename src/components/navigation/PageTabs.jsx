@@ -70,7 +70,7 @@ export default function PageTabs({
     <div>
       <div
         aria-label={ariaLabel}
-        className={`flex items-center gap-1 overflow-x-auto border-b ${palette.bar} [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}
+        className={`flex items-center gap-1 overflow-x-auto border-b ${palette.bar} scrollbar-none [&::-webkit-scrollbar]:hidden`}
         role="tablist"
       >
         {tabs.map((tab) => {

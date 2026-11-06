@@ -36,6 +36,8 @@ Mappa interattiva delle competenze per lo sviluppo web full-stack. I nodi tecnol
 
 Prerequisiti: Node.js e pnpm.
 
+In VS Code, installa l'estensione Tailwind CSS IntelliSense per il supporto alle direttive e alle classi Tailwind. L'impostazione del workspace disattiva gli avvisi `unknownAtRules` del validatore CSS integrato, anche per eventuali altre direttive sconosciute.
+
 ```bash
 pnpm install
 pnpm dev
