@@ -27,6 +27,7 @@ import { useMapGraph } from "../hooks/useMapGraph";
 import { useAuth } from "../hooks/useAuth";
 import { MACRO_GROUPS } from "../data/baseNodes";
 import { saveNodePosition } from "../services/mapService";
+import { getFocusViewport } from "../flow/utils/focusViewport";
 
 import "@xyflow/react/dist/style.css";
 
@@ -64,24 +65,28 @@ const SkillMapContent = () => {
     });
   }, []);
 
-  const { fitView, getNode, setCenter } = useReactFlow();
+  const { fitView, getInternalNode, setViewport } = useReactFlow();
   const location = useLocation();
+  const mapRef = useRef(null);
+  const panelRef = useRef(null);
 
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeKnowledgeId, setActiveKnowledgeId] = useState(
     () => location.state?.knowledgeNodeId ?? null,
   );
-  const [pendingFocusId, setPendingFocusId] = useState(null);
+  const [pendingFocus, setPendingFocus] = useState(null);
   const resetViewOnCloseRef = useRef(false);
 
   const handleOpenKnowledge = useCallback((nodeId) => {
+    setPendingFocus(null);
     setActiveKnowledgeId(nodeId);
     setIsModalOpen(false);
     setSelectedNodeId(null);
   }, []);
 
   const returnToMap = useCallback(() => {
+    setPendingFocus(null);
     setActiveKnowledgeId(null);
     setSelectedNodeId(null);
     setIsModalOpen(false);
@@ -149,29 +154,15 @@ const SkillMapContent = () => {
       setIsModalOpen(true);
 
       if (expandedIds.has(nodeId)) {
+        setPendingFocus(null);
         toggleNode(nodeId);
         return;
       }
 
       expandFocused(nodeId);
-
-      const flowNode = getNode(nodeId);
-      const fallbackNode = nodes.find((node) => node.id === nodeId);
-      const position = flowNode?.position ?? fallbackNode?.position;
-      if (!position) return;
-
-      const isSubNode =
-        (flowNode?.data?.parentCount ?? fallbackNode?.data?.parentCount ?? 0) >
-        0;
-      const width = flowNode?.measured?.width ?? (isSubNode ? 110 : 190);
-      const height = flowNode?.measured?.height ?? (isSubNode ? 30 : 44);
-
-      setCenter(position.x + width / 2, position.y + height / 2, {
-        zoom: 1,
-        duration: 500,
-      });
+      setPendingFocus({ nodeId, maxZoom: 1, duration: 500 });
     },
-    [expandedIds, toggleNode, expandFocused, getNode, setCenter, nodes],
+    [expandedIds, toggleNode, expandFocused],
   );
 
   const getRelatedNodes = useCallback(
@@ -195,43 +186,56 @@ const SkillMapContent = () => {
       expandFocused(nodeId);
       setSelectedNodeId(nodeId);
       setIsModalOpen(true);
-      setPendingFocusId(nodeId);
+      setPendingFocus({ nodeId, maxZoom: 1.2, duration: 600 });
     },
     [expandFocused, graph],
   );
 
   useEffect(() => {
-    if (!pendingFocusId) return undefined;
+    if (!pendingFocus) return undefined;
 
-    const frame = requestAnimationFrame(() => {
+    let frame;
+    const focus = () => {
       if (window.matchMedia("(max-width: 767px)").matches) {
-        setPendingFocusId(null);
+        setPendingFocus(null);
         return;
       }
 
-      const flowNode = getNode(pendingFocusId);
-      const fallbackNode = nodes.find((node) => node.id === pendingFocusId);
-      const position = flowNode?.position ?? fallbackNode?.position;
+      const { nodeId, maxZoom, duration } = pendingFocus;
+      const ids = new Set([nodeId, ...graph.getChildIds(nodeId)]);
+      const focusNodes = nodes.filter((node) => ids.has(node.id));
+      const measuredNodes = focusNodes.map((node) => ({
+        ...node,
+        measured: getInternalNode(node.id)?.measured,
+      }));
+      const map = mapRef.current;
+      const panel = panelRef.current;
 
-      if (position) {
-        const isSubNode =
-          (flowNode?.data?.parentCount ??
-            fallbackNode?.data?.parentCount ??
-            0) > 0;
-        const width = flowNode?.measured?.width ?? (isSubNode ? 110 : 190);
-        const height = flowNode?.measured?.height ?? (isSubNode ? 30 : 44);
-
-        setCenter(position.x + width / 2, position.y + height / 2, {
-          zoom: 1.2,
-          duration: 600,
-        });
+      if (
+        !map ||
+        !panel ||
+        !focusNodes.some((node) => node.id === nodeId) ||
+        measuredNodes.some(
+          (node) => !node.measured?.width || !node.measured?.height,
+        )
+      ) {
+        frame = requestAnimationFrame(focus);
+        return;
       }
 
-      setPendingFocusId(null);
-    });
+      const viewport = getFocusViewport(
+        measuredNodes,
+        map.getBoundingClientRect(),
+        panel.getBoundingClientRect(),
+        maxZoom,
+      );
+      setViewport(viewport, { duration });
+      setPendingFocus(null);
+    };
+    frame = requestAnimationFrame(focus);
 
     return () => cancelAnimationFrame(frame);
-  }, [pendingFocusId, nodes, getNode, setCenter]);
+  }, [pendingFocus, nodes, graph, getInternalNode, setViewport]);
 
   // Con la modale aperta restano in evidenza il nodo selezionato e, se espansi, i suoi figli
   const highlightedIds = useMemo(() => {
@@ -255,7 +259,7 @@ const SkillMapContent = () => {
   const handleNodeClick = useCallback(
     (_, node) => {
       handleOpenNodeDetails(node.id);
-      setPendingFocusId(node.id);
+      setPendingFocus({ nodeId: node.id, maxZoom: 1.2, duration: 600 });
     },
     [handleOpenNodeDetails],
   );
@@ -289,12 +293,14 @@ const SkillMapContent = () => {
 
   // Collassa tutto
   const handleCollapseAll = useCallback(() => {
+    setPendingFocus(null);
     collapseAll();
     setSelectedNodeId(null);
   }, [collapseAll]);
 
   // Chiudendo la modale si azzera la selezione e si collassano i nodi aperti
   const handleCloseModal = useCallback(() => {
+    setPendingFocus(null);
     resetViewOnCloseRef.current = true;
     setIsModalOpen(false);
     handleCollapseAll();
@@ -559,7 +565,7 @@ const SkillMapContent = () => {
       )}
 
       {/* ReactFlow */}
-      <div className="absolute inset-0 hidden md:block">
+      <div className="absolute inset-0 hidden md:block" ref={mapRef}>
         <ReactFlow
           edges={finalEdges}
           fitView
@@ -596,6 +602,7 @@ const SkillMapContent = () => {
         getRelated={getRelatedNodes}
         isOpen={isModalOpen && Boolean(selectedNode)}
         node={selectedNode}
+        panelRef={panelRef}
         onClose={handleCloseModal}
         onOpenKnowledge={handleOpenKnowledge}
         onSelectRelated={handleSearchSelectNode}
