@@ -81,6 +81,21 @@ const SkillMapContent = () => {
     setSelectedNodeId(null);
   }, []);
 
+  const returnToMap = useCallback(() => {
+    setActiveKnowledgeId(null);
+    setSelectedNodeId(null);
+    setIsModalOpen(false);
+    collapseAll();
+  }, [collapseAll]);
+
+  useEffect(() => {
+    const handleReturnToMap = () => returnToMap();
+    window.addEventListener("devskillmap:return-to-map", handleReturnToMap);
+    return () => {
+      window.removeEventListener("devskillmap:return-to-map", handleReturnToMap);
+    };
+  }, [returnToMap]);
+
   const toDisplayNode = useCallback(
     (nodeId) => {
       const node = graph.nodesById.get(nodeId);
@@ -363,11 +378,7 @@ const SkillMapContent = () => {
           onBack={() => setActiveKnowledgeId(knowledgeParent.id)}
           onSelectChild={(childId) => setActiveKnowledgeId(childId)}
           parentNode={knowledgeParent}
-          onClose={() => {
-            setActiveKnowledgeId(null);
-            setSelectedNodeId(null);
-            collapseAll();
-          }}
+          onClose={returnToMap}
         />
       );
     }

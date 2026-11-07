@@ -97,7 +97,10 @@ const Navbar = () => {
         {/* SINISTRA: Logo e Brand */}
         <NavLink
           className="flex shrink-0 items-center gap-1.5 text-base font-bold text-slate-100 no-underline sm:text-lg"
-          onClick={() => setIsMenuOpen(false)}
+          onClick={() => {
+            setIsMenuOpen(false);
+            window.dispatchEvent(new Event("devskillmap:return-to-map"));
+          }}
           to="/"
         >
           <Map className="text-blue-500" size={22} />
