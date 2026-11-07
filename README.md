@@ -66,6 +66,8 @@ Su un'installazione nuova le migrazioni possono precedere la creazione di `inter
 
 Le migrazioni `0009_guided_notebooks.sql` e `0010_seed_guided_notebooks.sql` sono necessarie per consultare e gestire i percorsi guidati. La migrazione `0011_guided_notebooks_editor_access.sql` estende la gestione ai ruoli editor e admin anche tramite RLS e va applicata prima di distribuire la relativa versione dell'app. Il catalogo resta pubblico. I tre percorsi originali sono copiati senza modificare gli URL; se i nodi corrispondenti non esistono ancora, vengono collegati alla loro successiva creazione, salvo scelta diversa dell'editor. Eliminare un nodo non elimina il percorso. `scripts/generate-notebook-migration.js` documenta come sono stati generati i dati originali: non rigenerare una migrazione già applicata per apportare modifiche successive.
 
+La migrazione `0012_seed_dentro_il_pc.sql` aggiunge il percorso originale **Dentro il PC**. La successiva `0013_separa_percorsi_pc.sql` lo sostituisce con il percorso sui componenti fisici e aggiunge **Sistema operativo, kernel e driver**. Entrambi sono consultabili anche senza nodo associato e possono collegarsi a un nodo con lo stesso slug. Se il contenuto originale è stato modificato, la migrazione 0013 si interrompe senza sovrascriverlo: confronta i dati e risolvi il conflitto prima di applicarla. Anche un percorso `sistema-operativo` preesistente con contenuto diverso blocca la migrazione.
+
 I blocchi rimangono nel JSON della rispettiva sezione; il salvataggio verifica `updated_at` per evitare di sovrascrivere cambiamenti avvenuti in un'altra scheda. In caso di conflitto la bozza rimane nell'editor: si possono aggiornare i dati senza perderla e, se il blocco interessato non è cambiato, riprovare il salvataggio. Se invece è cambiato, confrontare e copiare la bozza prima di annullare. Le immagini già salvate non vengono eliminate automaticamente dallo storage quando si rimuove o sostituisce un blocco, perché potrebbero essere ancora utilizzate altrove.
 
 ## Script
@@ -80,7 +82,7 @@ I blocchi rimangono nel JSON della rispettiva sezione; il salvataggio verifica `
 Per eseguire le verifiche mirate sui blocchi, sul testo formattato e sui conflitti:
 
 ```bash
-node --test src/components/content/sectionBlocks.test.js src/components/content/ContentSectionView.test.js src/components/content/blocks/RichTextBlock.test.js src/services/mapService.test.js src/notebooks/internetBrowserConfig.test.js src/notebooks/httpProtocolConfig.test.js src/notebooks/validateNotebook.test.js
+node --test src/components/content/sectionBlocks.test.js src/components/content/ContentSectionView.test.js src/components/content/blocks/RichTextBlock.test.js src/services/mapService.test.js src/notebooks/internetBrowserConfig.test.js src/notebooks/httpProtocolConfig.test.js src/notebooks/dentroIlPcConfig.test.js src/notebooks/computerExplorerParts.test.js src/notebooks/validateNotebook.test.js
 ```
 
 ## Rotte
@@ -107,6 +109,10 @@ Dalla pagina di approfondimento di un nodo con un notebook associato compare il 
 Nel nodo **Internet & Browser** il pulsante è disponibile sia in cima alla pagina sia dopo le sezioni teoriche; il diagramma distingue il percorso di rete dalla pipeline di rendering.
 
 La voce **Percorso Guidato** mostra l'indice degli appunti visivi, con titolo, descrizione e posizione di ciascun percorso nella mappa. Selezionando una scheda si apre il relativo diagramma a schermo intero.
+
+Il percorso **Dentro il PC** presenta i componenti fisici, mentre **Sistema operativo, kernel e driver** spiega come il software usa le risorse del computer. Entrambi utilizzano uno schema 2D compatto con gli elementi rilevanti evidenziati e lasciano più spazio alla spiegazione del passaggio corrente.
+
+In **Dentro il PC**, il pulsante **Esplora in 3D** apre un modello stilizzato della scheda madre e dei componenti, realizzato con React Three Fiber. Trascina per ruotare, usa la rotella o due dita per lo zoom e seleziona un elemento nella scena o nell'elenco: la relativa spiegazione e il passaggio degli appunti si aggiornano insieme. La batteria è mostrata separatamente come esempio di portatile. L'esploratore viene caricato solo all'apertura; senza WebGL restano utilizzabili l'elenco e il notebook 2D. La scena è un modello didattico, non una riproduzione in scala. Three.js è fissato alla versione `0.182.0` perché l'attuale React Three Fiber usa `Clock`, deprecato nelle versioni successive; rivalutare il vincolo quando Fiber passerà a `Timer`.
 
 Gli editor e gli admin possono creare percorsi dalla pagina **Percorsi guidati** o dalla scheda omonima nel pannello admin; la scheda permette anche di modificarli ed eliminarli. Il form gestisce titolo, descrizione, nodo facoltativo, fasi, icone, passaggi e pannelli di testo, codice e tabella, con anteprima prima del salvataggio. Lo slug è scelto alla creazione e rimane stabile; ogni nodo può avere al massimo un percorso associato. Il salvataggio rende immediatamente pubblico il percorso e verifica che non sia stato modificato contemporaneamente altrove.
 

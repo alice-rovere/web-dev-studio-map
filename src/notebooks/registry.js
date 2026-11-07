@@ -4,9 +4,27 @@ const loaders = {
   "prisma-orm": () => import("./configs/prismaFlowConfig.js"),
   "internet-browser": () => import("./configs/internetBrowserConfig.js"),
   "http-protocol": () => import("./configs/httpProtocolConfig.js"),
+  "dentro-il-pc": () => import("./configs/dentroIlPcConfig.js"),
+  "sistema-operativo": () => import("./configs/sistemaOperativoConfig.js"),
 };
 
 const notebookCatalog = [
+  {
+    slug: "dentro-il-pc",
+    title: "Dentro il PC",
+    description:
+      "Esplora i componenti fisici del computer: scheda madre, CPU, RAM, SSD, GPU, alimentazione e periferiche.",
+    nodeLabel: "Dentro il PC",
+    parentLabel: null,
+  },
+  {
+    slug: "sistema-operativo",
+    title: "Sistema operativo, kernel e driver",
+    description:
+      "Scopri come applicazioni, sistema operativo, kernel e driver collaborano per usare le risorse e i dispositivi del computer.",
+    nodeLabel: "Sistema operativo",
+    parentLabel: null,
+  },
   {
     slug: "internet-browser",
     title: "Internet & Browser",

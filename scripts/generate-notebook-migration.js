@@ -4,7 +4,8 @@ import { getNotebookCatalog, loadNotebookConfig } from "../src/notebooks/registr
 
 const quote = (value) => `'${value.replaceAll("'", "''")}'`;
 const inserts = [];
-for (const item of getNotebookCatalog()) {
+const originalSlugs = new Set(["internet-browser", "http-protocol", "prisma-orm"]);
+for (const item of getNotebookCatalog().filter(({ slug }) => originalSlugs.has(slug))) {
   const config = await loadNotebookConfig(item.slug);
   inserts.push(`insert into public.guided_notebooks (slug, description, node_id, pending_node_slug, config)
 select ${quote(item.slug)}, ${quote(item.description)}, n.id,

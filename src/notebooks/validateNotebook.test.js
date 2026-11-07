@@ -10,11 +10,13 @@ test("la migrazione conserva tutte le configurazioni e le descrizioni originali"
   const payloads = [...sql.matchAll(/convert_from\(decode\('([A-Za-z0-9+/=]+)', 'base64'\), 'UTF8'\)::jsonb/g)]
     .map((match) => JSON.parse(Buffer.from(match[1], "base64").toString("utf8")));
   const catalog = getNotebookCatalog();
-  assert.equal(payloads.length, catalog.length);
+  assert.equal(payloads.length, 3);
   assert.ok(!sql.includes("INSERT INTO orders"));
-  for (const [index, item] of catalog.entries()) {
+  for (const payload of payloads) {
+    const item = catalog.find((entry) => entry.slug === payload.slug);
+    assert.ok(item, `Il notebook ${payload.slug} deve restare registrato.`);
     const config = await loadNotebookConfig(item.slug);
-    assert.deepEqual(payloads[index], config);
+    assert.deepEqual(payload, config);
     assert.ok(sql.includes(item.description.replaceAll("'", "''")));
     assert.equal(validateNotebook({ slug: item.slug, description: item.description, config }), null);
   }

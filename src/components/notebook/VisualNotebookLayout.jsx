@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Component, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -12,15 +12,43 @@ import { useReducedMotion } from "framer-motion";
 import PrismaFlowDiagram from "./PrismaFlowDiagram.jsx";
 import InternetBrowserDiagram from "./InternetBrowserDiagram.jsx";
 import WebRequestCycleDiagram from "./WebRequestCycleDiagram.jsx";
+import ComputerSystemDiagram, { OperatingSystemDiagram } from "./ComputerSystemDiagram.jsx";
 import { PHASE_ICONS } from "../../notebooks/phaseIcons.js";
 
 const ILLUSTRATIONS = {
   "prisma-flow": PrismaFlowDiagram,
   "internet-browser": InternetBrowserDiagram,
   "web-request-cycle": WebRequestCycleDiagram,
+  "computer-system": ComputerSystemDiagram,
+  "operating-system": OperatingSystemDiagram,
 };
 
 const AUTOPLAY_MS = 3200;
+const ComputerExplorer = lazy(() => import("./ComputerExplorer.jsx"));
+
+class ExplorerErrorBoundary extends Component {
+  state = { error: null };
+
+  static getDerivedStateFromError(error) {
+    return { error };
+  }
+
+  componentDidCatch(error) {
+    console.error("Impossibile caricare l'esploratore 3D.", error);
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="fixed inset-0 z-60 flex flex-col items-center justify-center gap-4 bg-slate-950 p-6 text-center" role="alert">
+          <p>Impossibile caricare l’esploratore 3D. Gli appunti 2D restano disponibili.</p>
+          <button type="button" onClick={this.props.onClose} className="rounded border border-cyan-400 px-4 py-2 text-cyan-200">Torna agli appunti</button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function CodePanel({ panel }) {
   const highlighted = new Set(panel.highlightLines ?? []);
@@ -87,15 +115,15 @@ function TablePanel({ panel }) {
   );
 }
 
-function TextPanel({ panel }) {
+function TextPanel({ panel, compactDiagram }) {
   return (
-    <pre className="nodrag nowheel overflow-x-auto whitespace-pre-wrap rounded-md border border-fuchsia-500/20 bg-black/50 p-3 font-mono text-[11px] leading-5 text-zinc-300">
+    <pre className={`nodrag nowheel overflow-x-auto whitespace-pre-wrap rounded-md border border-fuchsia-500/20 bg-black/50 p-3 text-zinc-300 ${compactDiagram ? "font-sans text-sm leading-6" : "font-mono text-[11px] leading-5"}`}>
       {panel.content}
     </pre>
   );
 }
 
-function Panel({ panel }) {
+function Panel({ panel, compactDiagram }) {
   const Body =
     panel.kind === "table"
       ? TablePanel
@@ -109,7 +137,7 @@ function Panel({ panel }) {
         <span>{panel.label}</span>
         {panel.language && <span className="text-fuchsia-400">{panel.language}</span>}
       </div>
-      <Body panel={panel} />
+      <Body panel={panel} compactDiagram={compactDiagram} />
     </div>
   );
 }
@@ -124,6 +152,8 @@ export default function VisualNotebookLayout({ config, onClose }) {
   const phases = useMemo(() => config?.phases ?? [], [config]);
   const [stepIndex, setStepIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [explorerOpen, setExplorerOpen] = useState(false);
+  const explorerButton = useRef(null);
 
   const lastIndex = steps.length - 1;
   const currentStep = steps[stepIndex];
@@ -150,13 +180,14 @@ export default function VisualNotebookLayout({ config, onClose }) {
 
   useEffect(() => {
     const onKeyDown = (event) => {
+      if (explorerOpen) return;
       if (event.key === "ArrowRight") goTo(stepIndex + 1);
       else if (event.key === "ArrowLeft") goTo(stepIndex - 1);
       else if (event.key === "Escape") onClose?.();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [goTo, stepIndex, onClose]);
+  }, [goTo, stepIndex, onClose, explorerOpen]);
 
   // Per ogni fase mostra il contenuto dell'ultimo step raggiunto che la riguarda.
   const phaseStep = useMemo(() => {
@@ -175,6 +206,14 @@ export default function VisualNotebookLayout({ config, onClose }) {
 
   const progress = ((stepIndex + 1) / steps.length) * 100;
   const Illustration = ILLUSTRATIONS[currentStep.illustration];
+  const compactDiagram = ["computer-system", "operating-system"].includes(currentStep.illustration);
+  const visiblePhases = compactDiagram
+    ? phases.filter((phase) => phase.id === currentStep.phase)
+    : phases;
+  const closeExplorer = () => {
+    setExplorerOpen(false);
+    requestAnimationFrame(() => explorerButton.current?.focus());
+  };
 
   return (
     <div
@@ -203,6 +242,16 @@ export default function VisualNotebookLayout({ config, onClose }) {
           )}
         </div>
         <div className="flex shrink-0 items-center gap-4">
+          {config.slug === "dentro-il-pc" && (
+            <button
+              ref={explorerButton}
+              type="button"
+              onClick={() => { setIsPlaying(false); setExplorerOpen(true); }}
+              className="rounded-lg border border-cyan-400/50 px-3 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-400/10"
+            >
+              Esplora in 3D
+            </button>
+          )}
           <span className="hidden font-mono text-xs text-zinc-400 sm:inline">
             STEP {stepIndex + 1} / {steps.length}
           </span>
@@ -221,6 +270,28 @@ export default function VisualNotebookLayout({ config, onClose }) {
           style={{ width: `${progress}%` }}
         />
       </header>
+
+      {explorerOpen && (
+        <ExplorerErrorBoundary onClose={closeExplorer}>
+          <Suspense fallback={
+            <div className="fixed inset-0 z-60 flex flex-col items-center justify-center gap-4 bg-slate-950 text-slate-300">
+              <p>Caricamento esploratore 3D…</p>
+              <button type="button" onClick={closeExplorer} className="rounded border border-cyan-400 px-4 py-2 text-cyan-200">Torna agli appunti</button>
+            </div>
+          }>
+            <ComputerExplorer
+              steps={steps}
+              stepId={currentStep.id}
+              reducedMotion={shouldReduceMotion}
+              onClose={closeExplorer}
+              onSelect={(id) => {
+                const index = steps.findIndex((step) => step.id === id);
+                if (index >= 0) goTo(index);
+              }}
+            />
+          </Suspense>
+        </ExplorerErrorBoundary>
+      )}
 
       <div className="relative z-10 flex min-h-0 grow flex-col md:flex-row">
         <nav
@@ -275,10 +346,7 @@ export default function VisualNotebookLayout({ config, onClose }) {
 
           {Illustration && (
             <div className="shrink-0 px-3 pt-3 sm:px-4">
-              <Illustration
-                isPlaying={isPlaying && !shouldReduceMotion}
-                stepId={currentStep.id}
-              />
+              <Illustration isPlaying={isPlaying && !shouldReduceMotion} stepId={currentStep.id} />
             </div>
           )}
 
@@ -301,7 +369,7 @@ export default function VisualNotebookLayout({ config, onClose }) {
           )}
 
           <div className="nowheel grid min-h-0 grow auto-rows-min gap-3 overflow-y-auto p-3 sm:p-4 lg:grid-flow-col lg:auto-cols-fr lg:auto-rows-auto">
-            {phases.map((phase) => {
+            {visiblePhases.map((phase) => {
               const Icon = PHASE_ICONS[phase.icon] ?? Code2;
               const isActive = phase.id === currentStep.phase;
               const shown = phaseStep.get(phase.id);
@@ -331,7 +399,7 @@ export default function VisualNotebookLayout({ config, onClose }) {
                   </div>
                   {shown ? (
                     shown.panels.map((panel, index) => (
-                      <Panel key={`${shown.id}-${index}`} panel={panel} />
+                      <Panel key={`${shown.id}-${index}`} panel={panel} compactDiagram={compactDiagram} />
                     ))
                   ) : (
                     <p className="font-mono text-[11px] text-zinc-600">In attesa…</p>
