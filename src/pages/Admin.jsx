@@ -143,7 +143,7 @@ export default function Admin() {
         </header>
 
         <nav className="mb-6 flex flex-wrap gap-2 border-b border-slate-800 pb-3">
-          {[...TABS, { id: "notebooks", label: "Percorsi guidati", icon: Presentation }].map((entry) => {
+          {[...TABS, { id: "notebooks", label: "Appunti visivi", icon: Presentation }].map((entry) => {
             const Icon = entry.icon;
             return (
               <button

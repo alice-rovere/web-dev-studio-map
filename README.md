@@ -10,7 +10,7 @@ Mappa interattiva delle competenze per lo sviluppo web full-stack. I nodi tecnol
 - Dettaglio del nodo: click su un nodo per aprire il pannello e inquadrare il nodo e i suoi figli nello spazio libero della mappa, adattando lo zoom quando necessario (il resto della mappa si opacizza). Il pannello mostra padri e figli in un elenco espandibile e consultabile e il pulsante **Apri nodo** per l'approfondimento; i figli si aprono anche con il pulsante **+** del nodo.
 - Approfondimenti per nodo organizzati in sezioni e blocchi di contenuto, con best practice e convenzioni di naming sempre visibili e modificabili dagli editor, collegamenti esterni richiudibili e un box dedicato ai nodi figli nella colonna sinistra, lasciando spazio a destra per i post-it.
 - Nella pagina del nodo e nella scheda Contenuti dell'admin ogni blocco supportato si modifica, aggiunge, riordina o elimina separatamente; l'eliminazione richiede conferma. I blocchi di testo supportano grassetto, corsivo, sottolineatura, evidenziatore e dimensioni carattere. I precedenti blocchi Mermaid non sono più visualizzabili o modificabili, ma i loro dati rimangono salvati.
-- Appunti Visivi a step, con diagrammi SVG animati per il flusso di Prisma ORM e per il percorso dalla URL al rendering del browser. Il nodo Internet & Browser include anche teoria su Internet, Web, protocolli e browser.
+- Appunti visivi: percorsi a step con diagrammi SVG animati e griglie esplorabili senza Play per i componenti del PC e per HTML, CSS e JavaScript.
 - Glossario consultabile per iniziale o ricerca, con termini apribili in una modale, definizioni su più paragrafi e tooltip automatici con anteprima nei testi. Nella pagina knowledge è evidenziata solo la prima occorrenza di ogni termine: selezionandola si apre la definizione completa. Gli editor possono aggiungere termini anche dalla mappa e dalla pagina knowledge.
 - Percorso guidato che illustra il ciclo di vita di una richiesta web.
 - Pagine dedicate a linee guida e sicurezza.
@@ -102,6 +102,8 @@ La migrazione `0012_seed_dentro_il_pc.sql` aggiunge il percorso originale **Dent
 
 La migrazione `0014_seed_linguaggi_programmazione.sql` aggiunge il percorso **Linguaggi di programmazione** e lo collega a `backend-languages` quando il nodo è presente; in caso contrario resta consultabile e in attesa del collegamento.
 
+La migrazione `0015_visual_grids.sql` crea le griglie visive con lettura pubblica e modifica riservata a editor/admin. Prima di applicarla **esegui un backup del database**: trasferisce la versione corrente di «Dentro il PC» (compresi pannelli e collegamento al nodo) in una griglia ed elimina il vecchio percorso. Mantiene anche la configurazione originale nella griglia per non perdere metadati; il vecchio URL pubblico viene reindirizzato e lo slug `dentro-il-pc` è riservato alla griglia. Se i passaggi o i pannelli personalizzati non possono essere rappresentati, la migrazione si interrompe: confronta e trasferisci quei contenuti prima di riprovare, senza eliminare il percorso manualmente. Crea inoltre la griglia «La pagina web». Applica la migrazione prima di pubblicare la nuova versione dell'app.
+
 I blocchi rimangono nel JSON della rispettiva sezione; il salvataggio verifica `updated_at` per evitare di sovrascrivere cambiamenti avvenuti in un'altra scheda. In caso di conflitto la bozza rimane nell'editor: si possono aggiornare i dati senza perderla e, se il blocco interessato non è cambiato, riprovare il salvataggio. Se invece è cambiato, confrontare e copiare la bozza prima di annullare. Le immagini già salvate non vengono eliminate automaticamente dallo storage quando si rimuove o sostituisce un blocco, perché potrebbero essere ancora utilizzate altrove.
 
 ## Script
@@ -122,28 +124,32 @@ I blocchi rimangono nel JSON della rispettiva sezione; il salvataggio verifica `
 | `/linee-guida`      | Linee guida            | Pubblico                 |
 | `/sicurezza`        | Sicurezza              | Pubblico                 |
 | `/ai-web-dev`       | AI nel Web Dev         | Pubblico                 |
-| `/percorso-guidato` | Percorso guidato       | Pubblico                 |
+| `/percorso-guidato` | Catalogo appunti visivi | Pubblico                |
 | `/glossario`        | Glossario              | Pubblico                 |
 | `/login`            | Accesso                | Pubblico                 |
 | `/admin`            | Pannello editor        | Editor/admin autenticati |
 | `/quick-add`        | Aggiunta rapida link   | Editor/admin autenticati |
-| `/notebook/:slug`   | Appunti Visivi         | Pubblico                 |
+| `/notebook/:slug`   | Percorso a step        | Pubblico                 |
+| `/griglia/:slug`    | Griglia esplorabile    | Pubblico                 |
+| `/admin/griglie/:slug/modifica` | Modifica griglia | Editor/admin autenticati |
 | `/admin/percorsi/nuovo` | Nuovo percorso     | Editor/admin autenticati |
 | `/admin/percorsi/:slug/modifica` | Modifica percorso | Editor/admin autenticati |
 
-### Appunti Visivi (simulazioni a step)
+### Appunti visivi
 
 Dalla pagina di approfondimento di un nodo con un notebook associato compare il pulsante **Apri Appunti Visivi**, che apre `/notebook/:slug` a schermo intero (frecce ←/→ per gli step, Esc per chiudere).
 
 Nel nodo **Internet & Browser** il pulsante è disponibile sia in cima alla pagina sia dopo le sezioni teoriche; il diagramma distingue il percorso di rete dalla pipeline di rendering.
 
-La voce **Percorso Guidato** mostra l'indice degli appunti visivi, con titolo, descrizione e posizione di ciascun percorso nella mappa. Selezionando una scheda si apre il relativo diagramma a schermo intero.
+La voce **Appunti visivi** mostra un unico catalogo con sezioni distinte per percorsi guidati e griglie esplorabili. Ogni risorsa può essere collegata a un nodo; un nodo può offrire sia un percorso sia una o più griglie.
 
-Il percorso **Dentro il PC** presenta i componenti fisici in uno schema SVG interattivo: i componenti selezionabili evidenziano i collegamenti rilevanti e portano direttamente al relativo passaggio. Anche il pulsante **Esplora componenti** apre lo stesso schema con l'elenco e le spiegazioni sempre disponibili; non richiede WebGL. Le animazioni dei percorsi si disattivano con la preferenza di movimento ridotto. **Sistema operativo, kernel e driver** mantiene uno schema 2D compatto con gli elementi software rilevanti evidenziati.
+Le griglie **Dentro il PC** e **La pagina web** consentono di selezionare un componente nello schema o nell'elenco e leggere spiegazione e pannelli, senza progressione né Play. La selezione funziona con mouse, tocco e tastiera; lo schema del PC evidenzia i collegamenti e rispetta la preferenza di movimento ridotto. Non richiedono WebGL. **Sistema operativo, kernel e driver** rimane un percorso a step.
 
 Il percorso **Linguaggi di programmazione** segue il codice sorgente attraverso compilazione nativa, bytecode e runtime fino alle istruzioni della CPU, chiarendo dove queste strategie si sovrappongono. Lo schema evidenzia la strada del passaggio corrente; sugli schermi stretti si può scorrere in orizzontale per confrontare le tre colonne.
 
-Gli editor e gli admin possono creare percorsi dalla pagina **Percorsi guidati** o dalla scheda omonima nel pannello admin; la scheda permette anche di modificarli ed eliminarli. Il form gestisce titolo, descrizione, nodo facoltativo, fasi, icone, passaggi e pannelli di testo, codice e tabella, con anteprima prima del salvataggio. Lo slug è scelto alla creazione e rimane stabile; ogni nodo può avere al massimo un percorso associato. Il salvataggio rende immediatamente pubblico il percorso e verifica che non sia stato modificato contemporaneamente altrove.
+Gli editor e gli admin possono creare percorsi dal catalogo o dalla scheda **Appunti visivi** nel pannello admin; la scheda permette anche di modificarli ed eliminarli. Il form gestisce titolo, descrizione, nodo facoltativo, fasi, icone, passaggi e pannelli di testo, codice e tabella, con anteprima prima del salvataggio. Lo slug è scelto alla creazione e rimane stabile; ogni nodo può avere al massimo un percorso associato. Il salvataggio rende immediatamente pubblico il percorso e verifica che non sia stato modificato contemporaneamente altrove.
+
+Dalle schede delle griglie e dal pannello admin gli editor possono modificare titolo, sottotitolo, descrizione, nodo, spiegazioni e pannelli dei componenti esistenti. Si possono aggiungere pannelli di testo e codice e modificare le celle delle tabelle già presenti. Il salvataggio è immediatamente pubblico e verifica la versione per evitare sovrascritture; in caso di conflitto la bozza rimane nell'editor, quindi copiala prima di ricaricare. Gli schemi SVG e l'insieme dei componenti non si creano dall'editor: nuove scene richiedono codice e distribuzione.
 
 Per i nuovi passaggi si può scegliere uno schema generico delle fasi con icone predefinite o nessuna illustrazione. Le scene originali dei percorsi con diagrammi personalizzati restano disponibili sui rispettivi passaggi: sono componenti React legati ai loro identificativi, non disegni personalizzabili dal form. Nuove scene su misura richiedono codice. Le configurazioni in `src/notebooks/configs/` e il registry conservano i dati sorgente delle migrazioni e i riferimenti alle scene originali, non sono il catalogo usato dall'app.
 

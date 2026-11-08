@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet, RouterProvider, useLocation } from "react-router-dom";
 import { MotionConfig } from "framer-motion";
 import Navbar from "./components/navigation/Navbar";
 import LocalChat from "./components/navigation/LocalChat";
@@ -19,6 +19,13 @@ const Glossary = lazy(() => import("./pages/Glossary"));
 const QuickAdd = lazy(() => import("./pages/QuickAdd"));
 const VisualNotebook = lazy(() => import("./pages/VisualNotebook"));
 const NotebookEditor = lazy(() => import("./pages/NotebookEditor"));
+const VisualGrid = lazy(() => import("./pages/VisualGrid"));
+const VisualGridEditor = lazy(() => import("./pages/VisualGridEditor"));
+
+function LegacyComputerRedirect() {
+  const location = useLocation();
+  return <Navigate to="/griglia/dentro-il-pc" replace state={{ ...location.state, redirectedFromNotebook: true }} />;
+}
 
 function PageLoader() {
   return (
@@ -52,8 +59,12 @@ const router = createBrowserRouter([{
     { path: "/ai-web-dev", element: <AiWebDev /> },
     { path: "/percorso-guidato", element: <GuidedPath /> },
     { path: "/glossario", element: <Glossary /> },
+    { path: "/notebook/dentro-il-pc", element: <LegacyComputerRedirect /> },
     { path: "/notebook/:slug", element: <VisualNotebook /> },
+    { path: "/griglia/:slug", element: <VisualGrid /> },
+    { path: "/admin/griglie/:slug/modifica", element: <RequireEditor><VisualGridEditor /></RequireEditor> },
     { path: "/admin/percorsi/nuovo", element: <RequireEditor><NotebookEditor /></RequireEditor> },
+    { path: "/admin/percorsi/dentro-il-pc/modifica", element: <RequireEditor><Navigate to="/admin/griglie/dentro-il-pc/modifica" replace /></RequireEditor> },
     { path: "/admin/percorsi/:slug/modifica", element: <RequireEditor><NotebookEditor /></RequireEditor> },
     { path: "/login", element: <Login /> },
     { path: "/quick-add", element: <RequireEditor><QuickAdd /></RequireEditor> },

@@ -153,7 +153,9 @@ export default function NotebookEditor() {
   const updateConfig = (patch) => setConfig((previous) => ({ ...previous, ...patch }));
   const updatePhase = (index, patch) => updateConfig({ phases: config.phases.map((phase, i) => i === index ? { ...phase, ...patch } : phase) });
   const updateStep = (index, patch) => updateConfig({ steps: config.steps.map((step, i) => i === index ? { ...step, ...patch } : step) });
-  const validate = () => validateNotebook({ slug, description, config });
+  const validate = () => slug === "dentro-il-pc"
+    ? "Lo slug dentro-il-pc è riservato alla griglia visiva."
+    : validateNotebook({ slug, description, config });
   async function save(event) {
     event.preventDefault();
     const problem = validate();

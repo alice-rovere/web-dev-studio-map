@@ -4,11 +4,13 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useMapGraph } from "../hooks/useMapGraph";
 import { fetchNotebooks } from "../services/notebookService";
+import { fetchVisualGrids } from "../services/visualGridService";
 
 export default function GuidedPathPage() {
   const { isEditor } = useAuth();
   const { graph, loading: graphLoading, error: graphError, reload } = useMapGraph();
   const [state, setState] = useState({ notebooks: [], loading: true, error: null });
+  const [gridState, setGridState] = useState({ grids: [], loading: true, error: null });
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     let active = true;
@@ -16,6 +18,11 @@ export default function GuidedPathPage() {
       if (active) setState({ notebooks, loading: false, error: null });
     }).catch((error) => {
       if (active) setState({ notebooks: [], loading: false, error: error.message });
+    });
+    fetchVisualGrids().then((grids) => {
+      if (active) setGridState({ grids, loading: false, error: null });
+    }).catch((error) => {
+      if (active) setGridState({ grids: [], loading: false, error: error.message });
     });
     return () => { active = false; };
   }, [attempt]);
@@ -26,11 +33,11 @@ export default function GuidedPathPage() {
       <div className="mx-auto w-full max-w-6xl">
         <header className="mb-8 border-b border-slate-800 pb-5 sm:mb-10">
           <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            Percorsi guidati
+            Appunti visivi
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-300">
-            Scegli un percorso per esplorare un concetto passo dopo passo. Ogni
-            appunto può essere collegato a un nodo nella mappa delle competenze.
+            Esplora i percorsi passo dopo passo o seleziona liberamente i componenti delle griglie.
+            Ogni appunto può essere collegato a un nodo nella mappa delle competenze.
           </p>
           {isEditor && (
             <Link className="mt-4 inline-flex items-center gap-2 rounded-lg bg-cyan-400 px-3 py-2 text-sm font-semibold text-slate-950" to="/admin/percorsi/nuovo">
@@ -40,6 +47,7 @@ export default function GuidedPathPage() {
         </header>
 
         <section aria-label="Elenco dei percorsi guidati">
+          <h2 className="mb-4 text-xl font-bold">Percorsi guidati</h2>
           {(state.loading || graphLoading) && <p className="mb-4 text-sm text-slate-400">Caricamento percorsi…</p>}
           {(state.error || graphError) && (
             <div className="mb-4 text-sm text-rose-300" role="alert">
@@ -101,6 +109,28 @@ export default function GuidedPathPage() {
           </div>
             </>
           )}
+        </section>
+        <section aria-label="Elenco delle griglie visive" className="mt-10">
+          <h2 className="mb-4 text-xl font-bold">Griglie esplorabili</h2>
+          {gridState.loading && <p className="text-sm text-slate-400">Caricamento griglie…</p>}
+          {gridState.error && <p role="alert" className="text-sm text-rose-300">{gridState.error} <button className="underline" onClick={() => setAttempt((value) => value + 1)} type="button">Riprova</button></p>}
+          {!gridState.loading && !gridState.error && <>
+            <p className="mb-4 font-mono text-xs uppercase tracking-widest text-slate-400">{gridState.grids.length} griglie disponibili</p>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {gridState.grids.map((grid) => {
+                const node = graph.nodesById.get(grid.node_id);
+                return <div key={grid.slug}>
+                  <Link className="group flex min-h-48 flex-col rounded-2xl border border-slate-800 bg-slate-900/80 p-5 hover:border-cyan-400/50 focus-visible:outline-2 focus-visible:outline-cyan-300" to={`/griglia/${grid.slug}`}>
+                    <span className="mb-4 text-xs font-semibold uppercase tracking-widest text-cyan-300">Griglia esplorabile</span>
+                    <h3 className="text-lg font-bold text-white">{grid.config.title}</h3>
+                    <p className="mt-2 grow text-sm text-slate-300">{grid.description}</p>
+                    <p className="mt-4 border-t border-slate-800 pt-3 text-xs text-slate-400">Nodo: {graphError ? "Non disponibile" : graphLoading ? "Caricamento…" : node?.label ?? "Nessun nodo associato"}</p>
+                  </Link>
+                  {isEditor && <Link className="mt-2 inline-flex items-center gap-1 text-xs text-cyan-300 underline" to={`/admin/griglie/${grid.slug}/modifica`}><Pencil size={13} /> Modifica</Link>}
+                </div>;
+              })}
+            </div>
+          </>}
         </section>
       </div>
     </main>

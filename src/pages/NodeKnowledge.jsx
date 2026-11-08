@@ -2,6 +2,7 @@ import { ArrowLeft, GitFork, Lock, Presentation, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchNotebookForNode } from "../services/notebookService";
+import { fetchVisualGridsForNode } from "../services/visualGridService";
 import ContentSectionEditor from "../components/content/ContentSectionEditor";
 import NodeGenericInfo from "../components/skill-map/NodeGenericInfo";
 import GlossaryText from "../components/glossary/GlossaryText";
@@ -10,7 +11,7 @@ import { StickyNotesCanvas } from "../components/notes/StickyNotesCanvas";
 import QuickGlossaryAdd from "../components/glossary/QuickGlossaryAdd";
 import { GlossaryPageScope } from "../components/glossary/GlossaryPageScope";
 
-function NotebookButton({ onClick }) {
+function NotebookButton({ onClick, label = "Apri Appunti Visivi" }) {
   return (
     <button
       className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-cyan-400/50 bg-linear-to-r from-fuchsia-500/10 to-cyan-400/10 px-4 py-2 font-mono text-xs font-bold uppercase tracking-widest text-cyan-200 shadow-[0_0_14px_rgba(34,211,238,0.15)] transition-colors hover:border-cyan-300 hover:text-white"
@@ -18,7 +19,7 @@ function NotebookButton({ onClick }) {
       type="button"
     >
       <Presentation size={14} />
-      Apri Appunti Visivi
+      {label}
     </button>
   );
 }
@@ -45,6 +46,7 @@ export default function NodeKnowledgePage({
   const confirmNavigation = async () => !draftGuard.current || await draftGuard.current();
   const [notebook, setNotebook] = useState({ nodeId: null, slug: null, error: null });
   const [notebookAttempt, setNotebookAttempt] = useState(0);
+  const [grids, setGrids] = useState({ nodeId: null, items: [], error: null });
   useEffect(() => {
     if (!node?.id) return undefined;
     let active = true;
@@ -55,6 +57,14 @@ export default function NodeKnowledgePage({
       .catch((error) => {
         if (active) setNotebook({ nodeId: node.id, slug: null, error: error.message });
       });
+    return () => { active = false; };
+  }, [node?.id, notebookAttempt]);
+  useEffect(() => {
+    if (!node?.id) return undefined;
+    let active = true;
+    fetchVisualGridsForNode(node.id)
+      .then((items) => { if (active) setGrids({ nodeId: node.id, items, error: null }); })
+      .catch((error) => { if (active) setGrids({ nodeId: node.id, items: [], error: error.message }); });
     return () => { active = false; };
   }, [node?.id, notebookAttempt]);
   const notebookSlug = notebook.nodeId === node?.id ? notebook.slug : null;
@@ -165,6 +175,14 @@ export default function NodeKnowledgePage({
               <NotebookButton onClick={openNotebook} />
             </div>
           )}
+          {grids.nodeId === node?.id && grids.items.map((grid) => (
+            <div className="mb-3" key={grid.slug}>
+              <NotebookButton label={`Apri griglia: ${grid.config.title}`} onClick={async () => {
+                if (await confirmNavigation()) navigate(`/griglia/${grid.slug}`, { state: { knowledgeNodeId: node.id } });
+              }} />
+            </div>
+          ))}
+          {grids.nodeId === node?.id && grids.error && <p className="mb-6 text-xs text-rose-300" role="alert">{grids.error} <button className="underline" onClick={() => setNotebookAttempt((value) => value + 1)} type="button">Riprova</button></p>}
           {notebook.nodeId === node?.id && notebook.error && (
             <p className="mb-6 text-xs text-rose-300" role="alert">
               {notebook.error}{" "}

@@ -33,7 +33,7 @@ const NAV_ITEMS = [
   { to: "/linee-guida", label: "Linee Guida", icon: BookOpen },
   { to: "/sicurezza", label: "Sicurezza", icon: ShieldAlert },
   { to: "/ai-web-dev", label: "AI nel Web Dev", icon: Sparkles },
-  { to: "/percorso-guidato", label: "Percorsi Guidati", icon: Route },
+  { to: "/percorso-guidato", label: "Appunti visivi", icon: Route },
   { to: "/glossario", label: "Glossario", icon: BookOpen },
 ];
 
