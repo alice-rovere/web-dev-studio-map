@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { Loader2, PenLine } from "lucide-react";
+import { Loader2, PenLine, X } from "lucide-react";
 
 const WhiteboardModal = lazy(() => import("./WhiteboardModal"));
 
@@ -11,6 +11,8 @@ export function WhiteboardView({ payload }) {
   const files = payload.files;
   const annotations = payload.annotations;
   const isEmpty = !Array.isArray(elements) || elements.length === 0;
+  const hasAnnotations = annotations?.length > 0;
+  const selected = annotations?.find((item) => item.elementId === selectedId);
 
   useEffect(() => {
     let cancelled = false;
@@ -43,16 +45,15 @@ export function WhiteboardView({ payload }) {
           hotspot.setAttribute("width", String(Math.max(x2 - x1, 16)));
           hotspot.setAttribute("height", String(Math.max(y2 - y1, 16)));
           hotspot.setAttribute("fill", "transparent");
-          hotspot.setAttribute("stroke", "#22d3ee");
-          hotspot.setAttribute("stroke-dasharray", "5 4");
+          hotspot.setAttribute("stroke", "transparent");
           hotspot.setAttribute("stroke-width", "2");
+          hotspot.setAttribute("class", "outline-none focus-visible:stroke-cyan-400");
           hotspot.setAttribute("role", "button");
           hotspot.setAttribute("tabindex", "0");
           hotspot.setAttribute("aria-label", item.title);
+          hotspot.dataset.elementId = item.elementId;
           hotspot.style.cursor = "pointer";
           hotspot.addEventListener("click", () => setSelectedId(item.elementId));
-          hotspot.addEventListener("focus", () => hotspot.setAttribute("stroke", "#fbbf24"));
-          hotspot.addEventListener("blur", () => hotspot.setAttribute("stroke", "#22d3ee"));
           hotspot.addEventListener("keydown", (event) => {
             if (event.key === "Enter" || event.key === " ") {
               event.preventDefault();
@@ -78,25 +79,39 @@ export function WhiteboardView({ payload }) {
   }
 
   return (
-    <div className="my-4 overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950/40 p-3">
-      <div ref={containerRef} />
-      {annotations?.length > 0 && <>
-        <p className="mt-3 text-xs text-zinc-400">Seleziona un elemento evidenziato o usa l’elenco.</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {annotations.map((item) => <button key={item.elementId} type="button" aria-pressed={selectedId === item.elementId}
-            className="rounded border border-cyan-500/40 px-2 py-1 text-xs text-cyan-200 hover:bg-cyan-500/10"
-            onClick={() => setSelectedId(item.elementId)}>{item.title}</button>)}
+    <div className="@container my-4">
+      <div className={`grid gap-4 ${hasAnnotations ? "@3xl:grid-cols-[minmax(0,1fr)_minmax(18rem,25rem)]" : ""}`}>
+        <div className="min-w-0 rounded-lg border border-zinc-800 bg-zinc-950/40 p-3">
+          <div ref={containerRef} />
+          {failed && (
+            <p className="text-xs text-rose-300" role="alert">
+              Impossibile mostrare la lavagna.
+            </p>
+          )}
         </div>
-        {annotations.filter((item) => item.elementId === selectedId).map((item) => <section key={item.elementId} aria-live="polite" className="mt-3 rounded border border-zinc-700 p-3">
-          <h3 className="font-semibold text-cyan-200">{item.title}</h3>
-          <p className="mt-1 whitespace-pre-wrap text-sm text-zinc-300">{item.description}</p>
-        </section>)}
-      </>}
-      {failed && (
-        <p className="text-xs text-rose-300" role="alert">
-          Impossibile mostrare la lavagna.
-        </p>
-      )}
+        {hasAnnotations && <div aria-live="polite" className="min-w-0">
+          {selected ? <section className="rounded-xl border border-fuchsia-500/30 bg-fuchsia-500/5 p-4 shadow-[0_0_24px_rgba(217,70,239,0.12)]">
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="font-mono text-sm font-bold uppercase tracking-widest text-fuchsia-200">{selected.title}</h3>
+              <button
+                aria-label="Chiudi spiegazione"
+                className="shrink-0 rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/10 p-1 text-fuchsia-200 hover:bg-fuchsia-500/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fuchsia-300"
+                onClick={() => {
+                  const hotspot = Array.from(containerRef.current?.querySelectorAll("[data-element-id]") ?? [])
+                    .find((element) => element.dataset.elementId === selectedId);
+                  setSelectedId(null);
+                  hotspot?.focus();
+                }}
+                type="button"
+              ><X size={16} /></button>
+            </div>
+            <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-zinc-300">{selected.description}</p>
+          </section> : <div className="rounded-xl border border-fuchsia-500/20 bg-fuchsia-500/5 p-4">
+            <p className="text-sm leading-6 text-zinc-300">Seleziona un elemento del disegno per leggere la sua spiegazione.</p>
+            <p className="mt-2 text-xs text-zinc-400">Puoi usare anche Tab e Invio.</p>
+          </div>}
+        </div>}
+      </div>
     </div>
   );
 }
