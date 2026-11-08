@@ -1,10 +1,13 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import * as Dialog from "@radix-ui/react-dialog";
 import { Loader2, PenLine, X } from "lucide-react";
 
 const WhiteboardModal = lazy(() => import("./WhiteboardModal"));
 
 export function WhiteboardView({ payload }) {
   const containerRef = useRef(null);
+  const activeHotspotRef = useRef(null);
+  const interactedOutsideRef = useRef(false);
   const [failed, setFailed] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const elements = payload.elements;
@@ -33,7 +36,6 @@ export function WhiteboardView({ payload }) {
         svg.removeAttribute("height");
         svg.style.width = "100%";
         svg.style.height = "auto";
-        svg.style.maxHeight = "32rem";
         const [left, top] = getCommonBounds(elements);
         for (const item of annotations ?? []) {
           const element = elements.find((entry) => entry.id === item.elementId);
@@ -44,20 +46,28 @@ export function WhiteboardView({ payload }) {
           hotspot.setAttribute("y", String(y1 - top + 10));
           hotspot.setAttribute("width", String(Math.max(x2 - x1, 16)));
           hotspot.setAttribute("height", String(Math.max(y2 - y1, 16)));
+          hotspot.setAttribute("rx", "8");
           hotspot.setAttribute("fill", "transparent");
           hotspot.setAttribute("stroke", "transparent");
           hotspot.setAttribute("stroke-width", "2");
-          hotspot.setAttribute("class", "outline-none focus-visible:stroke-cyan-400");
+          hotspot.setAttribute("class", "whiteboard-hotspot");
+          hotspot.setAttribute("vector-effect", "non-scaling-stroke");
           hotspot.setAttribute("role", "button");
           hotspot.setAttribute("tabindex", "0");
-          hotspot.setAttribute("aria-label", item.title);
+          hotspot.setAttribute("aria-label", `Apri spiegazione: ${item.title}`);
+          hotspot.setAttribute("aria-haspopup", "dialog");
           hotspot.dataset.elementId = item.elementId;
           hotspot.style.cursor = "pointer";
-          hotspot.addEventListener("click", () => setSelectedId(item.elementId));
+          const openExplanation = () => {
+            activeHotspotRef.current = hotspot;
+            interactedOutsideRef.current = false;
+            setSelectedId(item.elementId);
+          };
+          hotspot.addEventListener("click", openExplanation);
           hotspot.addEventListener("keydown", (event) => {
             if (event.key === "Enter" || event.key === " ") {
               event.preventDefault();
-              setSelectedId(item.elementId);
+              openExplanation();
             }
           });
           svg.appendChild(hotspot);
@@ -79,39 +89,47 @@ export function WhiteboardView({ payload }) {
   }
 
   return (
-    <div className="@container my-4">
-      <div className={`grid gap-4 ${hasAnnotations ? "@3xl:grid-cols-[minmax(0,1fr)_minmax(18rem,25rem)]" : ""}`}>
-        <div className="min-w-0 rounded-lg border border-zinc-800 bg-zinc-950/40 p-3">
-          <div ref={containerRef} />
-          {failed && (
-            <p className="text-xs text-rose-300" role="alert">
-              Impossibile mostrare la lavagna.
-            </p>
-          )}
-        </div>
-        {hasAnnotations && <div aria-live="polite" className="min-w-0">
-          {selected ? <section className="rounded-xl border border-fuchsia-500/30 bg-fuchsia-500/5 p-4 shadow-[0_0_24px_rgba(217,70,239,0.12)]">
-            <div className="flex items-start justify-between gap-3">
-              <h3 className="font-mono text-sm font-bold uppercase tracking-widest text-fuchsia-200">{selected.title}</h3>
-              <button
-                aria-label="Chiudi spiegazione"
-                className="shrink-0 rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/10 p-1 text-fuchsia-200 hover:bg-fuchsia-500/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fuchsia-300"
-                onClick={() => {
-                  const hotspot = Array.from(containerRef.current?.querySelectorAll("[data-element-id]") ?? [])
-                    .find((element) => element.dataset.elementId === selectedId);
-                  setSelectedId(null);
-                  hotspot?.focus();
-                }}
-                type="button"
-              ><X size={16} /></button>
-            </div>
-            <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-zinc-300">{selected.description}</p>
-          </section> : <div className="rounded-xl border border-fuchsia-500/20 bg-fuchsia-500/5 p-4">
-            <p className="text-sm leading-6 text-zinc-300">Seleziona un elemento del disegno per leggere la sua spiegazione.</p>
-            <p className="mt-2 text-xs text-zinc-400">Puoi usare anche Tab e Invio.</p>
-          </div>}
-        </div>}
+    <div className="my-4">
+      {hasAnnotations && (
+        <p className="mb-2 text-xs text-zinc-400">Seleziona un elemento evidenziato per leggere la sua spiegazione. Puoi usare anche Tab e Invio.</p>
+      )}
+      <div className="relative min-w-0 rounded-lg border border-zinc-800 bg-zinc-950/40 p-3">
+        <div ref={containerRef} />
+        {selected && <div aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-lg bg-zinc-950/75 backdrop-blur-sm" />}
+        {failed && (
+          <p className="text-xs text-rose-300" role="alert">
+            Impossibile mostrare la lavagna.
+          </p>
+        )}
       </div>
+      <Dialog.Root modal={false} open={Boolean(selected)} onOpenChange={(open) => { if (!open) setSelectedId(null); }}>
+        <Dialog.Portal>
+          <Dialog.Content
+            className="fixed top-1/2 left-1/2 z-111 flex max-h-[85dvh] w-[min(94vw,25rem)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-xl border border-fuchsia-500/30 bg-zinc-950 p-4 shadow-[0_0_24px_rgba(217,70,239,0.12)] focus:outline-none"
+            onCloseAutoFocus={(event) => {
+              event.preventDefault();
+              if (!interactedOutsideRef.current && activeHotspotRef.current?.isConnected) activeHotspotRef.current.focus();
+            }}
+            onPointerDownOutside={(event) => {
+              const target = event.detail.originalEvent.target;
+              if (target instanceof Element && target.closest(".whiteboard-hotspot") && containerRef.current?.contains(target)) event.preventDefault();
+            }}
+            onInteractOutside={(event) => { if (!event.defaultPrevented) interactedOutsideRef.current = true; }}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <Dialog.Title className="min-w-0 wrap-break-word font-mono text-sm font-bold uppercase tracking-widest text-fuchsia-200">{selected?.title}</Dialog.Title>
+              <Dialog.Close asChild>
+                <button
+                  aria-label="Chiudi spiegazione"
+                  className="shrink-0 rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/10 p-1 text-fuchsia-200 hover:bg-fuchsia-500/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fuchsia-300"
+                  type="button"
+                ><X size={16} /></button>
+              </Dialog.Close>
+            </div>
+            <Dialog.Description className="mt-3 min-h-0 overflow-y-auto whitespace-pre-wrap wrap-break-word text-sm leading-6 text-zinc-300">{selected?.description}</Dialog.Description>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   );
 }

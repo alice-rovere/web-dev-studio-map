@@ -176,7 +176,7 @@ export default function NodeDetailsModal({
           aria-describedby={undefined}
           ref={panelRef}
           className="fixed inset-y-0 right-0 z-50 flex h-dvh w-full flex-col border-l border-slate-900 bg-slate-950/85 shadow-[-10px_0_30px_rgba(0,0,0,0.8)] backdrop-blur-xl focus:outline-hidden sm:max-w-md"
-          // La mappa resta interattiva: si chiude solo da X, Esc o click sul fondo mappa
+          // La mappa resta interattiva: il pannello si chiude con X o Esc
           onInteractOutside={(event) => event.preventDefault()}
           onOpenAutoFocus={(event) => event.preventDefault()}
           style={{ borderColor: `${accentColor}30` }}

@@ -265,10 +265,11 @@ const SkillMapContent = () => {
 
   const handleNodeClick = useCallback(
     (_, node) => {
+      if (!graph.nodesById.has(node.id)) return;
       handleOpenNodeDetails(node.id);
       setPendingFocus({ nodeId: node.id, maxZoom: 1.2, duration: 600 });
     },
-    [handleOpenNodeDetails],
+    [graph, handleOpenNodeDetails],
   );
 
   // Salvataggio posizione con debounce (solo root nodes se il drag è abilitato)
@@ -326,7 +327,10 @@ const SkillMapContent = () => {
 
   const finalNodes = useMemo(
     () => [
-      ...MACRO_GROUPS,
+      ...MACRO_GROUPS.map((group) => ({
+        ...group,
+        style: { ...group.style, pointerEvents: "none" },
+      })),
       ...nodes.map((node) => ({
         ...node,
         draggable: isDragEnabled && Boolean(node.draggable),
@@ -583,7 +587,6 @@ const SkillMapContent = () => {
           nodesDraggable={isDragEnabled}
           onNodeClick={handleNodeClick}
           onNodeDragStop={handleNodeDragStop}
-          onPaneClick={handleCloseModal}
           panOnDrag
           zoomOnPinch
           zoomOnScroll

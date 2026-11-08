@@ -46,6 +46,17 @@
   background-color: var(--app-canvas);
 }
 
+.whiteboard-hotspot {
+  outline: none;
+  transition: fill 150ms ease, stroke 150ms ease;
+}
+
+.whiteboard-hotspot:hover,
+.whiteboard-hotspot:focus-visible {
+  fill: rgb(217 70 239 / 0.12);
+  stroke: rgb(232 121 249 / 0.9);
+}
+
 /* Tematizzazione Cyberpunk per i controlli di React Flow */
 .react-flow__controls-button {
   @apply bg-transparent! border-b! border-slate-800/50! last:border-b-0! text-slate-400! hover:text-cyan-400! hover:bg-slate-900/50! transition-colors duration-200;
