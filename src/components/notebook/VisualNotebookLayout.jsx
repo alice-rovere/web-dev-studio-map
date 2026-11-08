@@ -1,4 +1,4 @@
-import { Component, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -14,6 +14,7 @@ import InternetBrowserDiagram from "./InternetBrowserDiagram.jsx";
 import WebRequestCycleDiagram from "./WebRequestCycleDiagram.jsx";
 import ComputerSystemDiagram, { OperatingSystemDiagram } from "./ComputerSystemDiagram.jsx";
 import LanguageExecutionDiagram from "./LanguageExecutionDiagram.jsx";
+import ComputerExplorer from "./ComputerExplorer.jsx";
 import { PHASE_ICONS } from "../../notebooks/phaseIcons.js";
 
 const ILLUSTRATIONS = {
@@ -26,31 +27,6 @@ const ILLUSTRATIONS = {
 };
 
 const AUTOPLAY_MS = 3200;
-const ComputerExplorer = lazy(() => import("./ComputerExplorer.jsx"));
-
-class ExplorerErrorBoundary extends Component {
-  state = { error: null };
-
-  static getDerivedStateFromError(error) {
-    return { error };
-  }
-
-  componentDidCatch(error) {
-    console.error("Impossibile caricare l'esploratore 3D.", error);
-  }
-
-  render() {
-    if (this.state.error) {
-      return (
-        <div className="fixed inset-0 z-60 flex flex-col items-center justify-center gap-4 bg-slate-950 p-6 text-center" role="alert">
-          <p>Impossibile caricare l’esploratore 3D. Gli appunti 2D restano disponibili.</p>
-          <button type="button" onClick={this.props.onClose} className="rounded border border-cyan-400 px-4 py-2 text-cyan-200">Torna agli appunti</button>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
 
 function CodePanel({ panel }) {
   const highlighted = new Set(panel.highlightLines ?? []);
@@ -252,7 +228,7 @@ export default function VisualNotebookLayout({ config, onClose }) {
               onClick={() => { setIsPlaying(false); setExplorerOpen(true); }}
               className="rounded-lg border border-cyan-400/50 px-3 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-400/10"
             >
-              Esplora in 3D
+              Esplora componenti
             </button>
           )}
           <span className="hidden font-mono text-xs text-zinc-400 sm:inline">
@@ -275,25 +251,16 @@ export default function VisualNotebookLayout({ config, onClose }) {
       </header>
 
       {explorerOpen && (
-        <ExplorerErrorBoundary onClose={closeExplorer}>
-          <Suspense fallback={
-            <div className="fixed inset-0 z-60 flex flex-col items-center justify-center gap-4 bg-slate-950 text-slate-300">
-              <p>Caricamento esploratore 3D…</p>
-              <button type="button" onClick={closeExplorer} className="rounded border border-cyan-400 px-4 py-2 text-cyan-200">Torna agli appunti</button>
-            </div>
-          }>
-            <ComputerExplorer
-              steps={steps}
-              stepId={currentStep.id}
-              reducedMotion={shouldReduceMotion}
-              onClose={closeExplorer}
-              onSelect={(id) => {
-                const index = steps.findIndex((step) => step.id === id);
-                if (index >= 0) goTo(index);
-              }}
-            />
-          </Suspense>
-        </ExplorerErrorBoundary>
+        <ComputerExplorer
+          steps={steps}
+          stepId={currentStep.id}
+          reducedMotion={shouldReduceMotion}
+          onClose={closeExplorer}
+          onSelect={(id) => {
+            const index = steps.findIndex((step) => step.id === id);
+            if (index >= 0) goTo(index);
+          }}
+        />
       )}
 
       <div className="relative z-10 flex min-h-0 grow flex-col md:flex-row">
@@ -350,7 +317,18 @@ export default function VisualNotebookLayout({ config, onClose }) {
           <div className={scrollWithIllustration ? "nowheel min-h-0 grow overflow-y-auto" : "contents"}>
           {Illustration && (
             <div className="shrink-0 px-3 pt-3 sm:px-4">
-              <Illustration isPlaying={isPlaying && !shouldReduceMotion} stepId={currentStep.id} />
+              <Illustration
+                isPlaying={isPlaying && !shouldReduceMotion}
+                stepId={currentStep.id}
+                reducedMotion={shouldReduceMotion}
+                onSelect={(id) => {
+                  const index = steps.findIndex((step) => step.id === id);
+                  if (index >= 0) {
+                    setIsPlaying(false);
+                    goTo(index);
+                  }
+                }}
+              />
             </div>
           )}
 

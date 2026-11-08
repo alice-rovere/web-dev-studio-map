@@ -1,11 +1,11 @@
 export const COMPUTER_EXPLORER_PARTS = {
-  "scheda-madre": { position: [0, 0, 0], camera: [6, 8, 8] },
-  cpu: { position: [-0.9, 0.3, -0.5], camera: [1.4, 3.2, 3.2] },
-  ram: { position: [0.55, 0.35, -0.4], camera: [3, 3, 3] },
-  archiviazione: { position: [1.4, 0.3, 1.15], camera: [4, 3, 4] },
-  gpu: { position: [-0.7, 0.65, 1.2], camera: [2.4, 3.1, 4.8] },
-  batteria: { position: [3.65, 0.25, 0.3], camera: [6, 3, 4.3] },
-  periferiche: { position: [-2.4, 0.4, -1.3], camera: [-5, 3, 2.5] },
+  "scheda-madre": { x: 170, y: 75, width: 700, height: 405 },
+  cpu: { x: 410, y: 230, width: 145, height: 90 },
+  ram: { x: 630, y: 132, width: 155, height: 70 },
+  archiviazione: { x: 630, y: 365, width: 155, height: 70 },
+  gpu: { x: 215, y: 365, width: 155, height: 70 },
+  batteria: { x: 215, y: 132, width: 155, height: 70 },
+  periferiche: { x: 10, y: 245, width: 135, height: 88 },
 };
 
 export function getExplorableSteps(steps) {
