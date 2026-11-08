@@ -155,20 +155,6 @@ export const tokenConcepts = [
 
 export const aiTools = [
   {
-    name: "OpenCode",
-    role: "Agente di coding nel terminale",
-    description:
-      "CLI open source per lavorare sul repository con un agente: legge i file, propone modifiche ed esegue comandi. E indipendente dal provider e puo usare modelli diversi.",
-    points: [
-      "Configurazione del progetto in opencode.json o opencode.jsonc.",
-      "Legge AGENTS.md per conoscere stack, comandi e convenzioni.",
-      "Supporta skill, server MCP e sessioni di lavoro riprendibili.",
-      "Le chiavi dei provider vanno nelle variabili d'ambiente, mai nel repository.",
-    ],
-    href: "https://opencode.ai/docs",
-    label: "Documentazione OpenCode",
-  },
-  {
     name: "OpenRouter",
     role: "Gateway unificato per i modelli",
     description:
@@ -208,7 +194,7 @@ export const agentFileSections = [
   {
     title: "Istruzioni e strumenti",
     description:
-      "Molti agenti leggono anche file di configurazione dedicati (per esempio opencode.json) e cartelle di skill. Tieni le regole generali in AGENTS.md e la configurazione tecnica nei file dello strumento.",
+      "Molti agenti leggono anche file di configurazione dedicati e cartelle di skill. Tieni le regole generali in AGENTS.md e la configurazione tecnica nei file dello strumento.",
   },
 ];
 
@@ -323,12 +309,6 @@ export const aiSecurityPractices = [
 ];
 
 export const resources = [
-  {
-    label: "OpenCode",
-    description: "Documentazione dell'agente di coding open source da terminale.",
-    href: "https://opencode.ai/docs",
-    category: "Strumenti",
-  },
   {
     label: "OpenRouter",
     description: "API unificata, listino per modello, routing e documentazione.",

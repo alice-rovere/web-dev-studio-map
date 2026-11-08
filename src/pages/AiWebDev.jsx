@@ -6,7 +6,6 @@ import {
   FileText,
   GitBranch,
   ShieldCheck,
-  Terminal,
 } from "lucide-react";
 import { StickyNotesCanvas } from "../components/notes/StickyNotesCanvas";
 import PageTabs from "../components/navigation/PageTabs";
@@ -203,16 +202,12 @@ const TABS = [
     label: "Strumenti",
     content: (
       <section aria-labelledby="ai-tools-title" className="space-y-4">
-        <SectionTitle id="ai-tools-title">OpenCode e OpenRouter</SectionTitle>
+        <SectionTitle id="ai-tools-title">OpenRouter</SectionTitle>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
           {aiTools.map(({ name, role, description, points, href, label }) => (
             <Card key={name} className="h-full">
               <div className="flex items-center gap-2 text-indigo-400">
-                {name === "OpenCode" ? (
-                  <Terminal size={18} />
-                ) : (
-                  <GitBranch size={18} />
-                )}
+                <GitBranch size={18} />
                 <h4 className="text-lg font-bold text-white">{name}</h4>
               </div>
               <p className="text-[11px] font-mono uppercase tracking-wider text-cyan-500">

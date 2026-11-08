@@ -10,7 +10,7 @@ Accanto a ogni file trovi la sua funzione e, quando utile, cosa modificare.
 
 La guida elenca i file del progetto presenti e non ignorati da Git, oltre ad
 alcune cartelle locali e al file .env. Non elenca il contenuto di .git,
-node_modules e dist, né altri eventuali file locali ignorati: sono dati Git,
+node_modules e dist, né eventuali altri file locali ignorati: sono dati Git,
 dipendenze, risultati di build o file personali, non il codice da modificare.
 Le cartelle vuote indicate sono quelle presenti sul computer al momento della
 stesura e potrebbero non esistere in un'altra copia del progetto.
@@ -85,9 +85,6 @@ web-dev-studio-map\                      Cartella principale del progetto.
 |-- eslint.config.js                     Regole di controllo del codice ESLint.
 |-- vite.config.js                       Configurazione Vite, React e Tailwind.
 |-- vercel.json                          Rewrite Vercel verso index.html per SPA.
-|
-|-- .opencode\
-|   |-- opencode.json                    Configurazione OpenCode e MCP Supabase.
 |
 |-- .vscode\
 |   |-- settings.json                    Impostazioni VS Code del progetto.
@@ -191,9 +188,6 @@ web-dev-studio-map\                      Cartella principale del progetto.
 |   |   |-- aiWebDev.js                  Testi, esempi e risorse della pagina AI.
 |   |   |-- baseNodes.js                 Categorie, etichette, colori e posizioni
 |   |   |                                di riferimento della mappa.
-|   |   |-- fullStackData.js             Dati e grafo di lezioni full-stack;
-|   |                                    non risultano importati dalla pagina
-|   |                                    attuale dei percorsi, che usa Supabase.
 |   |
 |   |-- flow\                            Strumenti React Flow della mappa desktop.
 |   |   |-- edges\                       Cartella archi, attualmente vuota.
@@ -225,6 +219,8 @@ web-dev-studio-map\                      Cartella principale del progetto.
 |   |   |-- dentroIlPcConfig.test.js     Verifica percorsi PC e sistema operativo.
 |   |   |-- httpProtocolConfig.test.js   Verifica catalogo e percorso HTTP.
 |   |   |-- internetBrowserConfig.test.js Verifica percorso Internet e registro.
+|   |   |-- languageExecutionDiagram.test.js Verifica il diagramma di esecuzione.
+|   |   |-- linguaggiProgrammazioneConfig.test.js Verifica il percorso sui linguaggi.
 |   |   |
 |   |   |-- configs\                     Configurazioni originali e modello.
 |   |   |   |-- _template.flowConfig.js  Esempio di struttura per un percorso.
@@ -292,6 +288,7 @@ web-dev-studio-map\                      Cartella principale del progetto.
 |   |   |-- 0012_seed_dentro_il_pc.sql   Inserimento del percorso originale PC.
 |   |   |-- 0013_separa_percorsi_pc.sql  Separa percorso hardware e sistema
 |   |                                    operativo, controllando eventuali conflitti.
+|   |   |-- 0014_seed_linguaggi_programmazione.sql Inserisce il percorso sui linguaggi.
 |   |
 |   |-- roadmaps\                        Script di popolamento dei nodi per area.
 |       |-- 01_frontend.sql              Roadmap frontend, browser e interfacce.
@@ -311,6 +308,5 @@ ESTENSIONI E VERIFICHE
 .css = stili.    .sql = istruzioni per il database.    .svg = disegno vettoriale.
 .json / .yaml = configurazione o dati.    .test.js = verifica automatica mirata.
 
-Per cambiamenti all'app: pnpm lint e pnpm build. Non c'è uno script test in
-package.json; esistono comunque file .test.js eseguibili con node --test.
-Consulta README.md per i comandi e le precauzioni aggiornate.
+Per cambiamenti all'app: pnpm lint, pnpm test e pnpm build. Consulta README.md
+per i comandi e le precauzioni aggiornate.

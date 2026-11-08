@@ -33,7 +33,7 @@ test("rendering preserves formatting and recognizes glossary terms across styles
     createElement(RichTextView, { document }),
   ));
   assert.match(html, /cursor-help/);
-  assert.match(html, /<strong>Re<\/strong>/);
+  assert.match(html, /<strong class="font-semibold">Re<\/strong>/);
   assert.match(html, /<em>act<\/em>/);
   assert.match(html, /<u>/);
   assert.match(html, /background-color:#fef08a/);

@@ -56,7 +56,6 @@ src/
 │   └── GlossaryProvider.jsx      # Caricamento e mutazioni del glossario
 ├── data/
 │   ├── baseNodes.js              # Macro gruppi, ancore, colori ed etichette categoria
-│   └── fullStackData.js          # Nodi, archi e lezioni del percorso guidato
 ├── flow/
 │   ├── nodes/
 │   │   ├── index.jsx             # Registro nodeTypes
@@ -146,9 +145,9 @@ parole. Il testo viene scomposto in nodi React e i termini trovati diventano tri
 Radix Tooltip con la definizione recuperata dal glossario.
 
 4.7 Percorso guidato
-fullStackData definisce 11 lezioni e un grafo statico del ciclo di vita di una
-richiesta web. GuidedPath usa React Flow con nodi dedicati e un edge personalizzato
-per le curve di ritorno, evidenziando nodo e arco correnti a ogni passo.
+La precedente implementazione statica basata su fullStackData è stata rimossa.
+La pagina Percorsi guidati carica ora configurazioni e contenuti da Supabase;
+i modelli originali restano in src/notebooks/configs.
 
 4.8 Schema Supabase
 Tabelle principali:

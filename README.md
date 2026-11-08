@@ -14,7 +14,7 @@ Mappa interattiva delle competenze per lo sviluppo web full-stack. I nodi tecnol
 - Glossario consultabile per iniziale o ricerca, con termini apribili in una modale, definizioni su più paragrafi e tooltip automatici con anteprima nei testi. Nella pagina knowledge è evidenziata solo la prima occorrenza di ogni termine: selezionandola si apre la definizione completa. Gli editor possono aggiungere termini anche dalla mappa e dalla pagina knowledge.
 - Percorso guidato che illustra il ciclo di vita di una richiesta web.
 - Pagine dedicate a linee guida e sicurezza.
-- Pagina "AI nel Web Dev" con best practice per i prompt, gestione dei token, OpenCode/OpenRouter, `AGENTS.md`, OpenSpec, sicurezza e link utili (contenuti statici nel codice).
+- Pagina "AI nel Web Dev" con best practice per i prompt, gestione dei token, OpenRouter, `AGENTS.md`, OpenSpec, sicurezza e link utili (contenuti statici nel codice).
 - Post-it personali associati alle pagine e ai nodi, salvati su Supabase.
 - Pannello di amministrazione per editor/admin: ricerca gerarchica dei nodi con antenati, scorrimento automatico ai dettagli del nodo selezionato, relazioni, categorie, sezioni di contenuto e glossario.
 - Creazione e modifica dei nodi con slug generato dal nome, categorie obbligatorie e salvataggio atomico di nodo, categorie e relazioni.
@@ -80,12 +80,7 @@ I blocchi rimangono nel JSON della rispettiva sezione; il salvataggio verifica `
 | `pnpm build`   | Genera la build di produzione in `dist/`.   |
 | `pnpm preview` | Anteprima locale della build di produzione. |
 | `pnpm lint`    | Esegue ESLint su tutto il progetto.         |
-
-Per eseguire le verifiche mirate sui blocchi, sul testo formattato e sui conflitti:
-
-```bash
-node --test src/components/content/sectionBlocks.test.js src/components/content/ContentSectionView.test.js src/components/content/blocks/RichTextBlock.test.js src/services/mapService.test.js src/notebooks/internetBrowserConfig.test.js src/notebooks/httpProtocolConfig.test.js src/notebooks/dentroIlPcConfig.test.js src/notebooks/computerExplorerParts.test.js src/notebooks/validateNotebook.test.js src/notebooks/linguaggiProgrammazioneConfig.test.js src/notebooks/languageExecutionDiagram.test.js
-```
+| `pnpm test`    | Esegue tutti i test con il runner integrato di Node.js. |
 
 ## Rotte
 
@@ -188,7 +183,7 @@ pnpm build
 ## Note
 
 - Il file `.env` è escluso dal repository: non committare chiavi o segreti.
-- Non è presente uno script `pnpm test`; i test mirati si eseguono con `node --test` come indicato sopra.
+- `pnpm test` esegue tutti i file `*.test.js` con il runner integrato di Node.js.
 - Prima di modificare schema o policy Supabase, crea una nuova migrazione e verifica che sia compatibile con i dati già presenti.
 
 ## Sistema Sticky Notes (Memo Fluttuanti)
