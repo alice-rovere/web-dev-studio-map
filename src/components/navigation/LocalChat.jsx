@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { MessageCircle, X } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
-import { collectChatContext } from "../../services/chatContext";
+import { prepareChatRequest } from "../../services/chatRequest";
 
 const ENDPOINT = "http://127.0.0.1:43175/chat";
 
@@ -14,6 +14,8 @@ export default function LocalChat() {
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [useMap, setUseMap] = useState(false);
+  const [conversationSegment, setConversationSegment] = useState(0);
   const controller = useRef(null);
 
   useEffect(() => {
@@ -32,6 +34,8 @@ export default function LocalChat() {
     setMessage("");
     setMessages([]);
     setError("");
+    setUseMap(false);
+    setConversationSegment(0);
   }
 
   async function submit(event) {
@@ -43,13 +47,14 @@ export default function LocalChat() {
     setPending(true);
     setError("");
     try {
-      const sources = await collectChatContext(text, selectedNodeId);
+      const body = await prepareChatRequest({
+        message: text, messages, conversationSegment, useMap, selectedNodeId,
+      });
       if (abort.signal.aborted) return;
-      const history = messages.slice(-4).map(({ role, content }) => ({ role, content: content.slice(0, 3000) }));
       const response = await fetch(ENDPOINT, {
         method: "POST",
         headers: { Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, history, sources }),
+        body: JSON.stringify(body),
         signal: abort.signal,
       });
       let payload;
@@ -63,8 +68,8 @@ export default function LocalChat() {
       if (controller.current !== abort) return;
       setMessages((previous) => [
         ...previous,
-        { role: "user", content: text },
-        { role: "assistant", content: payload.content, sources: sources.map((source) => source.name), remaining: payload.remaining },
+        { role: "user", content: text, conversationSegment },
+        { role: "assistant", content: payload.content, conversationSegment, useMap, sources: body.sources.map((source) => source.name), remaining: payload.remaining },
       ]);
       setMessage("");
     } catch (requestError) {
@@ -105,14 +110,18 @@ export default function LocalChat() {
             </Dialog.Close>
           </div>
           <div aria-live="polite" className="mt-4 flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
-            {messages.length === 0 && <p className="text-sm text-slate-400">Fai una domanda di studio. La domanda e un estratto pertinente della mappa saranno inviati a Copilot.</p>}
+            {messages.length === 0 && <p className="text-sm text-slate-400">Fai una domanda di studio. Per impostazione predefinita Copilot risponde senza consultare la mappa.</p>}
             {messages.map((item, index) => (
               <div key={index} className={`rounded-lg p-3 text-sm ${item.role === "user" ? "ml-6 bg-cyan-950" : "mr-6 bg-slate-800"}`}>
                 <p className="mb-1 text-xs font-semibold text-cyan-300">{item.role === "user" ? "Tu" : "Copilot"}</p>
                 <p className="whitespace-pre-wrap wrap-break-word">{item.content}</p>
                 {item.role === "assistant" && (
                   <p className="mt-3 text-xs text-slate-400">
-                    {item.sources.length ? `Fonti inviate: ${item.sources.join(", ")}.` : "Nessuna fonte pertinente trovata nella mappa; verifica la risposta."}
+                    {!item.useMap
+                      ? "Modalità generica: nessun contenuto della mappa inviato."
+                      : item.sources.length
+                        ? `Fonti inviate: ${item.sources.join(", ")}.`
+                        : "Nessuna fonte pertinente trovata nella mappa; verifica la risposta."}
                     {Number.isInteger(item.remaining) && ` Richieste locali rimaste oggi: ${item.remaining}.`}
                   </p>
                 )}
@@ -122,6 +131,24 @@ export default function LocalChat() {
           </div>
           {error && <p className="mt-2 text-sm text-red-300" role="alert">{error}</p>}
           <form className="mt-3 space-y-2" onSubmit={submit}>
+            <label className="flex items-center gap-2 text-sm text-slate-200">
+              <input
+                checked={useMap}
+                className="h-4 w-4 accent-cyan-400"
+                disabled={pending}
+                onChange={(event) => {
+                  setUseMap(event.target.checked);
+                  setConversationSegment((previous) => previous + 1);
+                }}
+                type="checkbox"
+              />
+              Usa la mappa
+            </label>
+            <p className="text-xs text-slate-400">
+              {useMap
+                ? "Invia anche estratti pertinenti della mappa. Cambiando modalità, le risposte precedenti non vengono inviate."
+                : "Invia solo domanda e messaggi di questa modalità. Cambiando modalità, le risposte precedenti non vengono inviate."}
+            </p>
             <label className="block text-xs text-slate-300" htmlFor="local-chat-message">Domanda</label>
             <textarea className="min-h-20 w-full resize-y rounded border border-slate-600 bg-slate-950 p-2 text-sm" id="local-chat-message" maxLength={2000} onChange={(event) => setMessage(event.target.value)} value={message} />
             <div className="flex flex-wrap gap-2">
