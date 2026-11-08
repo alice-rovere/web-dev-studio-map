@@ -26,11 +26,92 @@ function PartBox({ position, size, color, selected, onSelect, children }) {
   );
 }
 
+function BoardDetail({ position, size, color = "#c29a52" }) {
+  return (
+    <mesh position={position} raycast={() => null}>
+      <boxGeometry args={size} />
+      <meshStandardMaterial color={color} roughness={0.55} />
+    </mesh>
+  );
+}
+
+function MotherboardDetails() {
+  const traces = [
+    { position: [-1.65, 0.09, -0.5], size: [0.8, 0.012, 0.035] },
+    { position: [-1.25, 0.09, -0.72], size: [0.035, 0.012, 0.45] },
+    { position: [-1.05, 0.09, -0.95], size: [0.4, 0.012, 0.035] },
+    { position: [-0.1, 0.09, -1.05], size: [0.035, 0.012, 0.6] },
+    { position: [1.25, 0.09, -0.25], size: [0.7, 0.012, 0.035] },
+    { position: [1.6, 0.09, -0.75], size: [0.035, 0.012, 1] },
+    { position: [-1.45, 0.09, 1.55], size: [1, 0.012, 0.035] },
+    { position: [0.2, 0.09, 1.7], size: [1.6, 0.012, 0.035] },
+  ];
+
+  return (
+    <group>
+      <BoardDetail position={[-0.9, 0.115, -0.5]} size={[1.58, 0.05, 1.58]} color="#94a3b8" />
+      {[-1.65, -0.15].map((x) => (
+        <BoardDetail
+          key={`socket-contact-${x}`}
+          position={[x, 0.145, -0.5]}
+          size={[0.07, 0.012, 0.72]}
+        />
+      ))}
+
+      {[0, 0.3, 0.8, 1.1].map((x) => (
+        <group key={`ram-slot-${x}`}>
+          <BoardDetail position={[x, 0.105, -0.4]} size={[0.29, 0.035, 2.38]} color="#111827" />
+          {[-1.58, 0.78].map((z) => (
+            <BoardDetail
+              key={`ram-latch-${x}-${z}`}
+              position={[x, 0.13, z]}
+              size={[0.34, 0.045, 0.08]}
+              color="#64748b"
+            />
+          ))}
+        </group>
+      ))}
+
+      <BoardDetail position={[-2, 0.15, 0.55]} size={[0.62, 0.12, 0.62]} color="#334155" />
+      <BoardDetail position={[-2, 0.22, 0.55]} size={[0.42, 0.04, 0.42]} color="#64748b" />
+      {[-2.13, -2, -1.87].map((x) => (
+        <BoardDetail
+          key={`chipset-fin-${x}`}
+          position={[x, 0.26, 0.55]}
+          size={[0.035, 0.04, 0.36]}
+          color="#94a3b8"
+        />
+      ))}
+
+      {traces.map((trace, index) => (
+        <BoardDetail
+          key={`trace-${index}`}
+          position={trace.position}
+          size={trace.size}
+          color={index % 3 === 0 ? "#c29a52" : "#2dd4bf"}
+        />
+      ))}
+
+      {[-1.45, -0.95, -0.45, 1.45].map((x) => (
+        <BoardDetail
+          key={`edge-connector-${x}`}
+          position={[x, 0.14, -1.98]}
+          size={[0.3, 0.12, 0.38]}
+          color="#334155"
+        />
+      ))}
+      <BoardDetail position={[2.22, 0.16, -0.85]} size={[0.28, 0.18, 0.82]} color="#475569" />
+      <BoardDetail position={[2.22, 0.255, -0.85]} size={[0.12, 0.025, 0.58]} color="#111827" />
+    </group>
+  );
+}
+
 function HardwareModel({ selected, onSelect }) {
   const part = (id) => () => onSelect(id);
   return (
     <group>
       <PartBox color="#155b4c" position={[0, 0, 0]} size={[5.2, 0.16, 4.4]} selected={selected === "scheda-madre"} onSelect={part("scheda-madre")} />
+      <MotherboardDetails />
 
       <PartBox color="#cbd5e1" position={[-0.9, 0.25, -0.5]} size={[1.3, 0.25, 1.3]} selected={selected === "cpu"} onSelect={part("cpu")}>
         <mesh position={[0, 0.15, 0]}><boxGeometry args={[0.95, 0.06, 0.95]} /><meshStandardMaterial color="#64748b" /></mesh>
