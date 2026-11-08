@@ -1,0 +1,316 @@
+DEVSKILLMAP - GUIDA ALLA STRUTTURA DELL'APP
+Inventario del progetto al 8 novembre 2026
+===============================================================================
+
+COME LEGGERE QUESTA GUIDA
+
+Le cartelle terminano con \. I file sono indentati sotto la cartella che li
+contiene: per esempio, src\pages\Login.jsx è nella cartella pages, dentro src.
+Accanto a ogni file trovi la sua funzione e, quando utile, cosa modificare.
+
+La guida elenca i file del progetto presenti e non ignorati da Git, oltre ad
+alcune cartelle locali e al file .env. Non elenca il contenuto di .git,
+node_modules e dist, né altri eventuali file locali ignorati: sono dati Git,
+dipendenze, risultati di build o file personali, non il codice da modificare.
+Le cartelle vuote indicate sono quelle presenti sul computer al momento della
+stesura e potrebbero non esistere in un'altra copia del progetto.
+
+Le descrizioni fotografano lo stato attuale: se aggiungi, sposti o elimini
+file, aggiorna anche questa guida. Per stampare, usa un carattere monospaziato.
+
+PRIMA DI MODIFICARE: CODICE O CONTENUTI?
+-------------------------------------------------------------------------------
+- Nodi, descrizioni, sezioni, relazioni, glossario e percorsi guidati sono
+  normalmente salvati su Supabase. Con un account editor/admin puoi modificarli
+  dall'app; cambiare solo i file SQL o le configurazioni iniziali non aggiorna
+  automaticamente i dati già presenti nel database.
+- Per cambiare aspetto e comportamento dell'interfaccia, intervieni nei file
+  React di src\pages e src\components; per le operazioni sui dati consulta
+  anche src\services e gli hook in src\hooks.
+- I file SQL in supabase\migrations documentano cambiamenti applicati nel
+  tempo. Per evolvere schema o permessi crea una nuova migrazione: non alterare
+  migrazioni già applicate. Prima di eseguire seed o roadmap leggi README.md:
+  alcuni script sono destinati a database nuovi e possono sostituire dati.
+- Non inserire mai chiavi segrete nel codice client o nelle variabili VITE_*.
+  .env è locale e non va condiviso; usa solo URL e chiave pubblica Supabase.
+
+DOVE ANDARE PER...
+-------------------------------------------------------------------------------
+- Cambiare pagine, indirizzi e protezione degli accessi: src\App.jsx.
+- Cambiare menu e navigazione: src\components\navigation\Navbar.jsx.
+- Modificare aspetto generale, colori e stili: src\index.css e classi Tailwind
+  dei singoli componenti.
+- Cambiare la mappa desktop: src\pages\SkillMap.jsx, src\flow\nodes e
+  src\flow\utils. Per la versione mobile: MobileSkillTree.jsx.
+- Aggiungere/modificare nodi e relativi testi: pannello Admin nell'app;
+  per cambiare il modulo e il salvataggio: NodeForm.jsx e mapService.js.
+- Modificare le schede di approfondimento e i loro blocchi: NodeKnowledge.jsx,
+  ContentSectionEditor.jsx, ContentSectionView.jsx e content\blocks.
+- Cambiare glossario: pagina Glossario/Admin nell'app; per la sua interfaccia
+  vedi components\glossary e GlossaryManager.jsx.
+- Cambiare un percorso guidato esistente: usa l'editor dei percorsi nell'app.
+  Per layout, controlli o diagrammi: components\notebook. Le configurazioni
+  originali in notebooks\configs sono anche usate come esempi/modelli e per
+  generare i dati iniziali: non sostituiscono il contenuto già su Supabase.
+- Cambiare le pagine Linee guida, Sicurezza e AI: src\pages\Guidelines.jsx,
+  Security.jsx e AiWebDev.jsx; molti contenuti AI sono in data\aiWebDev.js.
+- Cambiare salvataggio e aspetto dei post-it: useStickyNotes.js e
+  components\notes\StickyNotesCanvas.jsx.
+- Cambiare struttura database e permessi: nuova migrazione in
+  supabase\migrations, verificando policy e istruzioni nel README.
+
+STRUTTURA DETTAGLIATA
+===============================================================================
+
+web-dev-studio-map\                      Cartella principale del progetto.
+|
+|-- .env.example                         Modello delle variabili Supabase.
+|-- .env                                 Configurazione locale, ignorata da Git;
+|                                        non contiene codice da condividere.
+|-- .gitignore                           File e cartelle esclusi da Git.
+|-- AGENTS.md                            Istruzioni di progetto per gli agenti AI.
+|-- README.md                            Funzionalità, avvio, database e comandi.
+|-- IDEE-PERCORSI-REACT-THREE.md         Idee per percorsi e visualizzazioni 3D.
+|-- creareNuovoVisualNotebook.txt        Appunti sulla creazione di notebook;
+|                                        parte del flusso può essere datata.
+|-- doveSiamoArrivati.txt                Fotografia precedente dello stato tecnico;
+|                                        può non riflettere le ultime modifiche.
+|-- prompt per inserire nuovi nodi.txt    Prompt di supporto per nuovi nodi.
+|-- STRUTTURA-APP.txt                    Questa guida stampabile.
+|-- index.html                           Pagina HTML iniziale e punto di aggancio
+|                                        dell'app React, metadati e manifest.
+|-- package.json                         Dipendenze e comandi pnpm del progetto.
+|-- pnpm-lock.yaml                       Versioni precise delle dipendenze;
+|                                        aggiornato dal gestore pnpm.
+|-- eslint.config.js                     Regole di controllo del codice ESLint.
+|-- vite.config.js                       Configurazione Vite, React e Tailwind.
+|-- vercel.json                          Rewrite Vercel verso index.html per SPA.
+|
+|-- .opencode\
+|   |-- opencode.json                    Configurazione OpenCode e MCP Supabase.
+|
+|-- .vscode\
+|   |-- settings.json                    Impostazioni VS Code del progetto.
+|
+|-- public\                              Risorse pubbliche servite direttamente.
+|   |-- favicon.svg                      Icona dell'app; modifica qui il disegno.
+|   |-- manifest.webmanifest             Nome, icone, scorciatoia e condivisione
+|   |                                    dell'app installabile.
+|   |-- sw.js                            Service worker minimale.
+|
+|-- scripts\
+|   |-- generate-notebook-migration.js   Genera la migrazione dei notebook
+|                                        originali; non rigenerare migrazioni
+|                                        già applicate per aggiornare i dati.
+|
+|-- src\                                 Codice principale dell'app React.
+|   |-- main.jsx                         Avvia React, importa gli stili globali
+|   |                                    e registra il service worker in produzione.
+|   |-- App.jsx                          Route, layout comune, provider e guardie
+|   |                                    di accesso; punto di partenza delle pagine.
+|   |-- index.css                        Tailwind, stili globali e contrasto.
+|   |
+|   |-- assets\                          Cartella risorse locali, attualmente vuota.
+|   |-- lib\                             Cartella utilità locali, attualmente vuota.
+|   |
+|   |-- components\                      Elementi di interfaccia riutilizzabili.
+|   |   |
+|   |   |-- admin\                       Componenti del pannello di gestione.
+|   |   |   |-- GlossaryManager.jsx      Ricerca e gestione termini del glossario;
+|   |   |   |                            usato anche nella pagina Glossario.
+|   |   |   |-- NodeForm.jsx             Modulo per dati, categorie e padri
+|   |   |   |                            di un nodo; modifica qui i suoi campi.
+|   |   |   |-- NodeTree.jsx             Albero e ricerca dei nodi nell'admin.
+|   |   |   |-- NotebookManager.jsx      Elenco, accesso alla modifica ed
+|   |   |                                eliminazione dei percorsi nell'admin.
+|   |   |
+|   |   |-- auth\
+|   |   |   |-- RequireEditor.jsx        Protegge le pagine riservate a editor
+|   |   |                                e admin e gestisce accesso non consentito.
+|   |   |
+|   |   |-- content\                     Sezioni di approfondimento dei nodi.
+|   |   |   |-- ContentSectionEditor.jsx Editor, aggiunta, ordine e modifica
+|   |   |   |                            dei blocchi di una sezione.
+|   |   |   |-- ContentSectionView.jsx   Visualizzazione delle schede contenuto.
+|   |   |   |-- ContentSectionView.test.js Verifica visualizzazione e compatibilità
+|   |   |   |                            con blocchi precedenti non supportati.
+|   |   |   |-- sectionBlocks.js         Conversione e aggiornamento dei blocchi,
+|   |   |   |                            inclusa la gestione delle bozze in conflitto.
+|   |   |   |-- sectionBlocks.test.js    Verifica conversione e modifiche ai blocchi.
+|   |   |   |
+|   |   |   |-- blocks\                  Tipi di blocco per gli approfondimenti.
+|   |   |       |-- CalloutBlock.jsx      Visualizzazione e modifica di avvisi.
+|   |   |       |-- ImageBlock.jsx        Immagini, caricamento e anteprima.
+|   |   |       |-- RichTextBlock.jsx     Editor e visualizzazione testo formattato.
+|   |   |       |-- RichTextBlock.test.js Verifica formattazione e glossario.
+|   |   |       |-- WhiteboardBlock.jsx   Blocco lavagna e apertura dell'editor.
+|   |   |       |-- WhiteboardModal.jsx   Finestra di disegno con Excalidraw.
+|   |   |
+|   |   |-- glossary\                    Componenti per i termini del glossario.
+|   |   |   |-- GlossaryDialog.jsx        Finestra con la definizione completa.
+|   |   |   |-- GlossaryForm.jsx          Modulo per aggiungere un termine.
+|   |   |   |-- GlossaryPageScope.jsx     Gestisce occorrenze e dialogo nella pagina.
+|   |   |   |-- GlossaryText.jsx          Riconosce termini nel testo e mostra
+|   |   |   |                            anteprime e collegamenti al glossario.
+|   |   |   |-- QuickGlossaryAdd.jsx      Pulsante e finestra di aggiunta rapida.
+|   |   |
+|   |   |-- navigation\
+|   |   |   |-- Navbar.jsx               Barra di navigazione, accesso e inbox.
+|   |   |   |-- PageTabs.jsx             Schede di navigazione interne alle pagine.
+|   |   |
+|   |   |-- notebook\                    Aspetto e interazioni degli appunti visivi.
+|   |   |   |-- VisualNotebookLayout.jsx  Layout condiviso: fasi, step, pannelli,
+|   |   |   |                            riproduzione e collegamento ai diagrammi.
+|   |   |   |-- NotebookEditorPreview.jsx Anteprima dei contenuti nell'editor.
+|   |   |   |-- ComputerExplorer.jsx     Modello 3D interattivo del computer.
+|   |   |   |-- ComputerSystemDiagram.jsx Diagrammi dei componenti del PC e
+|   |   |   |                            del sistema operativo.
+|   |   |   |-- InternetBrowserDiagram.jsx Diagramma del percorso URL-browser.
+|   |   |   |-- PrismaFlowDiagram.jsx    Diagramma del flusso Prisma/SQL.
+|   |   |   |-- WebRequestCycleDiagram.jsx Diagramma del ciclo richiesta web.
+|   |   |
+|   |   |-- notes\
+|   |   |   |-- StickyNotesCanvas.jsx     Area dei post-it e loro interfaccia.
+|   |   |
+|   |   |-- skill-map\                   Componenti specifici della mappa.
+|   |       |-- MobileSkillTree.jsx       Albero dei nodi per schermi piccoli.
+|   |       |-- NodeDetailsModal.jsx      Pannello dettagli, relazioni e navigazione.
+|   |       |-- NodeGenericInfo.jsx       Informazioni generiche e modifica dei
+|   |       |                            dati descrittivi del nodo.
+|   |       |-- NodeIcon.jsx              Sceglie l'icona associata al nodo.
+|   |       |-- SkillMapSearch.jsx        Ricerca di nodi e termini del glossario.
+|   |
+|   |-- context\                         Stato condiviso dai componenti React.
+|   |   |-- AuthContext.jsx              Provider di autenticazione e ruoli.
+|   |   |-- authContextStore.js          Definizione del contesto autenticazione.
+|   |   |-- GlossaryContext.jsx          Definizione del contesto glossario.
+|   |   |-- GlossaryPageContext.js       Contesto delle occorrenze nella pagina.
+|   |   |-- GlossaryProvider.jsx         Carica e condivide dati del glossario.
+|   |
+|   |-- data\                            Dati statici presenti nel codice.
+|   |   |-- aiWebDev.js                  Testi, esempi e risorse della pagina AI.
+|   |   |-- baseNodes.js                 Categorie, etichette, colori e posizioni
+|   |   |                                di riferimento della mappa.
+|   |   |-- fullStackData.js             Dati e grafo di lezioni full-stack;
+|   |                                    non risultano importati dalla pagina
+|   |                                    attuale dei percorsi, che usa Supabase.
+|   |
+|   |-- flow\                            Strumenti React Flow della mappa desktop.
+|   |   |-- edges\                       Cartella archi, attualmente vuota.
+|   |   |-- nodes\
+|   |   |   |-- MacroGroupNode.jsx       Aspetto del gruppo/categoria principale.
+|   |   |   |-- TechNode.jsx             Aspetto e controlli del nodo tecnologico.
+|   |   |   |-- index.jsx                Registra i tipi di nodo React Flow.
+|   |   |-- utils\
+|   |       |-- focusViewport.js         Inquadratura dei nodi accanto al pannello.
+|   |       |-- focusViewport.test.js    Verifica centratura e zoom della mappa.
+|   |       |-- geometry.js              Calcolo delle posizioni circolari.
+|   |       |-- nodeGraph.js             Costruzione del grafo, colori e posizioni.
+|   |
+|   |-- hooks\                           Logica React condivisa tra componenti.
+|   |   |-- useAuth.js                   Accesso allo stato di autenticazione.
+|   |   |-- useGlossary.js               Accesso allo stato del glossario.
+|   |   |-- useMapGraph.js               Caricamento e stato del grafo della mappa.
+|   |   |-- useStickyNotes.js            Lettura e operazioni Supabase sui post-it.
+|   |
+|   |-- notebooks\                       Modelli e strumenti degli appunti visivi.
+|   |   |-- computerExplorerParts.js     Componenti, posizioni e viste del modello 3D.
+|   |   |-- computerExplorerParts.test.js Verifica parti e selezioni del modello.
+|   |   |-- registry.js                  Catalogo e caricamento delle configurazioni
+|   |   |                                originali; usato anche per modelli/editor.
+|   |   |-- phaseIcons.js                Elenco e nomi delle icone per le fasi.
+|   |   |-- validateNotebook.js         Controlla struttura e riferimenti dei
+|   |   |                                percorsi prima del salvataggio.
+|   |   |-- validateNotebook.test.js     Verifica validazione e dati di migrazione.
+|   |   |-- dentroIlPcConfig.test.js     Verifica percorsi PC e sistema operativo.
+|   |   |-- httpProtocolConfig.test.js   Verifica catalogo e percorso HTTP.
+|   |   |-- internetBrowserConfig.test.js Verifica percorso Internet e registro.
+|   |   |
+|   |   |-- configs\                     Configurazioni originali e modello.
+|   |   |   |-- _template.flowConfig.js  Esempio di struttura per un percorso.
+|   |   |   |-- dentroIlPcConfig.js      Contenuti originali sui componenti del PC.
+|   |   |   |-- sistemaOperativoConfig.js Contenuti originali su OS, kernel e driver.
+|   |   |   |-- httpProtocolConfig.js    Contenuti originali sul ciclo HTTP.
+|   |   |   |-- internetBrowserConfig.js Contenuti originali su Internet/browser.
+|   |   |   |-- prismaFlowConfig.js      Contenuti originali del percorso Prisma.
+|   |   |
+|   |   |-- icons\                       Disegni SVG delle tecnologie nei diagrammi.
+|   |       |-- ApiIcon.jsx              Icona API.
+|   |       |-- BrowserIcon.jsx          Icona browser.
+|   |       |-- CssIcon.jsx              Icona CSS.
+|   |       |-- DatabaseIcon.jsx         Icona database.
+|   |       |-- ExpressIcon.jsx          Icona Express.
+|   |       |-- HtmlIcon.jsx             Icona HTML.
+|   |       |-- HttpIcon.jsx             Icona HTTP.
+|   |       |-- JavaScriptIcon.jsx       Icona JavaScript.
+|   |       |-- NodeJsIcon.jsx           Icona Node.js.
+|   |       |-- PrismaIcon.jsx           Icona Prisma.
+|   |       |-- ServerIcon.jsx           Icona server.
+|   |       |-- TerminalIcon.jsx         Icona terminale.
+|   |       |-- index.js                 Associa le icone ai nomi usati nell'app.
+|   |
+|   |-- pages\                           Schermate principali dell'app.
+|   |   |-- SkillMap.jsx                 Mappa, vista mobile, selezione e dettagli.
+|   |   |-- NodeKnowledge.jsx            Approfondimento di un nodo, aperto dalla
+|   |   |                                mappa; sezioni, informazioni e post-it.
+|   |   |-- Admin.jsx                    Pagina admin per nodi, contenuti,
+|   |   |                                glossario e percorsi.
+|   |   |-- Login.jsx                    Pagina di accesso.
+|   |   |-- Glossary.jsx                 Pagina del glossario.
+|   |   |-- GuidedPath.jsx               Catalogo dei percorsi guidati.
+|   |   |-- VisualNotebook.jsx           Carica il percorso da Supabase e lo apre.
+|   |   |-- NotebookEditor.jsx          Editor per creare/modificare percorsi.
+|   |   |-- QuickAdd.jsx                 Aggiunta rapida di link e inbox privata.
+|   |   |-- Guidelines.jsx               Pagina e contenuti delle linee guida.
+|   |   |-- Security.jsx                 Pagina e risorse sulla sicurezza.
+|   |   |-- AiWebDev.jsx                 Interfaccia della pagina AI nel web dev.
+|   |
+|   |-- services\                        Operazioni verso Supabase.
+|       |-- supabase.js                  Configurazione e client Supabase.
+|       |-- mapService.js                Nodi, relazioni, sezioni, immagini e link.
+|       |-- mapService.test.js           Verifica salvataggi condizionali e conflitti.
+|       |-- glossaryService.js           Lettura e modifica termini del glossario.
+|       |-- notebookService.js           Lettura e gestione percorsi guidati.
+|
+|-- supabase\                            Schema, permessi e dati iniziali.
+|   |-- seed.sql                         Dati iniziali per database nuovo; leggere
+|   |                                    il README prima di eseguirlo.
+|   |
+|   |-- migrations\                     Evoluzioni del database in ordine numerico.
+|   |   |-- 0001_init.sql                Tabelle e funzioni iniziali.
+|   |   |-- 0002_rls.sql                 Policy di accesso Row Level Security.
+|   |   |-- 0003_add_devops_category.sql Aggiunge categorie devops e tools.
+|   |   |-- 0004_note_images_storage.sql Bucket e policy per immagini dei contenuti.
+|   |   |-- 0005_inbox_links.sql         Inbox privata e relative policy.
+|   |   |-- 0006_prisma_orm_node.sql     Inserisce il nodo Prisma ORM e i legami.
+|   |   |-- 0007_atomic_node_save.sql    Salvataggio atomico di nodo e relazioni.
+|   |   |-- 0008_internet_browser_notebook.sql Teoria Internet/browser e backup
+|   |   |                                delle sezioni originali riconosciute.
+|   |   |-- 0009_guided_notebooks.sql    Tabella, policy e collegamenti dei percorsi.
+|   |   |-- 0010_seed_guided_notebooks.sql Dati iniziali dei percorsi originali.
+|   |   |-- 0011_guided_notebooks_editor_access.sql Permessi editor sui percorsi.
+|   |   |-- 0012_seed_dentro_il_pc.sql   Inserimento del percorso originale PC.
+|   |   |-- 0013_separa_percorsi_pc.sql  Separa percorso hardware e sistema
+|   |                                    operativo, controllando eventuali conflitti.
+|   |
+|   |-- roadmaps\                        Script di popolamento dei nodi per area.
+|       |-- 01_frontend.sql              Roadmap frontend, browser e interfacce.
+|       |-- 02_backend.sql               Roadmap backend, API e linguaggi server.
+|       |-- 03_database.sql              Roadmap database, storage e ORM.
+|       |-- 04_devops.sql                Roadmap DevOps, cloud e deployment.
+|       |-- 05_tools.sql                 Roadmap strumenti e workflow di sviluppo.
+|
+|-- .github\workflows\                   Cartella locale attualmente vuota.
+|-- node_modules\                        Dipendenze installate; non modificare a mano.
+|-- dist\                                Build generata; non modificare a mano.
+|-- .git\                                Dati interni Git; non modificare a mano.
+
+ESTENSIONI E VERIFICHE
+-------------------------------------------------------------------------------
+.jsx = componente React / interfaccia.    .js = logica, dati o configurazione.
+.css = stili.    .sql = istruzioni per il database.    .svg = disegno vettoriale.
+.json / .yaml = configurazione o dati.    .test.js = verifica automatica mirata.
+
+Per cambiamenti all'app: pnpm lint e pnpm build. Non c'è uno script test in
+package.json; esistono comunque file .test.js eseguibili con node --test.
+Consulta README.md per i comandi e le precauzioni aggiornate.
