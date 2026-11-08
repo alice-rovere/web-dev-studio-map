@@ -35,3 +35,12 @@ test("i contenuti iniziali della pagina web corrispondono al renderer", async ()
   assert.deepEqual(config.components.map(({ id }) => id), GRID_COMPONENT_IDS["web-page"]);
   assert.equal(validateVisualGrid({ renderer: "web-page", description: "Descrizione", config }), null);
 });
+
+test("le griglie Excalidraw richiedono una lavagna e spiegazioni coerenti", () => {
+  const grid = { renderer: "excalidraw", description: "Descrizione", config: { title: "Griglia", whiteboard: { elements: [{ id: "a" }], files: {}, annotations: [{ elementId: "a", title: "Titolo", description: "Descrizione" }] } } };
+  assert.equal(validateVisualGrid(grid), null);
+  grid.config.whiteboard.elements = [];
+  assert.match(validateVisualGrid(grid), /Disegna/);
+  grid.config.whiteboard.elements = [{ id: "b" }];
+  assert.match(validateVisualGrid(grid), /spiegazione/i);
+});

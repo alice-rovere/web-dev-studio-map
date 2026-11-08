@@ -20,7 +20,7 @@ globalThis.fetch = async (input, init) => {
 const cacheDir = mkdtempSync(join(tmpdir(), "visual-grid-test-"));
 const vite = await createServer({ cacheDir, server: { middlewareMode: true, ws: false }, optimizeDeps: { noDiscovery: true }, appType: "custom" });
 after(async () => { globalThis.fetch = originalFetch; await vite.close(); rmSync(cacheDir, { recursive: true, force: true }); });
-const { updateVisualGrid, fetchVisualGridsForNode } = await vite.ssrLoadModule("/src/services/visualGridService.js");
+const { createVisualGrid, deleteVisualGrid, updateVisualGrid, fetchVisualGridsForNode } = await vite.ssrLoadModule("/src/services/visualGridService.js");
 
 test("il salvataggio verifica versione e conflitti senza perdere la bozza", async () => {
   const draft = { slug: "pc", description: "Test", nodeId: null, pendingNodeSlug: "pc", config: { title: "Test" }, updatedAt: "old" };
@@ -39,4 +39,15 @@ test("il nodo può avere più griglie associate", async () => {
   response = [{ slug: "pc" }, { slug: "web" }];
   assert.equal((await fetchVisualGridsForNode("node")).length, 2);
   assert.equal(requests.at(-1).url.searchParams.get("node_id"), "eq.node");
+});
+
+test("creazione salva renderer Excalidraw e cancellazione controlla la versione", async () => {
+  response = { slug: "nuova", updated_at: "new" };
+  await createVisualGrid({ slug: "nuova", description: "Descrizione", nodeId: null, config: { title: "Nuova" } });
+  assert.equal(requests.at(-1).init.method, "POST");
+  assert.equal(JSON.parse(requests.at(-1).init.body).renderer, "excalidraw");
+  response = [];
+  await assert.rejects(deleteVisualGrid("nuova", "old"), /modificata o eliminata/);
+  assert.equal(requests.at(-1).url.searchParams.get("updated_at"), "eq.old");
+  assert.equal(requests.at(-1).init.method, "DELETE");
 });

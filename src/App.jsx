@@ -62,6 +62,7 @@ const router = createBrowserRouter([{
     { path: "/notebook/dentro-il-pc", element: <LegacyComputerRedirect /> },
     { path: "/notebook/:slug", element: <VisualNotebook /> },
     { path: "/griglia/:slug", element: <VisualGrid /> },
+    { path: "/admin/griglie/nuova", element: <RequireEditor><VisualGridEditor /></RequireEditor> },
     { path: "/admin/griglie/:slug/modifica", element: <RequireEditor><VisualGridEditor /></RequireEditor> },
     { path: "/admin/percorsi/nuovo", element: <RequireEditor><NotebookEditor /></RequireEditor> },
     { path: "/admin/percorsi/dentro-il-pc/modifica", element: <RequireEditor><Navigate to="/admin/griglie/dentro-il-pc/modifica" replace /></RequireEditor> },

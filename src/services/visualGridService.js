@@ -3,11 +3,27 @@ import { requireSupabase } from "./supabase";
 const COLUMNS = "slug, description, node_id, pending_node_slug, renderer, config, updated_at";
 
 function gridError(error, fallback) {
+  if (error?.code === "23505") return new Error("Esiste già una griglia con questo slug.");
   if (error?.code === "42501" || error?.code === "PGRST301") return new Error("Permessi insufficienti: serve un ruolo editor o admin.");
   if (error?.code === "23503") return new Error("Il nodo selezionato non esiste più.");
   return new Error(fallback);
 }
 
+export async function createVisualGrid({ slug, description, nodeId, config }) {
+  const { data, error } = await requireSupabase().from("visual_grids")
+    .insert({ slug, description, node_id: nodeId || null, renderer: "excalidraw", config })
+    .select(COLUMNS).single();
+  if (error) throw gridError(error, "Impossibile creare la griglia.");
+  return data;
+}
+
+export async function deleteVisualGrid(slug, updatedAt) {
+  if (!updatedAt) throw new Error("Versione della griglia mancante: ricarica prima di eliminare.");
+  const { data, error } = await requireSupabase().from("visual_grids").delete()
+    .eq("slug", slug).eq("updated_at", updatedAt).select("slug").maybeSingle();
+  if (error) throw gridError(error, "Impossibile eliminare la griglia.");
+  if (!data) throw new Error("La griglia è stata modificata o eliminata, oppure non hai più i permessi. Ricarica prima di eliminare.");
+}
 export async function fetchVisualGrids() {
   const { data, error } = await requireSupabase().from("visual_grids").select(COLUMNS).order("created_at");
   if (error) throw gridError(error, "Impossibile caricare le griglie visive. Verifica la connessione e le migrazioni Supabase.");

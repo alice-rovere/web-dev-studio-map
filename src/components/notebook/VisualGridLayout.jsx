@@ -3,6 +3,7 @@ import { useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { ComputerHardwareMap } from "./ComputerSystemDiagram";
 import { validateVisualGrid } from "../../notebooks/visualGrid";
+import { WhiteboardView } from "../content/blocks/WhiteboardBlock";
 
 const WEB_PARTS = [
   { id: "html", label: "HTML", subtitle: "Struttura", x: 30, color: "#fb923c" },
@@ -48,6 +49,13 @@ export default function VisualGridLayout({ grid, onClose }) {
   const [selectedId, setSelectedId] = useState(grid.config?.components?.[0]?.id);
   const problem = validateVisualGrid(grid);
   if (problem) return <div className="p-6 text-sm text-rose-300" role="alert">{problem} <button className="underline" onClick={onClose} type="button">Torna indietro</button></div>;
+  if (grid.renderer === "excalidraw") return <main className="h-full overflow-y-auto bg-[#0b1120] text-slate-100">
+    <header className="flex items-start justify-between gap-4 border-b border-cyan-500/20 px-4 py-4 sm:px-6">
+      <div><h1 className="text-xl font-bold text-cyan-200">{grid.config.title}</h1><p className="mt-1 text-sm text-slate-400">{grid.config.subtitle}</p></div>
+      <button aria-label="Chiudi griglia" className="rounded-lg border border-slate-700 p-2 hover:bg-slate-800" onClick={onClose} type="button"><X size={20} /></button>
+    </header>
+    <div className="mx-auto max-w-7xl p-4 sm:p-6"><WhiteboardView payload={grid.config.whiteboard} /></div>
+  </main>;
   const selected = grid.config.components.find((component) => component.id === selectedId) ?? grid.config.components[0];
   return <main className="h-full overflow-y-auto bg-[#0b1120] text-slate-100">
     <header className="flex items-start justify-between gap-4 border-b border-cyan-500/20 px-4 py-4 sm:px-6">

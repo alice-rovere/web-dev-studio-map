@@ -28,7 +28,6 @@ import {
 const SECTION_TYPES = [
   { value: "text", label: "Testo" },
   { value: "code", label: "Codice" },
-  { value: "list", label: "Lista" },
   { value: "table", label: "Tabella" },
   { value: "timeline", label: "Timeline" },
   { value: "callout", label: "Callout" },
@@ -132,6 +131,7 @@ function ensurePayload(type, payload) {
       };
     case "whiteboard":
       return {
+        ...source,
         elements: Array.isArray(source.elements) ? source.elements : [],
         files:
           source.files && typeof source.files === "object" ? source.files : {},
@@ -1159,7 +1159,7 @@ export default function ContentSectionEditor({ nodeId, canEdit = false, onDraftC
                 </div>
               ) : null
             }
-            blockActions={canEdit ? (block, index) => (
+            blockActions={canEdit ? (block, index) => block.type === "list" ? null : (
               <BlockActionsMenu
                 editable={SECTION_TYPES.some((entry) => entry.value === block.type)}
                 index={index}

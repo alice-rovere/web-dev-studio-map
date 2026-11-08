@@ -5,9 +5,10 @@ export const GRID_COMPONENT_IDS = {
 
 export function validateVisualGrid({ description, renderer, config }) {
   const ids = GRID_COMPONENT_IDS[renderer];
-  if (!ids) return "Schema della griglia non riconosciuto.";
+  if (!ids && renderer !== "excalidraw") return "Schema della griglia non riconosciuto.";
   if (typeof description !== "string" || !description.trim() || typeof config?.title !== "string" || !config.title.trim()) return "Inserisci il titolo e la descrizione della griglia.";
   if (config.subtitle != null && typeof config.subtitle !== "string") return "Il sottotitolo della griglia non è valido.";
+  if (renderer === "excalidraw") return validateWhiteboard(config.whiteboard, { requireContent: true });
   if (!Array.isArray(config.components) || config.components.length !== ids.length) return "La griglia deve contenere tutti i componenti dello schema.";
   const found = new Set();
   for (const component of config.components) {
@@ -29,3 +30,4 @@ export function validateVisualGrid({ description, renderer, config }) {
   }
   return null;
 }
+import { validateWhiteboard } from "../components/content/blocks/interactiveWhiteboard.js";

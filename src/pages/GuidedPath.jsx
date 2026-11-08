@@ -111,7 +111,9 @@ export default function GuidedPathPage() {
           )}
         </section>
         <section aria-label="Elenco delle griglie visive" className="mt-10">
-          <h2 className="mb-4 text-xl font-bold">Griglie esplorabili</h2>
+          <div className="mb-4 flex flex-wrap items-center gap-4"><h2 className="text-xl font-bold">Griglie esplorabili</h2>
+            {isEditor && <Link className="inline-flex items-center gap-2 rounded-lg bg-cyan-400 px-3 py-2 text-sm font-semibold text-slate-950" to="/admin/griglie/nuova"><Plus size={16} /> Nuova griglia</Link>}
+          </div>
           {gridState.loading && <p className="text-sm text-slate-400">Caricamento griglie…</p>}
           {gridState.error && <p role="alert" className="text-sm text-rose-300">{gridState.error} <button className="underline" onClick={() => setAttempt((value) => value + 1)} type="button">Riprova</button></p>}
           {!gridState.loading && !gridState.error && <>
