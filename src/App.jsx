@@ -2,9 +2,11 @@ import { lazy, Suspense } from "react";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import { MotionConfig } from "framer-motion";
 import Navbar from "./components/navigation/Navbar";
+import LocalChat from "./components/navigation/LocalChat";
 import RequireEditor from "./components/auth/RequireEditor";
 import { AuthProvider } from "./context/AuthContext";
 import { GlossaryProvider } from "./context/GlossaryProvider";
+import { useAuth } from "./hooks/useAuth";
 
 const SkillMap = lazy(() => import("./pages/SkillMap"));
 const Guidelines = lazy(() => import("./pages/Guidelines"));
@@ -27,6 +29,7 @@ function PageLoader() {
 }
 
 function AppLayout() {
+  const { session, isAdmin } = useAuth();
   return (
             <div className="flex h-dvh w-full flex-col overflow-hidden bg-[#0b1120] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-[env(safe-area-inset-top)] text-[#e8edf5]">
               <Navbar />
@@ -35,6 +38,7 @@ function AppLayout() {
                   <Outlet />
                 </Suspense>
               </div>
+              {session && isAdmin && <LocalChat key={session.user.id} />}
             </div>
   );
 }
