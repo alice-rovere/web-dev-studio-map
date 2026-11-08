@@ -17,7 +17,7 @@ export function validateNotebook({ slug, description, config }) {
       return "Ogni passaggio deve avere un titolo, una descrizione e una fase valida.";
     }
     steps.add(step.id);
-    if (step.illustration && !["generic", "prisma-flow", "internet-browser", "web-request-cycle", "computer-system", "operating-system"].includes(step.illustration)) return "Illustrazione non riconosciuta.";
+    if (step.illustration && !["generic", "prisma-flow", "internet-browser", "web-request-cycle", "computer-system", "operating-system", "language-execution"].includes(step.illustration)) return "Illustrazione non riconosciuta.";
     if (!Array.isArray(step.panels) || !step.panels.length) return `Aggiungi almeno un pannello al passaggio "${step.title}".`;
     for (const panel of step.panels) {
       if (!panel.label?.trim() || !["text", "code", "table"].includes(panel.kind)) return "Ogni pannello deve avere un titolo e un tipo valido.";

@@ -13,6 +13,7 @@ import PrismaFlowDiagram from "./PrismaFlowDiagram.jsx";
 import InternetBrowserDiagram from "./InternetBrowserDiagram.jsx";
 import WebRequestCycleDiagram from "./WebRequestCycleDiagram.jsx";
 import ComputerSystemDiagram, { OperatingSystemDiagram } from "./ComputerSystemDiagram.jsx";
+import LanguageExecutionDiagram from "./LanguageExecutionDiagram.jsx";
 import { PHASE_ICONS } from "../../notebooks/phaseIcons.js";
 
 const ILLUSTRATIONS = {
@@ -21,6 +22,7 @@ const ILLUSTRATIONS = {
   "web-request-cycle": WebRequestCycleDiagram,
   "computer-system": ComputerSystemDiagram,
   "operating-system": OperatingSystemDiagram,
+  "language-execution": LanguageExecutionDiagram,
 };
 
 const AUTOPLAY_MS = 3200;
@@ -206,7 +208,8 @@ export default function VisualNotebookLayout({ config, onClose }) {
 
   const progress = ((stepIndex + 1) / steps.length) * 100;
   const Illustration = ILLUSTRATIONS[currentStep.illustration];
-  const compactDiagram = ["computer-system", "operating-system"].includes(currentStep.illustration);
+  const compactDiagram = ["computer-system", "operating-system", "language-execution"].includes(currentStep.illustration);
+  const scrollWithIllustration = currentStep.illustration === "language-execution";
   const visiblePhases = compactDiagram
     ? phases.filter((phase) => phase.id === currentStep.phase)
     : phases;
@@ -344,6 +347,7 @@ export default function VisualNotebookLayout({ config, onClose }) {
             </p>
           </div>
 
+          <div className={scrollWithIllustration ? "nowheel min-h-0 grow overflow-y-auto" : "contents"}>
           {Illustration && (
             <div className="shrink-0 px-3 pt-3 sm:px-4">
               <Illustration isPlaying={isPlaying && !shouldReduceMotion} stepId={currentStep.id} />
@@ -368,7 +372,9 @@ export default function VisualNotebookLayout({ config, onClose }) {
             </div>
           )}
 
-          <div className="nowheel grid min-h-0 grow auto-rows-min gap-3 overflow-y-auto p-3 sm:p-4 lg:grid-flow-col lg:auto-cols-fr lg:auto-rows-auto">
+          <div className={scrollWithIllustration
+            ? "grid gap-3 p-3 sm:p-4"
+            : "nowheel grid min-h-0 grow auto-rows-min gap-3 overflow-y-auto p-3 sm:p-4 lg:grid-flow-col lg:auto-cols-fr lg:auto-rows-auto"}>
             {visiblePhases.map((phase) => {
               const Icon = PHASE_ICONS[phase.icon] ?? Code2;
               const isActive = phase.id === currentStep.phase;
@@ -407,6 +413,7 @@ export default function VisualNotebookLayout({ config, onClose }) {
                 </section>
               );
             })}
+          </div>
           </div>
 
           <footer className="flex flex-wrap items-center justify-center gap-2 border-t border-fuchsia-500/20 px-4 py-3">

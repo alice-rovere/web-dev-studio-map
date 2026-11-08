@@ -6,6 +6,7 @@ const loaders = {
   "http-protocol": () => import("./configs/httpProtocolConfig.js"),
   "dentro-il-pc": () => import("./configs/dentroIlPcConfig.js"),
   "sistema-operativo": () => import("./configs/sistemaOperativoConfig.js"),
+  "linguaggi-programmazione": () => import("./configs/linguaggiProgrammazioneConfig.js"),
 };
 
 const notebookCatalog = [
@@ -48,6 +49,14 @@ const notebookCatalog = [
       "Segui una richiesta Express attraverso Prisma Client e SQL parametrizzato fino alla riga creata nel database e alla risposta al client.",
     nodeLabel: "Prisma ORM",
     parentLabel: "Librerie ORM & ODM (Prisma, Mongoose)",
+  },
+  {
+    slug: "linguaggi-programmazione",
+    title: "Linguaggi di programmazione",
+    description:
+      "Segui il percorso dal codice sorgente alle strategie di compilazione, ai runtime e alle istruzioni eseguite dalla CPU.",
+    nodeLabel: "Linguaggi Backend Multiparadigma",
+    parentLabel: null,
   },
 ];
 

@@ -68,6 +68,8 @@ Le migrazioni `0009_guided_notebooks.sql` e `0010_seed_guided_notebooks.sql` son
 
 La migrazione `0012_seed_dentro_il_pc.sql` aggiunge il percorso originale **Dentro il PC**. La successiva `0013_separa_percorsi_pc.sql` lo sostituisce con il percorso sui componenti fisici e aggiunge **Sistema operativo, kernel e driver**. Entrambi sono consultabili anche senza nodo associato e possono collegarsi a un nodo con lo stesso slug. Se il contenuto originale è stato modificato, la migrazione 0013 si interrompe senza sovrascriverlo: confronta i dati e risolvi il conflitto prima di applicarla. Anche un percorso `sistema-operativo` preesistente con contenuto diverso blocca la migrazione.
 
+La migrazione `0014_seed_linguaggi_programmazione.sql` aggiunge il percorso **Linguaggi di programmazione** e lo collega a `backend-languages` quando il nodo è presente; in caso contrario resta consultabile e in attesa del collegamento.
+
 I blocchi rimangono nel JSON della rispettiva sezione; il salvataggio verifica `updated_at` per evitare di sovrascrivere cambiamenti avvenuti in un'altra scheda. In caso di conflitto la bozza rimane nell'editor: si possono aggiornare i dati senza perderla e, se il blocco interessato non è cambiato, riprovare il salvataggio. Se invece è cambiato, confrontare e copiare la bozza prima di annullare. Le immagini già salvate non vengono eliminate automaticamente dallo storage quando si rimuove o sostituisce un blocco, perché potrebbero essere ancora utilizzate altrove.
 
 ## Script
@@ -82,7 +84,7 @@ I blocchi rimangono nel JSON della rispettiva sezione; il salvataggio verifica `
 Per eseguire le verifiche mirate sui blocchi, sul testo formattato e sui conflitti:
 
 ```bash
-node --test src/components/content/sectionBlocks.test.js src/components/content/ContentSectionView.test.js src/components/content/blocks/RichTextBlock.test.js src/services/mapService.test.js src/notebooks/internetBrowserConfig.test.js src/notebooks/httpProtocolConfig.test.js src/notebooks/dentroIlPcConfig.test.js src/notebooks/computerExplorerParts.test.js src/notebooks/validateNotebook.test.js
+node --test src/components/content/sectionBlocks.test.js src/components/content/ContentSectionView.test.js src/components/content/blocks/RichTextBlock.test.js src/services/mapService.test.js src/notebooks/internetBrowserConfig.test.js src/notebooks/httpProtocolConfig.test.js src/notebooks/dentroIlPcConfig.test.js src/notebooks/computerExplorerParts.test.js src/notebooks/validateNotebook.test.js src/notebooks/linguaggiProgrammazioneConfig.test.js src/notebooks/languageExecutionDiagram.test.js
 ```
 
 ## Rotte
@@ -112,11 +114,13 @@ La voce **Percorso Guidato** mostra l'indice degli appunti visivi, con titolo, d
 
 Il percorso **Dentro il PC** presenta i componenti fisici, mentre **Sistema operativo, kernel e driver** spiega come il software usa le risorse del computer. Entrambi utilizzano uno schema 2D compatto con gli elementi rilevanti evidenziati e lasciano più spazio alla spiegazione del passaggio corrente.
 
+Il percorso **Linguaggi di programmazione** segue il codice sorgente attraverso compilazione nativa, bytecode e runtime fino alle istruzioni della CPU, chiarendo dove queste strategie si sovrappongono. Lo schema evidenzia la strada del passaggio corrente; sugli schermi stretti si può scorrere in orizzontale per confrontare le tre colonne.
+
 In **Dentro il PC**, il pulsante **Esplora in 3D** apre un modello stilizzato della scheda madre e dei componenti, realizzato con React Three Fiber. Trascina per ruotare, usa la rotella o due dita per lo zoom e seleziona un elemento nella scena o nell'elenco: la relativa spiegazione e il passaggio degli appunti si aggiornano insieme. La batteria è mostrata separatamente come esempio di portatile. L'esploratore viene caricato solo all'apertura; senza WebGL restano utilizzabili l'elenco e il notebook 2D. La scena è un modello didattico, non una riproduzione in scala. Three.js è fissato alla versione `0.182.0` perché l'attuale React Three Fiber usa `Clock`, deprecato nelle versioni successive; rivalutare il vincolo quando Fiber passerà a `Timer`.
 
 Gli editor e gli admin possono creare percorsi dalla pagina **Percorsi guidati** o dalla scheda omonima nel pannello admin; la scheda permette anche di modificarli ed eliminarli. Il form gestisce titolo, descrizione, nodo facoltativo, fasi, icone, passaggi e pannelli di testo, codice e tabella, con anteprima prima del salvataggio. Lo slug è scelto alla creazione e rimane stabile; ogni nodo può avere al massimo un percorso associato. Il salvataggio rende immediatamente pubblico il percorso e verifica che non sia stato modificato contemporaneamente altrove.
 
-Per i nuovi passaggi si può scegliere uno schema generico delle fasi con icone predefinite o nessuna illustrazione. Le scene animate originali dei tre percorsi migrati restano disponibili sui rispettivi passaggi: sono componenti React legati ai loro identificativi, non disegni personalizzabili dal form. Nuove scene animate su misura richiedono ancora codice. Le configurazioni in `src/notebooks/configs/` e il registry conservano i dati sorgente della migrazione e i riferimenti alle scene originali, non sono il catalogo usato dall'app.
+Per i nuovi passaggi si può scegliere uno schema generico delle fasi con icone predefinite o nessuna illustrazione. Le scene originali dei percorsi con diagrammi personalizzati restano disponibili sui rispettivi passaggi: sono componenti React legati ai loro identificativi, non disegni personalizzabili dal form. Nuove scene su misura richiedono codice. Le configurazioni in `src/notebooks/configs/` e il registry conservano i dati sorgente delle migrazioni e i riferimenti alle scene originali, non sono il catalogo usato dall'app.
 
 Le icone dei nodi vivono in `src/notebooks/icons/` (un file `.jsx` per nodo, registrato per slug in `index.js`) e sono usate sia dalla mappa (desktop e mobile) sia dai visualizer. I nodi senza icona registrata non ne mostrano alcuna.
 
