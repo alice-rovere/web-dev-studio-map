@@ -4,7 +4,7 @@ import { ImageView } from "./blocks/ImageBlock";
 import { WhiteboardView } from "./blocks/WhiteboardBlock";
 import { RichTextView } from "./blocks/RichTextBlock";
 
-function ContentBlock({ section }) {
+export function ContentBlock({ section }) {
   const payload = section?.payload ?? {};
 
   if (section?.type === "text" && payload.richText) {
