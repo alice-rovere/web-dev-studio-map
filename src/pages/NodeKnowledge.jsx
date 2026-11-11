@@ -45,7 +45,6 @@ export default function NodeKnowledgePage({
   const onDraftChange = useCallback((guard) => { draftGuard.current = guard; }, []);
   const confirmNavigation = async () => !draftGuard.current || await draftGuard.current();
   const [notebook, setNotebook] = useState({ nodeId: null, slug: null, error: null });
-  const [infographic, setInfographic] = useState(false);
   const [notebookAttempt, setNotebookAttempt] = useState(0);
   const [grids, setGrids] = useState({ nodeId: null, items: [], error: null });
   useEffect(() => {
@@ -74,11 +73,6 @@ export default function NodeKnowledgePage({
     if (await confirmNavigation()) {
       navigate(`/notebook/${notebookSlug}`, { state: { knowledgeNodeId: node.id } });
     }
-  };
-
-  const changeView = async (nextInfographic) => {
-    if (nextInfographic === infographic) return;
-    if (await confirmNavigation()) setInfographic(nextInfographic);
   };
 
   const getDefaultNotePosition = () => {
@@ -244,35 +238,10 @@ export default function NodeKnowledgePage({
           className="min-w-0 border-t pt-6 2xl:col-start-2 2xl:row-start-2"
           style={{ borderTopColor: `${accent}22` }}
         >
-          {nodeData.slug === "html" && (
-            <div className="mb-6 space-y-4">
-              <div aria-label="Vista degli approfondimenti" className="flex flex-wrap gap-2" role="group">
-                <button
-                  aria-pressed={!infographic}
-                  className={`min-h-10 rounded-lg border px-3 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 ${!infographic ? "border-cyan-400 bg-cyan-400/15 text-cyan-100" : "border-zinc-700 text-zinc-300 hover:bg-zinc-800"}`}
-                  onClick={() => changeView(false)}
-                  type="button"
-                >
-                  Vista classica
-                </button>
-                <button
-                  aria-pressed={infographic}
-                  className={`min-h-10 rounded-lg border px-3 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 ${infographic ? "border-cyan-400 bg-cyan-400/15 text-cyan-100" : "border-zinc-700 text-zinc-300 hover:bg-zinc-800"}`}
-                  onClick={() => changeView(true)}
-                  type="button"
-                >
-                  Infografica
-                </button>
-              </div>
-            </div>
-          )}
           <ContentSectionEditor
             canEdit={canEdit}
-            infographic={nodeData.slug === "html" && infographic}
             nodeId={node?.id}
             onDraftChange={onDraftChange}
-            onEditView={() => changeView(false)}
-            scrollContainerRef={scrollContainerRef}
           />
           {notebookSlug === "internet-browser" && (
             <div className="mt-6">

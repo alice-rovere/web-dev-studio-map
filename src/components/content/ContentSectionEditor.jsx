@@ -11,7 +11,6 @@ import {
   X,
 } from "lucide-react";
 import { SectionCard } from "./ContentSectionView";
-import { InfographicSections } from "./HtmlInfographic";
 import { CalloutEditor } from "./blocks/CalloutBlock";
 import { ImageEditor } from "./blocks/ImageBlock";
 import { WhiteboardEditor } from "./blocks/WhiteboardBlock";
@@ -593,7 +592,7 @@ function PayloadEditor({ draft, setDraft, onUploadingChange, onUploaded }) {
   );
 }
 
-export default function ContentSectionEditor({ nodeId, canEdit = false, onDraftChange, infographic = false, onEditView, scrollContainerRef }) {
+export default function ContentSectionEditor({ nodeId, canEdit = false, onDraftChange }) {
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(Boolean(nodeId));
   const [error, setError] = useState(null);
@@ -912,41 +911,6 @@ export default function ContentSectionEditor({ nodeId, canEdit = false, onDraftC
     } finally {
       setSaving(false);
     }
-  }
-
-  if (infographic) {
-    return (
-      <section className="space-y-4" aria-label="Approfondimenti del nodo">
-        {canEdit && (
-          <button
-            className="min-h-10 rounded-lg border border-cyan-500/30 px-3 py-2 text-xs font-semibold text-cyan-300 hover:bg-cyan-500/15"
-            onClick={onEditView}
-            type="button"
-          >
-            Modifica nella vista classica
-          </button>
-        )}
-        {error && (
-          <div className="flex items-center justify-between gap-3 rounded-lg border border-rose-500/30 bg-rose-950/10 px-3 py-2 text-xs text-rose-300" role="alert">
-            <span>{error}</span>
-            <button className="font-semibold hover:underline" onClick={retryLoad} type="button">Riprova</button>
-          </div>
-        )}
-        {loading && <p className="py-8 text-xs text-zinc-500">Caricamento approfondimenti…</p>}
-        {!loading && !error && sections.length === 0 && (
-          <p className="rounded-xl border border-dashed border-zinc-800 bg-zinc-950/30 py-12 text-center text-sm italic text-zinc-500">
-            Gli approfondimenti strutturati per questo nodo non sono ancora disponibili.
-          </p>
-        )}
-        {!loading && sections.length > 0 && <InfographicSections sections={sections} scrollContainerRef={scrollContainerRef} />}
-        {actionError && (
-          <div className="rounded-md border border-rose-500/30 bg-rose-950/20 px-3 py-2 text-xs text-rose-300" role="alert">
-            <p>{actionError}</p>
-            <button className="mt-2 underline" onClick={retryLoad} type="button">Ricarica sezioni</button>
-          </div>
-        )}
-      </section>
-    );
   }
 
   return (

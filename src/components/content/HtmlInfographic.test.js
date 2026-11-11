@@ -68,3 +68,64 @@ test("the visual guide uses actual sections and keeps tag lists and rich text in
   assert.match(html, /id="html-step-media"/);
   assert.match(html, /• &lt;p&gt; → un elemento/);
 });
+
+test("the infographic selects layouts from the content structure and uses live data", () => {
+  const sections = [
+    {
+      id: "history",
+      title: "HTML nel tempo",
+      type: "timeline",
+      payload: {
+        entries: [
+          { date: "1989", title: "Proposta", description: "Nasce il Web." },
+          { date: "1990", title: "Primo browser", description: "Arriva HTML." },
+        ],
+      },
+    },
+    {
+      id: "comparison",
+      title: "HTML e JSX a confronto",
+      type: "table",
+      payload: {
+        columns: ["HTML", "JSX"],
+        rows: [["class", "className"]],
+      },
+    },
+    {
+      id: "process",
+      title: "Passaggi per creare una pagina",
+      type: "list",
+      payload: { items: ["Definisci la struttura", "Aggiungi i contenuti"] },
+    },
+    {
+      id: "concepts",
+      title: "Elementi semantici",
+      type: "list",
+      payload: {
+        items: [
+          "<header> → introduce la pagina",
+          "<main> → contiene il contenuto principale",
+          "<footer> → chiude la pagina",
+        ],
+      },
+    },
+  ];
+
+  const html = render(createElement(InfographicSections, { sections }));
+  for (const text of [
+    "cronologia",
+    "Proposta",
+    "Nasce il Web.",
+    "confronto",
+    "HTML",
+    "className",
+    "procedura",
+    "Definisci la struttura",
+    "mappa di concetti",
+    "Elementi semantici",
+    "introduce la pagina",
+  ]) {
+    assert.ok(html.includes(text), `Manca il contenuto/layout: ${text}`);
+  }
+  assert.doesNotMatch(html, /Ecosistema Web: Bento Grid|HTML Standard|CSS Grid|60fps/);
+});
