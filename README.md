@@ -107,6 +107,8 @@ La migrazione `0015_visual_grids.sql` crea le griglie visive con lettura pubblic
 
 La migrazione `0016_excalidraw_grids.sql` abilita la creazione delle griglie Excalidraw nel catalogo; non modifica le griglie esistenti. Va applicata prima di distribuire la versione dell'app che le crea.
 
+La migrazione `0017_seed_web_foundations.sql` aggiunge il nodo e il percorso guidato **Professioni e infrastruttura del Web**. Il percorso introduce i ruoli professionali, distingue server fisico e software, e spiega data center, server farm, bilanciamento, reti e modelli cloud. Nella pagina **AI nel Web Dev** sono inoltre disponibili i fondamenti degli LLM, i framework di prompt e le applicazioni AI nei prodotti e nel lavoro. La configurazione è in `src/notebooks/configs/webFoundationsConfig.js`; lo script `scripts/generate-notebook-migration.js` genera la migrazione 0017 insieme alla migrazione originale 0010, quindi non rigenerarle dopo averle applicate.
+
 I blocchi rimangono nel JSON della rispettiva sezione; il salvataggio verifica `updated_at` per evitare di sovrascrivere cambiamenti avvenuti in un'altra scheda. In caso di conflitto la bozza rimane nell'editor: si possono aggiornare i dati senza perderla e, se il blocco interessato non è cambiato, riprovare il salvataggio. Se invece è cambiato, confrontare e copiare la bozza prima di annullare. Le immagini già salvate non vengono eliminate automaticamente dallo storage quando si rimuove o sostituisce un blocco, perché potrebbero essere ancora utilizzate altrove.
 
 ## Script

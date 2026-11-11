@@ -7,6 +7,7 @@ const loaders = {
   "dentro-il-pc": () => import("./configs/dentroIlPcConfig.js"),
   "sistema-operativo": () => import("./configs/sistemaOperativoConfig.js"),
   "linguaggi-programmazione": () => import("./configs/linguaggiProgrammazioneConfig.js"),
+  "web-foundations": () => import("./configs/webFoundationsConfig.js"),
 };
 
 const notebookCatalog = [
@@ -56,6 +57,14 @@ const notebookCatalog = [
     description:
       "Segui il percorso dal codice sorgente alle strategie di compilazione, ai runtime e alle istruzioni eseguite dalla CPU.",
     nodeLabel: "Linguaggi Backend Multiparadigma",
+    parentLabel: null,
+  },
+  {
+    slug: "web-foundations",
+    title: "Professioni e infrastruttura del Web",
+    description:
+      "Conosci i ruoli di un team Web e segui le richieste dai server ai data center, alle server farm e ai servizi cloud.",
+    nodeLabel: "Professioni e infrastruttura del Web",
     parentLabel: null,
   },
 ];

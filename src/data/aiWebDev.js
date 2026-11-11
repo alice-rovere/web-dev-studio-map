@@ -153,6 +153,131 @@ export const tokenConcepts = [
   },
 ];
 
+export const aiFoundations = [
+  {
+    title: "Modello, prodotto e interfaccia",
+    description:
+      "Un modello è il sistema addestrato che produce risultati; un'interfaccia come ChatGPT è il prodotto attraverso cui una persona può usarlo. Un'applicazione può anche chiamare il modello tramite API.",
+  },
+  {
+    title: "Come genera testo un LLM",
+    description:
+      "Un Large Language Model elabora il contesto in token e stima quali token possano seguire. Genera il testo un passo alla volta: è un processo probabilistico, non una ricerca automatica della risposta vera.",
+  },
+  {
+    title: "Addestramento e generazione",
+    description:
+      "Durante l'addestramento il modello apprende regolarità dai dati. Quando risponde, usa il contesto ricevuto e i parametri di generazione: normalmente non sta riaddestrando il proprio modello.",
+  },
+  {
+    title: "Temperatura e variabilità",
+    description:
+      "La temperatura influenza quanto la scelta dei token è concentrata o variabile. Valori più bassi tendono a rendere le risposte più prevedibili; non garantiscono accuratezza e la scala dipende dal provider.",
+  },
+  {
+    title: "Limiti e verifica",
+    description:
+      "Un modello può produrre informazioni plausibili ma inesatte (talvolta dette allucinazioni), perdere dettagli o non conoscere aggiornamenti recenti. Verifica fatti, codice, fonti e risultati; non trattare la sicurezza del tono come prova di correttezza.",
+  },
+];
+
+export const promptFrameworks = [
+  {
+    name: "RACE",
+    use: "Framework generale",
+    parts: "Role, Action, Context, Execution / Example",
+    description:
+      "Indica il ruolo, il compito, il contesto e il formato o un esempio del risultato atteso.",
+  },
+  {
+    name: "CRAFT",
+    use: "Scrittura e comunicazione",
+    parts: "Context, Role, Action, Format, Tone",
+    description:
+      "Aggiunge formato e tono per adattare email, post e altri contenuti a un contesto e a un pubblico.",
+  },
+  {
+    name: "TAG",
+    use: "Attività tecniche",
+    parts: "Task, Action, Goal",
+    description:
+      "Definisce il problema, l'azione da svolgere e il risultato desiderato.",
+  },
+  {
+    name: "APE",
+    use: "Marketing e branding",
+    parts: "Action, Purpose, Example",
+    description:
+      "Specifica cosa produrre, perché serve e un esempio che orienti il risultato.",
+  },
+  {
+    name: "CASPER",
+    use: "UI, Web design e prototipazione",
+    parts: "Context, Audience, Style, Platforms, Elements, Requirements",
+    description:
+      "Descrive il prodotto, le persone che lo useranno, lo stile, le piattaforme, gli elementi richiesti e i vincoli.",
+  },
+];
+
+export const promptTypes = [
+  {
+    name: "Zero-shot",
+    description:
+      "Chiedi direttamente il risultato senza fornire esempi. È un buon punto di partenza per richieste semplici e ben specificate.",
+  },
+  {
+    name: "Few-shot",
+    description:
+      "Aggiungi uno o più esempi di input e output per chiarire il formato o lo stile desiderato. Gli esempi devono essere pertinenti al compito.",
+  },
+  {
+    name: "Istruzioni di sistema e utente",
+    description:
+      "Le istruzioni di sistema definiscono regole e comportamento dell'applicazione; il messaggio utente descrive la richiesta specifica. La gestione effettiva dipende dall'API e dal provider.",
+  },
+];
+
+export const aiProductApplications = [
+  {
+    title: "Assistenti e chatbot",
+    description:
+      "Rispondono in linguaggio naturale usando un modello; per informazioni specifiche possono aver bisogno di dati e documentazione forniti dall'applicazione.",
+  },
+  {
+    title: "Analisi e sintesi dei contenuti",
+    description:
+      "Un'app può riassumere testi o media, estrarre elementi rilevanti e aiutare a esplorare grandi quantità di contenuti.",
+  },
+  {
+    title: "Suggerimenti personalizzati",
+    description:
+      "Il modello può generare proposte o contenuti adattati alla richiesta; l'app deve definire quali dati usare e come verificare le risposte.",
+  },
+  {
+    title: "Esperienze guidate",
+    description:
+      "Un sistema può simulare un interlocutore, per esempio durante un colloquio di pratica, chiarendo limiti e natura simulata dell'interazione.",
+  },
+];
+
+export const aiDevelopmentWork = [
+  {
+    title: "Un supporto al lavoro quotidiano",
+    description:
+      "Chat, autocompletamento e strumenti integrati nell'IDE possono aiutare con spiegazioni, bozze, debug e revisione del codice. Il risultato va verificato nel contesto del progetto.",
+  },
+  {
+    title: "Le basi restano importanti",
+    description:
+      "Conoscere HTML, CSS, JavaScript, reti e architettura permette di valutare le proposte, trovare errori e scegliere una soluzione adatta, invece di accettare codice che non si comprende.",
+  },
+  {
+    title: "Cambiano le attività, resta la responsabilità",
+    description:
+      "L'AI può accelerare alcuni compiti ma non conosce automaticamente requisiti, vincoli e impatto del prodotto. Chi sviluppa resta responsabile di decisioni, qualità, sicurezza e manutenzione.",
+  },
+];
+
 export const aiTools = [
   {
     name: "OpenRouter",

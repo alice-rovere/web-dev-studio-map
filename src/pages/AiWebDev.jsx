@@ -12,12 +12,17 @@ import PageTabs from "../components/navigation/PageTabs";
 import {
   agentFileExample,
   agentFileSections,
+  aiFoundations,
+  aiDevelopmentWork,
+  aiProductApplications,
   aiSecurityPractices,
   aiTools,
   openSpecCommands,
   openSpecFlow,
   openSpecTree,
+  promptFrameworks,
   promptBestPractices,
+  promptTypes,
   promptTemplates,
   resources,
   tokenConcepts,
@@ -84,6 +89,37 @@ function PracticeList({ items }) {
 
 const TABS = [
   {
+    id: "fondamenti",
+    label: "Fondamenti AI",
+    content: (
+      <section aria-labelledby="ai-foundations-title" className="space-y-4">
+        <Card>
+          <SectionTitle id="ai-foundations-title">
+            Modelli linguistici: cosa succede dietro una risposta
+          </SectionTitle>
+          <p className="text-slate-300 text-sm leading-relaxed">
+            Un LLM genera testo a partire da un contesto e da scelte
+            probabilistiche. È uno strumento utile, ma una risposta fluida non è
+            una garanzia che i fatti siano corretti.
+          </p>
+          <div className="grid grid-cols-1 gap-4 pt-2 sm:grid-cols-2">
+            {aiFoundations.map(({ title, description }) => (
+              <article
+                key={title}
+                className="h-full rounded-lg border border-slate-800 bg-slate-950 p-4 space-y-2"
+              >
+                <h4 className="text-sm font-semibold text-white">{title}</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {description}
+                </p>
+              </article>
+            ))}
+          </div>
+        </Card>
+      </section>
+    ),
+  },
+  {
     id: "prompt",
     label: "Prompt",
     content: (
@@ -110,6 +146,52 @@ const TABS = [
                 <p className="text-xs text-indigo-300 leading-relaxed">{tip}</p>
               </article>
             ))}
+          </div>
+          <div className="space-y-3 pt-3">
+            <h4 className="text-sm font-semibold text-white">
+              Modi di impostare una richiesta
+            </h4>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {promptTypes.map(({ name, description }) => (
+                <article
+                  key={name}
+                  className="rounded-lg border border-slate-800 bg-slate-950 p-4 space-y-2"
+                >
+                  <h5 className="font-mono text-sm font-bold text-indigo-300">
+                    {name}
+                  </h5>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    {description}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-3 pt-3">
+            <h4 className="text-sm font-semibold text-white">
+              Framework di prompt
+            </h4>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {promptFrameworks.map(({ name, use, parts, description }) => (
+                <article
+                  key={name}
+                  className="rounded-lg border border-slate-800 bg-slate-950 p-4 space-y-2"
+                >
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <h5 className="font-mono text-sm font-bold text-indigo-300">
+                      {name}
+                    </h5>
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-cyan-500">
+                      {use}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-200">{parts}</p>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    {description}
+                  </p>
+                </article>
+              ))}
+            </div>
           </div>
         </Card>
       </section>
@@ -228,6 +310,70 @@ const TABS = [
             </Card>
           ))}
         </div>
+      </section>
+    ),
+  },
+  {
+    id: "applicazioni",
+    label: "AI nei prodotti",
+    content: (
+      <section aria-labelledby="ai-applications-title" className="space-y-4">
+        <Card>
+          <SectionTitle id="ai-applications-title">
+            Funzionalità AI nelle applicazioni Web
+          </SectionTitle>
+          <p className="text-slate-300 text-sm leading-relaxed">
+            Un&apos;app può integrare un modello tramite API per creare funzioni
+            intelligenti. Il modello non sostituisce le regole applicative:
+            l&apos;app deve gestire input, dati, errori, sicurezza e verifica dei
+            risultati.
+          </p>
+          <div className="grid grid-cols-1 gap-4 pt-2 sm:grid-cols-2">
+            {aiProductApplications.map(({ title, description }) => (
+              <article
+                key={title}
+                className="h-full rounded-lg border border-slate-800 bg-slate-950 p-4 space-y-2"
+              >
+                <h4 className="text-sm font-semibold text-white">{title}</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {description}
+                </p>
+              </article>
+            ))}
+          </div>
+          <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4">
+            <h4 className="text-sm font-semibold text-amber-200">
+              Accorgimenti per chi sviluppa
+            </h4>
+            <PracticeList
+              items={[
+                "Chiama i provider tramite un backend: non esporre la chiave API nel browser.",
+                "Definisci limiti di costo e richieste, timeout e gestione degli errori.",
+                "Invia solo i dati necessari e informa le persone sull'uso dei loro contenuti.",
+                "Valida gli output prima di usarli per azioni o decisioni nell'app.",
+                "Mantieni verifiche e responsabilità umane dove un errore può avere conseguenze.",
+              ]}
+            />
+          </div>
+        </Card>
+        <Card>
+          <SectionTitle id="ai-work-title">
+            AI e lavoro nello sviluppo Web
+          </SectionTitle>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {aiDevelopmentWork.map(({ title, description }) => (
+              <article
+                key={title}
+                className="rounded-lg border border-slate-800 bg-slate-950 p-4 space-y-2"
+              >
+                <h4 className="text-sm font-semibold text-white">{title}</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {description}
+                </p>
+              </article>
+            ))}
+          </div>
+        </Card>
       </section>
     ),
   },
