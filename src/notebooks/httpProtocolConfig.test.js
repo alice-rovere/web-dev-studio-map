@@ -3,7 +3,7 @@ import test from "node:test";
 import config from "./configs/httpProtocolConfig.js";
 import { getNotebookCatalog, hasNotebook, loadNotebookConfig } from "./registry.js";
 
-test("l'indice elenca i sette appunti con la posizione nella mappa", () => {
+test("l'indice elenca gli otto appunti con la posizione nella mappa", () => {
   const catalog = getNotebookCatalog();
   assert.ok(catalog.every(({ slug }) => hasNotebook(slug)));
   assert.deepEqual(catalog.map((notebook) => notebook.slug), [
@@ -13,7 +13,8 @@ test("l'indice elenca i sette appunti con la posizione nella mappa", () => {
     "http-protocol",
     "prisma-orm",
     "linguaggi-programmazione",
-    "web-foundations",
+    "web-professions",
+    "web-infrastructure",
   ]);
   assert.deepEqual(
     catalog.map(({ nodeLabel, parentLabel }) => [nodeLabel, parentLabel]),
@@ -24,7 +25,8 @@ test("l'indice elenca i sette appunti con la posizione nella mappa", () => {
       ["HTTP & Protocolli Web", "Internet & Browser"],
       ["Prisma ORM", "Librerie ORM & ODM (Prisma, Mongoose)"],
       ["Linguaggi Backend Multiparadigma", null],
-      ["Professioni e infrastruttura del Web", null],
+      ["Professioni nel Web", null],
+      ["Server e infrastruttura Web", null],
     ],
   );
   assert.ok(catalog.every(({ title, description }) => title && description));

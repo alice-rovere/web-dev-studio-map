@@ -52,17 +52,17 @@ function CodePanel({ panel }) {
   );
 }
 
-function TablePanel({ panel }) {
+function TablePanel({ panel, readable }) {
   const highlighted = new Set(panel.highlightRows ?? []);
 
   return (
     <div className="nodrag nowheel overflow-x-auto rounded-md border border-cyan-500/20 bg-black/50">
-      <table className="w-full border-collapse font-mono text-[11px]">
+      <table className={`w-full border-collapse ${readable ? "text-sm" : "font-mono text-[11px]"}`}>
         <thead>
-          <tr className="text-left text-fuchsia-300">
+          <tr className={`text-left ${readable ? "text-fuchsia-200" : "text-fuchsia-300"}`}>
             {(panel.columns ?? []).map((column) => (
               <th
-                className="border-b border-cyan-500/20 px-2 py-1.5 font-semibold"
+                className="border-b border-cyan-500/20 px-3 py-2 font-semibold"
                 key={column}
               >
                 {column}
@@ -76,12 +76,17 @@ function TablePanel({ panel }) {
               className={
                 highlighted.has(rowIndex)
                   ? "bg-cyan-400/15 text-cyan-100"
-                  : "text-zinc-400"
+                  : readable
+                    ? "text-zinc-300"
+                    : "text-zinc-400"
               }
               key={rowIndex}
             >
               {row.map((cell, cellIndex) => (
-                <td className="whitespace-nowrap px-2 py-1.5" key={cellIndex}>
+                <td
+                  className={`px-3 py-2 align-top ${readable ? "whitespace-normal leading-relaxed" : "whitespace-nowrap"}`}
+                  key={cellIndex}
+                >
                   {cell}
                 </td>
               ))}
@@ -93,15 +98,15 @@ function TablePanel({ panel }) {
   );
 }
 
-function TextPanel({ panel, compactDiagram }) {
+function TextPanel({ panel, readable }) {
   return (
-    <pre className={`nodrag nowheel overflow-x-auto whitespace-pre-wrap rounded-md border border-fuchsia-500/20 bg-black/50 p-3 text-zinc-300 ${compactDiagram ? "font-sans text-sm leading-6" : "font-mono text-[11px] leading-5"}`}>
+    <pre className={`nodrag nowheel overflow-x-auto whitespace-pre-wrap rounded-md border border-fuchsia-500/20 bg-black/50 p-4 text-zinc-300 ${readable ? "font-sans text-sm leading-7" : "font-mono text-[11px] leading-5"}`}>
       {panel.content}
     </pre>
   );
 }
 
-function Panel({ panel, compactDiagram }) {
+function Panel({ panel, readable }) {
   const Body =
     panel.kind === "table"
       ? TablePanel
@@ -115,7 +120,7 @@ function Panel({ panel, compactDiagram }) {
         <span>{panel.label}</span>
         {panel.language && <span className="text-fuchsia-400">{panel.language}</span>}
       </div>
-      <Body panel={panel} compactDiagram={compactDiagram} />
+      <Body panel={panel} readable={readable} />
     </div>
   );
 }
@@ -183,10 +188,13 @@ export default function VisualNotebookLayout({ config, onClose }) {
   }
 
   const progress = ((stepIndex + 1) / steps.length) * 100;
+  const focused = config.displayMode === "focus";
   const Illustration = ILLUSTRATIONS[currentStep.illustration];
   const compactDiagram = ["computer-system", "operating-system", "language-execution"].includes(currentStep.illustration);
   const scrollWithIllustration = currentStep.illustration === "language-execution";
-  const visiblePhases = compactDiagram
+  const visiblePhases = focused
+    ? phases.filter((phase) => phase.id === currentStep.phase)
+    : compactDiagram
     ? phases.filter((phase) => phase.id === currentStep.phase)
     : phases;
   const closeExplorer = () => {
@@ -332,7 +340,7 @@ export default function VisualNotebookLayout({ config, onClose }) {
             </div>
           )}
 
-          {!Illustration && currentStep.illustration === "generic" && (
+          {!focused && !Illustration && currentStep.illustration === "generic" && (
             <div aria-label="Schema delle fasi" className="flex shrink-0 items-center gap-2 overflow-x-auto px-4 pt-3">
               {phases.map((phase, index) => {
                 const Icon = PHASE_ICONS[phase.icon] ?? Code2;
@@ -381,9 +389,21 @@ export default function VisualNotebookLayout({ config, onClose }) {
                       <p className="font-mono text-[10px] text-zinc-500">{phase.hint}</p>
                     </div>
                   </div>
-                  {shown ? (
+                  {focused ? (
+                    currentStep.panels.map((panel, index) => (
+                      <Panel
+                        key={`${currentStep.id}-${index}`}
+                        panel={panel}
+                        readable
+                      />
+                    ))
+                  ) : shown ? (
                     shown.panels.map((panel, index) => (
-                      <Panel key={`${shown.id}-${index}`} panel={panel} compactDiagram={compactDiagram} />
+                      <Panel
+                        key={`${shown.id}-${index}`}
+                        panel={panel}
+                        readable={compactDiagram}
+                      />
                     ))
                   ) : (
                     <p className="font-mono text-[11px] text-zinc-600">In attesa…</p>

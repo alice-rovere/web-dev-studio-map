@@ -7,7 +7,8 @@ const loaders = {
   "dentro-il-pc": () => import("./configs/dentroIlPcConfig.js"),
   "sistema-operativo": () => import("./configs/sistemaOperativoConfig.js"),
   "linguaggi-programmazione": () => import("./configs/linguaggiProgrammazioneConfig.js"),
-  "web-foundations": () => import("./configs/webFoundationsConfig.js"),
+  "web-professions": () => import("./configs/webProfessionsConfig.js"),
+  "web-infrastructure": () => import("./configs/webInfrastructureConfig.js"),
 };
 
 const notebookCatalog = [
@@ -60,11 +61,19 @@ const notebookCatalog = [
     parentLabel: null,
   },
   {
-    slug: "web-foundations",
-    title: "Professioni e infrastruttura del Web",
+    slug: "web-professions",
+    title: "Professioni nel Web",
     description:
-      "Conosci i ruoli di un team Web e segui le richieste dai server ai data center, alle server farm e ai servizi cloud.",
-    nodeLabel: "Professioni e infrastruttura del Web",
+      "Scopri cosa fanno frontend e backend developer, designer, QA, DevOps e sistemisti e come collaborano in un progetto.",
+    nodeLabel: "Professioni nel Web",
+    parentLabel: null,
+  },
+  {
+    slug: "web-infrastructure",
+    title: "Server e infrastruttura Web",
+    description:
+      "Distingui server e web server e scopri data center, server farm, bilanciamento, continuità del servizio e cloud.",
+    nodeLabel: "Server e infrastruttura Web",
     parentLabel: null,
   },
 ];
