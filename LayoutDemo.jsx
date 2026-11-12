@@ -2,9 +2,7 @@ import { useState } from "react";
 import GlossaryText from "./src/components/glossary/GlossaryText";
 
 export function BentoGridInfographic({ children }) {
-  return (
-    <div className="grid gap-3 sm:grid-cols-2">{children}</div>
-  );
+  return <div className="grid gap-3 sm:grid-cols-2">{children}</div>;
 }
 
 export function SplitScreenInfographic({ columns, rows }) {
@@ -51,7 +49,10 @@ export function FlowchartInfographic({ items }) {
               {String(index + 1).padStart(2, "0")}
             </span>
             {index < items.length - 1 && (
-              <span aria-hidden="true" className="my-1 w-px grow bg-emerald-400/30" />
+              <span
+                aria-hidden="true"
+                className="my-1 w-px grow bg-emerald-400/30"
+              />
             )}
           </div>
           <p className="mb-2 min-w-0 flex-1 rounded-lg border border-slate-700/70 bg-slate-950/60 p-3 text-sm leading-6 text-slate-200 wrap-break-word">
@@ -69,7 +70,7 @@ export function InteractiveRadialInfographic({ title, items }) {
   const radius = 39;
 
   return (
-    <div className="mx-auto aspect-square w-full max-w-[28rem]">
+    <div className="mx-auto aspect-square w-full max-w-md">
       <div className="relative h-full w-full">
         <div
           aria-hidden="true"
@@ -105,7 +106,7 @@ export function InteractiveRadialInfographic({ title, items }) {
           return (
             <button
               aria-pressed={isSelected}
-              className={`absolute z-20 flex h-16 w-24 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-xl border px-2 text-center transition-colors sm:h-[4.5rem] sm:w-28 ${isSelected ? "border-orange-400 bg-slate-800" : "border-slate-700 bg-slate-900 hover:border-orange-400/60"}`}
+              className={`absolute z-20 flex h-16 w-24 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-xl border px-2 text-center transition-colors sm:h-18 sm:w-28 ${isSelected ? "border-orange-400 bg-slate-800" : "border-slate-700 bg-slate-900 hover:border-orange-400/60"}`}
               key={`${item.title}-${index}`}
               onClick={() => setSelectedIndex(isSelected ? null : index)}
               style={{ left: `${left}%`, top: `${top}%` }}

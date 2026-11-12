@@ -67,17 +67,17 @@ const TABS = [
           Cosa significa “bombardare” un server?
         </h3>
         <p className="text-slate-300 text-sm leading-relaxed">
-          In genere ci si riferisce a un attacco denial of service (DoS), o
-          DDoS quando il traffico proviene da più sistemi: il servizio può
-          diventare lento o irraggiungibile. Generare traffico contro sistemi
-          senza permesso può danneggiare servizi e utenti ed è illegale.
+          In genere ci si riferisce a un attacco denial of service (DoS), o DDoS
+          quando il traffico proviene da più sistemi: il servizio può diventare
+          lento o irraggiungibile. Generare traffico contro sistemi senza
+          permesso può danneggiare servizi e utenti ed è illegale.
         </p>
         <p className="text-slate-300 text-sm leading-relaxed">
           Per imparare a misurare le prestazioni, usa test di carico solo su
           applicazioni locali o infrastrutture per cui hai un’autorizzazione
           esplicita. Concorda prima obiettivo e limiti, aumenta il carico in
-          modo controllato, monitora il sistema e interrompi il test se
-          emergono anomalie.
+          modo controllato, monitora il sistema e interrompi il test se emergono
+          anomalie.
         </p>
       </section>
     ),
@@ -110,6 +110,66 @@ const TABS = [
           <li className="leading-relaxed">
             Testa solo sistemi tuoi o coperti da un’autorizzazione scritta che
             definisca chiaramente perimetro e metodi consentiti.
+          </li>
+        </ol>
+      </section>
+    ),
+  },
+
+  {
+    id: "owasp",
+    label: "Owasp 10",
+    content: (
+      <section
+        aria-labelledby="security-practice-title"
+        className="space-y-4 rounded-xl border border-slate-800 bg-slate-900 p-4 sm:p-6"
+      >
+        <h3
+          id="security-practice-title"
+          className="border-b border-slate-800 pb-2 text-lg font-bold text-white sm:text-xl"
+        >
+          Owasp Top 10
+        </h3>
+        <p>Raggruppa i rischi di sicurezza più critici per le web app.</p>
+        <ol className="list pl-5 space-y-4 text-slate-300 text-sm">
+          <li className="leading-relaxed">
+            A01 BROKEN ACCESS CONTROL, mancato controllo dei permessi.
+          </li>
+          <li className="leading-relaxed">
+            A02 SECURITY MISCONFIGURATION, errori di configurazione. es.
+            password di default nel server, mostrare errori troppo dettagliati.
+          </li>
+          <li className="leading-relaxed">
+            A03 SOFTWARE SUPPLY CHAIN FAILURES, problemi nella catena del
+            software. usare librerie Third parties, plug-in, docker compromessi
+            o contenenti virus.
+          </li>
+          <li className="leading-relaxed">
+            A04 CRYPTOGRAPHIC FAILURES, errori crittografici. Salvare password
+            nel db in chiaro, trasmettere dati sensibili senza protezione HTTPS.
+          </li>
+          <li className="leading-relaxed">
+            A05 INJECTION/iniezione di codice. SQL injection o cross-site
+            scripting
+          </li>
+          <li className="leading-relaxed">
+            A06 INSECURE DESIGN, errori di progettazione iniziali.
+          </li>
+          <li className="leading-relaxed">
+            A07 AUTHENTICATION FAILURES, gestione errata dei cookies, non
+            bloccare i tentativi ripetuti di accesso (attacchi brute force)
+          </li>
+          <li className="leading-relaxed">
+            A08 SOFTWARE or DATA INTEGRITY FAILURES, mancanza di verifica
+            dell'integrità, elaborazione dati senza verifiche sulla fonte.
+          </li>
+          <li className="leading-relaxed">
+            A09 SECURITY LOGGING AND ALERTING FAILURES, non salvare traccia di
+            ciò che accade sul server.
+          </li>
+          <li className="leading-relaxed">
+            A10 MISHANDLING OF EXCEPTIONAL CONDITIONS, quando il codice va in
+            crash.
           </li>
         </ol>
       </section>

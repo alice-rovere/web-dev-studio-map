@@ -78,13 +78,6 @@ const SkillMapContent = () => {
   const [pendingFocus, setPendingFocus] = useState(null);
   const resetViewOnCloseRef = useRef(false);
 
-  useEffect(() => {
-    window.dispatchEvent(new CustomEvent("devskillmap:chat-selection", {
-      detail: activeKnowledgeId ?? selectedNodeId,
-    }));
-    return () => window.dispatchEvent(new CustomEvent("devskillmap:chat-selection", { detail: null }));
-  }, [activeKnowledgeId, selectedNodeId]);
-
   const handleOpenKnowledge = useCallback((nodeId) => {
     setPendingFocus(null);
     setActiveKnowledgeId(nodeId);
