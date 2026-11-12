@@ -190,7 +190,23 @@ function InfographicStep({ section, index }) {
       />
     );
   } else if (layout.type === "flow") {
-    content = <FlowchartInfographic items={layout.items} />;
+    content = (
+      <div className="space-y-4">
+        <FlowchartInfographic items={layout.items} />
+        {layout.supportingBlocks.length > 0 && (
+          <BentoGridInfographic>
+            {layout.supportingBlocks.map((block, blockIndex) => (
+              <div
+                className="min-w-0 rounded-xl border border-slate-700/70 bg-slate-950/50 p-3 sm:p-4"
+                key={block.id ?? `${block.type}-${blockIndex}`}
+              >
+                <InfographicBlock block={block} />
+              </div>
+            ))}
+          </BentoGridInfographic>
+        )}
+      </div>
+    );
   } else if (layout.type === "radial") {
     content = (
       <InteractiveRadialInfographic
@@ -251,6 +267,28 @@ function InfographicStep({ section, index }) {
 }
 
 function getSectionLayout(section, blocks) {
+  const processBlockIndex = blocks.findIndex((block) => {
+    const items = block.payload?.items;
+    return (
+      block.type === "list" &&
+      Array.isArray(items) &&
+      items.length > 1 &&
+      isProcessList(section, items)
+    );
+  });
+
+  if (processBlockIndex !== -1) {
+    const processBlock = blocks[processBlockIndex];
+    return {
+      type: "flow",
+      label: "procedura",
+      items: processBlock.payload.items,
+      supportingBlocks: blocks.filter(
+        (_, index) => index !== processBlockIndex,
+      ),
+    };
+  }
+
   if (blocks.length === 1) {
     const [block] = blocks;
     const payload = block.payload ?? {};
@@ -286,9 +324,6 @@ function getSectionLayout(section, blocks) {
       const items = payload.items.filter(
         (item) => typeof item === "string" && item.trim(),
       );
-      if (items.length > 1 && isProcessList(section, items)) {
-        return { type: "flow", label: "procedura", items };
-      }
       if (items.length >= 3 && items.length <= 6) {
         return {
           type: "radial",

@@ -109,6 +109,29 @@ test("the infographic selects layouts from the content structure and uses live d
         ],
       },
     },
+    {
+      id: "request-lifecycle",
+      title: "Percorso di una richiesta HTTP",
+      type: "text",
+      payload: {
+        subtitle: "Sequenza richiesta e risposta",
+        blocks: [
+          {
+            type: "list",
+            payload: {
+              items: [
+                "Passo 1. Il browser prepara la richiesta",
+                "Passo 2. Il server valida e risponde",
+              ],
+            },
+          },
+          {
+            type: "text",
+            payload: { text: "Il body dipende dal metodo e dal tipo di contenuto." },
+          },
+        ],
+      },
+    },
   ];
 
   const html = render(createElement(InfographicSections, { sections }));
@@ -124,6 +147,9 @@ test("the infographic selects layouts from the content structure and uses live d
     "mappa di concetti",
     "Elementi semantici",
     "introduce la pagina",
+    "Percorso di una richiesta HTTP",
+    "Il browser prepara la richiesta",
+    "Il body dipende dal metodo",
   ]) {
     assert.ok(html.includes(text), `Manca il contenuto/layout: ${text}`);
   }

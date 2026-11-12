@@ -78,6 +78,8 @@ La migrazione `0016_excalidraw_grids.sql` abilita la creazione delle griglie Exc
 
 La migrazione `0017_seed_web_foundations.sql` aggiunge i nodi e i percorsi guidati indipendenti **Professioni nel Web** e **Server e infrastruttura Web**. Le configurazioni sono rispettivamente in `src/notebooks/configs/webProfessionsConfig.js` e `src/notebooks/configs/webInfrastructureConfig.js`. Lo script `scripts/generate-notebook-migration.js` genera solo la migrazione 0017; non rigenerare una migrazione già applicata. Nella pagina **AI nel Web Dev** sono inoltre disponibili i fondamenti degli LLM, i framework di prompt e le applicazioni AI nei prodotti e nel lavoro.
 
+La migrazione `0018_seed_web_security_course.sql` aggiunge al nodo `web-security` otto sezioni didattiche originali in italiano e un glossario tecnico, mantenendo gli altri contenuti e non duplicando sezioni omonime. Richiede che il nodo esista già; in questa mappa lo slug è `web-security` e l'etichetta è **web security**.
+
 I blocchi rimangono nel JSON della rispettiva sezione; il salvataggio verifica `updated_at` per evitare di sovrascrivere cambiamenti avvenuti in un'altra scheda. In caso di conflitto la bozza rimane nell'editor: si possono aggiornare i dati senza perderla e, se il blocco interessato non è cambiato, riprovare il salvataggio. Se invece è cambiato, confrontare e copiare la bozza prima di annullare. Le immagini già salvate non vengono eliminate automaticamente dallo storage quando si rimuove o sostituisce un blocco, perché potrebbero essere ancora utilizzate altrove.
 
 ## Script
